@@ -78,7 +78,8 @@ public class Utils {
           Element elem = (Element) current;
           //Print out the attributes of this element
           System.out.println("Investigating the attributes:");
-          System.out.println(elem.getTagName() + " : " + elem.getAttribute("tutId") + " " + elem.getAttribute("type"));
+          System.out.println(elem.getTagName() + " : " + elem.getAttribute("tutId") + " "
+                  + elem.getAttribute("type"));
 
           //Print out the text that exists inside of this element: it doesn't look pretty...
           //and it erases the other elements
