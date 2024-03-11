@@ -76,19 +76,6 @@ public class Event {
     this.time.setEndDay(endDay);
   }
 
-  public String getStartTime() {
-    return this.time.getStartTime();
-  }
-  public DayOfWeek getStartDay() {
-    return this.time.getStartDay();
-  }
-  public String getEndTime() {
-    return this.time.getEndTime();
-  }
-  public DayOfWeek getEndDay() {
-    return this.time.getEndDay();
-  }
-
   /**
    * Sets the location for this event.
    *
