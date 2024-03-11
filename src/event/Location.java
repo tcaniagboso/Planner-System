@@ -22,7 +22,4 @@ public class Location {
     this.location = location;
   }
 
-  public boolean getOnline() {
-    return this.isOnline;
-  }
 }

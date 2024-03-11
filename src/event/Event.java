@@ -1,6 +1,7 @@
 package event;
 
 import java.time.DayOfWeek;
+import java.util.ArrayList;
 import java.util.List;
 
 import user.User;
@@ -13,11 +14,20 @@ public class Event {
   private User host;
   private List<User> invitees;
 
+  public Event() {
+    this.time = new Time();
+    this.location = new Location();
+    this.invitees = new ArrayList<>();
+  }
+
   public String getName() {
     return name;
   }
 
-  public void setName(String name) {
+  public void setName(String name) throws IllegalArgumentException{
+    if (name == null || name.isEmpty()) {
+      throw new IllegalArgumentException("Event name cannot be null or empty");
+    }
     this.name = name;
   }
 
@@ -25,16 +35,10 @@ public class Event {
     return time;
   }
 
-  public void setStartTime(String startTime) {
+  public void setEventTimes(String startTime, String startDay, String endTime, String endDay) {
     this.time.setStartTime(startTime);
-  }
-  public void setStartDay(String startDay) {
     this.time.setStartDay(startDay);
-  }
-  public void setEndTime(String endTime) {
     this.time.setEndTime(endTime);
-  }
-  public void setEndDay(String endDay) {
     this.time.setEndDay(endDay);
   }
 
@@ -63,17 +67,16 @@ public class Event {
     return this.location.getLocation();
   }
 
-  public boolean getOnline() {
-    return this.location.getOnline();
-  }
-
-
   public List<User> getInvitees() {
     return invitees;
   }
 
   public void setInvitees(List<User> invitees) {
-    this.invitees = invitees;
+    if (invitees == null || invitees.contains(null)) {
+      throw new IllegalArgumentException("Invitees list cannot be null and cannot " +
+              "contain null elements");
+    }
+    this.invitees = new ArrayList<>(invitees);
   }
 
   public User getHost() {
@@ -81,6 +84,10 @@ public class Event {
   }
 
   public void setHost(User host) {
+    if (host == null) {
+      throw new IllegalArgumentException("Host cannot be null");
+    }
+
     this.host = host;
   }
 }

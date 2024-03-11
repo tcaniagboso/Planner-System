@@ -9,7 +9,7 @@ import event.Event;
 import user.User;
 
 public class NUPlannerSystem implements PlannerSystem{
-  Map<String, User> users;
+  private Map<String, User> users;
 
   public NUPlannerSystem() {
     this.users = new HashMap<>();
