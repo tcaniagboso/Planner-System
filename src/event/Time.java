@@ -45,6 +45,10 @@ public class Time {
 
   public void setEndTime(String endTime) {
     this.validateTime(endTime);
+    if (this.startDay == this.endDay && this.startDay != null && this.startTime.equals(endTime)) {
+      throw new IllegalArgumentException("An event cannot last for more than 6 days 23 hours and "
+              + "59 minutes.");
+    }
     this.endTime = endTime;
   }
 
