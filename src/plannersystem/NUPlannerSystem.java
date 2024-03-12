@@ -91,8 +91,7 @@ public class NUPlannerSystem implements PlannerSystem {
   }
 
   @Override
-  public File saveUserSchedule() {
-    return null;
+  public void saveUserSchedule() {
   }
 
   @Override
@@ -101,12 +100,34 @@ public class NUPlannerSystem implements PlannerSystem {
   }
 
   @Override
-  public void createEvent(Event event, List<String> invitees) {
+  public void createEvent(String name, String startDay, String startTime, String endDay,
+                          String endTime, boolean isOnline, String location, List<User> invitees) {
 
   }
 
   @Override
   public void modifyEvent(Event event) {
+
+  }
+
+  @Override
+  public void modifyEvent(Event event, String name) {
+
+  }
+
+  @Override
+  public void modifyEvent(Event event, String startDay, String startTime, String endDay,
+                          String endTime) {
+
+  }
+
+  @Override
+  public void modifyEvent(Event event, boolean isOnline, String location) {
+
+  }
+
+  @Override
+  public void modifyEvent(Event event, List<User> invitees) {
 
   }
 
@@ -121,7 +142,7 @@ public class NUPlannerSystem implements PlannerSystem {
   }
 
   @Override
-  public void showEvents(String startTime) {
+  public void showEvents(String startDay, String startTime, String endDay, String endTime) {
 
   }
 
