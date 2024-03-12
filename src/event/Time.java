@@ -163,4 +163,9 @@ public class Time {
   public int hashCode() {
     return Objects.hash(startDay, startTime, endDay, endTime);
   }
+
+  public boolean overlap(Time time) {
+    //TODO
+    return false;
+  }
 }

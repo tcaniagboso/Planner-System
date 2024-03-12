@@ -80,8 +80,8 @@ public class NUPlannerSystem implements PlannerSystem {
           User invitee = assignUser(uid);
           try {
             invitee.addEvent(event);
-            event.getInvitees().add(invitee.getUserId());
-          } catch (IOException ignored) {
+            event.addInvitee(invitee);
+          } catch (IllegalArgumentException ignored) {
             // TODO: Maybe throw an exception?
           }
         }
@@ -89,7 +89,6 @@ public class NUPlannerSystem implements PlannerSystem {
       }
     }
   }
-  //implement other methods
 
   @Override
   public File saveUserSchedule() {

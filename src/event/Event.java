@@ -1,15 +1,17 @@
 package event;
 
-import java.time.DayOfWeek;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import user.User;
 
 /**
- * Represents an event with a specific name, time, location, host, and invitees.
- * This class encapsulates all the necessary details for creating and managing an event.
+ * Represents an event, encapsulating details such as the event's name, timing, location,
+ * host, and a list of invitees.
+ * This class provides mechanisms to manage event details including adding and
+ * removing invitees and checking for time overlaps with other events.
  */
 public class Event {
 
@@ -17,16 +19,16 @@ public class Event {
   private Time time;
   private Location location;
   private User host;
-  private List<String> invitees;
+  private Set<User> invitees;
 
   /**
-   * Constructs a new Event with default settings.
-   * Initializes the time, location, and invitees list.
+   * Initializes a new Event instance with default Time and Location settings,
+   * and an empty set of invitees.
    */
   public Event() {
     this.time = new Time();
     this.location = new Location();
-    this.invitees = new ArrayList<>();
+    this.invitees = new HashSet<>();
   }
 
   /**
@@ -98,11 +100,11 @@ public class Event {
   }
 
   /**
-   * Returns the List of String associated with this event.
+   * Returns the Set of Users associated with this event.
    *
-   * @return the list of invitees for this event
+   * @return the set of invitees for this event
    */
-  public List<String> getInvitees() {
+  public Set<User> getInvitees() {
     return invitees;
   }
 
@@ -112,15 +114,15 @@ public class Event {
    * an IllegalArgumentException is thrown. This ensures that the event has a valid
    * list of invitees.
    *
-   * @param invitees the list of String representing the IDs of users invited to the event.
+   * @param invitees the list of Users representing the users invited to the event.
    * @throws IllegalArgumentException if the invitees list is null or contains null elements.
    */
-  public void setInvitees(List<String> invitees) {
+  public void setInvitees(List<User> invitees) {
     if (invitees == null || invitees.contains(null)) {
       throw new IllegalArgumentException("Invitees list cannot be null and cannot "
               + "contain null elements");
     }
-    this.invitees = new ArrayList<>(invitees);
+    this.invitees = new HashSet<>(invitees);
   }
 
   /**
@@ -141,13 +143,69 @@ public class Event {
    * @throws IllegalArgumentException if the host parameter is null.
    */
   public void setHost(User host) {
-    if (host == null) {
-      throw new IllegalArgumentException("Host cannot be null");
-    }
+    this.validateUser(host);
 
     this.host = host;
   }
 
+  /**
+   * Adds a User as an invitee to the event.
+   * Validates that the User is not null before adding.
+   *
+   * @param invitee The user to be added as an invitee to the event.
+   * @throws IllegalArgumentException if the invitee is null.
+   */
+  public void addInvitee(User invitee) {
+    this.validateUser(invitee);
+    this.invitees.add(invitee);
+
+  }
+
+  /**
+   * Removes a User from the event's list of invitees.
+   * Validates that the User is not null before attempting removal.
+   *
+   * @param invitee The user to be removed from the event's invitees.
+   * @throws IllegalArgumentException if the invitee is null.
+   */
+  public void removeInvitee(User invitee) {
+    this.validateUser(invitee);
+    this.invitees.remove(invitee);
+  }
+
+  /**
+   * Validates that a User object is not null.
+   *
+   * @param user The user to validate.
+   * @throws IllegalArgumentException if the user is null.
+   */
+  private void validateUser(User user) {
+    if (user == null) {
+      throw new IllegalArgumentException("User cannot be null");
+    }
+  }
+
+  /**
+   * Checks if this event overlaps in time with another event.
+   * Two events overlap if they have the same time or if their time ranges intersect.
+   *
+   * @param event The event to check for overlap with.
+   * @return true if the events overlap in time, false otherwise.
+   */
+  public boolean overlap(Event event) {
+    return this.equals(event) || this.time.overlap(event.getTime());
+  }
+
+  /**
+   * Compares this event with the specified object for equality. Two events are considered equal
+   * if all their respective fields (name, time, location, invitees, and host) are equal. This
+   * method uses {@link Objects#equals(Object, Object)} for field comparisons to handle nulls
+   * gracefully.
+   *
+   * @param object the object to be compared for equality with this event.
+   * @return true if the specified object is equal to this event based on the criteria defined
+   * above.
+   */
   @Override
   public boolean equals(Object object) {
     if (this == object) {
@@ -164,6 +222,14 @@ public class Event {
             && Objects.equals(this.host, other.getHost());
   }
 
+  /**
+   * Returns a hash code value for this event. The hash code is generated by combining the hash
+   * codes of all the event's fields using {@link Objects#hash(Object...)} method. This ensures that
+   * {@code hashCode} is consistent with {@code equals} as per the contract specified in
+   * {@link Object#hashCode()}.
+   *
+   * @return a hash code value for this event.
+   */
   @Override
   public int hashCode() {
     return Objects.hash(this.name, this.time, this.location, this.invitees, this.host);
