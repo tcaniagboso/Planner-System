@@ -7,7 +7,6 @@ import java.util.List;
 import event.Event;
 
 public class Schedule {
-
   private final String userId;
   private List<Event> events;
   public Schedule(String userId) {

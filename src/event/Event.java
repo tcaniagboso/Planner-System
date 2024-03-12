@@ -16,7 +16,7 @@ public class Event {
   private Time time;
   private Location location;
   private User host;
-  private List<User> invitees;
+  private List<String> invitees;
 
   /**
    * Constructs a new Event with default settings.
@@ -64,16 +64,16 @@ public class Event {
    * Sets the start and end times for the event, including the days.
    * This is a convenience method that sets all time-related fields at once.
    *
-   * @param startTime the start time of the event
    * @param startDay the start day of the event
-   * @param endTime the end time of the event
+   * @param startTime the start time of the event
    * @param endDay the end day of the event
+   * @param endTime the end time of the event
    */
-  public void setEventTimes(String startTime, String startDay, String endTime, String endDay) {
-    this.time.setStartTime(startTime);
+  public void setEventTimes(String startDay, String startTime, String endDay, String endTime) {
     this.time.setStartDay(startDay);
-    this.time.setEndTime(endTime);
+    this.time.setStartTime(startTime);
     this.time.setEndDay(endDay);
+    this.time.setEndTime(endTime);
   }
 
   /**
@@ -97,11 +97,11 @@ public class Event {
   }
 
   /**
-   * Returns the List of User object associated with this event.
+   * Returns the List of String associated with this event.
    *
    * @return the list of invitees for this event
    */
-  public List<User> getInvitees() {
+  public List<String> getInvitees() {
     return invitees;
   }
 
@@ -111,10 +111,10 @@ public class Event {
    * an IllegalArgumentException is thrown. This ensures that the event has a valid
    * list of invitees.
    *
-   * @param invitees the list of User objects representing the users invited to the event.
+   * @param invitees the list of String representing the IDs of users invited to the event.
    * @throws IllegalArgumentException if the invitees list is null or contains null elements.
    */
-  public void setInvitees(List<User> invitees) {
+  public void setInvitees(List<String> invitees) {
     if (invitees == null || invitees.contains(null)) {
       throw new IllegalArgumentException("Invitees list cannot be null and cannot "
               + "contain null elements");

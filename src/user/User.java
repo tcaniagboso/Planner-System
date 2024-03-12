@@ -1,7 +1,5 @@
 package user;
 
-import java.util.Objects;
-
 import event.Event;
 import schedule.Schedule;
 
@@ -13,8 +11,6 @@ public class User {
     this.validateUserID(userId);
     this.userId = userId;
     this.schedule = new Schedule(this.userId);
-
-
   }
 
   // to validate the user ID
