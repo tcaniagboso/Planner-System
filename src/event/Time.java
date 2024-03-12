@@ -4,6 +4,7 @@ import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Objects;
 
 /**
  * Represents time information for an event, including start and end times along with their
@@ -12,9 +13,9 @@ import java.time.format.DateTimeParseException;
 public class Time {
 
   private DayOfWeek startDay;
-  private String startTime;
+  private LocalTime startTime;
   private DayOfWeek endDay;
-  private String endTime;
+  private LocalTime endTime;
 
 
   /**
@@ -43,7 +44,7 @@ public class Time {
    *
    * @return A string representing the start time in HHmm format.
    */
-  public String getStartTime() {
+  public LocalTime getStartTime() {
     return startTime;
   }
 
@@ -56,8 +57,7 @@ public class Time {
    *                                  HHmm format.
    */
   public void setStartTime(String startTime) {
-    this.validateTime(startTime);
-    this.startTime = startTime;
+    this.startTime = this.validateTime(startTime);;
   }
 
   /**
@@ -86,7 +86,7 @@ public class Time {
    *
    * @return A string representing the end time in HHmm format.
    */
-  public String getEndTime() {
+  public LocalTime getEndTime() {
     return endTime;
   }
 
@@ -101,12 +101,11 @@ public class Time {
    *                                  HHmm format or violates event duration constraints.
    */
   public void setEndTime(String endTime) {
-    this.validateTime(endTime);
     if (this.startDay == this.endDay && this.startDay != null && this.startTime.equals(endTime)) {
       throw new IllegalArgumentException("An event cannot last for more than 6 days 23 hours and "
               + "59 minutes.");
     }
-    this.endTime = endTime;
+    this.endTime = this.validateTime(endTime);
   }
 
   /**
@@ -115,10 +114,13 @@ public class Time {
    * @param timeString The time string to validate.
    * @throws IllegalArgumentException If the time string is not a valid time in HHmm format.
    */
-  private void validateTime(String timeString) {
+  private LocalTime validateTime(String timeString) {
+    if (timeString == null || timeString.length() != 4) {
+      throw new IllegalArgumentException("The chosen time is invalid");
+    }
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HHmm");
     try {
-      LocalTime.parse(timeString, formatter);
+      return LocalTime.parse(timeString, formatter);
     } catch (DateTimeParseException e) {
       throw new IllegalArgumentException(e.getMessage());
     }
@@ -133,10 +135,32 @@ public class Time {
    *                                 {@link DayOfWeek}.
    */
   private DayOfWeek validateDay(String dayString) {
+    if (dayString == null || dayString.isEmpty()) {
+      throw new IllegalArgumentException("The chosen day is invalid");
+    }
     try {
       return DayOfWeek.valueOf(dayString.toUpperCase());
     } catch (IllegalArgumentException e) {
       throw new IllegalArgumentException(e.getMessage());
     }
+  }
+
+  @Override
+  public boolean equals(Object object) {
+    if (object == this) {
+      return true;
+    }
+    if (!(object instanceof Time)) {
+      return false;
+    }
+
+    Time other = (Time) object;
+    return this.startTime.equals(other.getStartTime()) && this.endTime.equals(other.getEndTime())
+            && this.startDay.equals(other.getStartDay()) && this.endDay.equals(other.getEndDay());
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(startDay, startTime, endDay, endTime);
   }
 }

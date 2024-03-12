@@ -1,7 +1,6 @@
 package schedule;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import event.Event;
@@ -28,7 +27,8 @@ public class Schedule {
     }
   }
 
-  public void modifyEvent(Event event) {
+  public void modifyEvent(Event event, String name, String startDay, String startTime,
+                          String endDay, String endTime, boolean isOnline, String location) {
   }
 
   public void removeEvent(Event event) {

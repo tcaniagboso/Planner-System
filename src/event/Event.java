@@ -3,6 +3,7 @@ package event;
 import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import user.User;
 
@@ -146,4 +147,26 @@ public class Event {
 
     this.host = host;
   }
+
+  @Override
+  public boolean equals(Object object) {
+    if (this == object) {
+      return true;
+    }
+    if (!(object instanceof Event)) {
+      return false;
+    }
+    Event other = (Event) object;
+    return Objects.equals(this.name, other.getName())
+            && Objects.equals(this.time, other.getTime())
+            && Objects.equals(this.location, other.getLocation())
+            && Objects.equals(this.invitees, other.getInvitees())
+            && Objects.equals(this.host, other.getHost());
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(this.name, this.time, this.location, this.invitees, this.host);
+  }
+
 }

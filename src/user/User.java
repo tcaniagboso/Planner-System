@@ -32,8 +32,10 @@ public class User {
     this.schedule.addEvent(event);
   }
 
-  public void modifyEvent(Event event) {
-    this.schedule.modifyEvent(event);
+  public void modifyEvent(Event event, String name, String startDay, String startTime,
+                          String endDay, String endTime, boolean isOnline, String location) {
+    this.schedule.modifyEvent(event, name, startDay, startTime, endDay, endTime, isOnline,
+            location);
   }
 
   public void removeEvent(Event event) {
