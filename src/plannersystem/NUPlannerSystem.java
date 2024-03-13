@@ -20,6 +20,7 @@ import java.util.Map;
 import event.Event;
 import user.User;
 
+//TODO make plannerSystem more user friendly by changing list of users to list of strings for methods
 public class NUPlannerSystem implements PlannerSystem {
   private final Map<String, User> users;
 
