@@ -12,23 +12,25 @@ public interface PlannerSystem {
 
   void saveUserSchedule();
 
-  String displayUserSchedule(String userID);
+  String displayUserSchedule(String userId);
 
-  void createEvent(String userID, String name, String startDay, String startTime, String endDay,
+  void createEvent(String userId, String name, String startDay, String startTime, String endDay,
                    String endTime, boolean isOnline, String location, List<User> invitees);
 
-  void modifyEvent(String userID, Event event);
+  void modifyEvent(String userId, Event event, String name, String startDay, String startTime,
+                   String endDay, String endTime, boolean isOnline, String location,
+                   List<User> invitees);
 
-  void modifyEvent(String userID, Event event, String name);
+  void modifyEvent(String userId, Event event, String name);
 
-  void modifyEvent(String userID, Event event, String startDay, String startTime, String endDay,
+  void modifyEvent(String userId, Event event, String startDay, String startTime, String endDay,
                    String endTime);
 
-  void modifyEvent(String userID, Event event, boolean isOnline, String location);
+  void modifyEvent(String userId, Event event, boolean isOnline, String location);
 
-  void modifyEvent(String userID, Event event, List<User> invitees);
+  void modifyEvent(String userId, Event event, List<User> invitees);
 
-  void removeEvent(String userID, Event event);
+  void removeEvent(String userId, Event event);
 
   void automaticScheduling(String time);
 

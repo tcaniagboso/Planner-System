@@ -13,7 +13,7 @@ import schedule.Schedule;
  */
 public class User {
   private final String userId; // Represents the ID of the user.
-  private Schedule schedule; // Represents the schedule of the user.
+  private final Schedule schedule; // Represents the schedule of the user.
 
   /**
    * Constructs a new User instance with the specified user ID.
@@ -86,6 +86,63 @@ public class User {
                           List<User> invitees) {
     this.schedule.modifyEvent(event, name, startDay, startTime, endDay, endTime, isOnline,
             location, invitees);
+  }
+
+  /**
+   * Updates the name of the specified event.
+   * Validates that the event is not null and exists in the schedule before setting its new name.
+   *
+   * @param event The event to be modified.
+   * @param name The new name to assign to the event.
+   * @throws IllegalArgumentException if the event is null or does not exist in the schedule.
+   */
+  public void modifyEvent(Event event, String name) {
+    this.schedule.modifyEvent(event, name);
+  }
+
+  /**
+   * Updates the timing details of the specified event.
+   * Validates that the event is not null and exists in the schedule before setting
+   * its new time.
+   *
+   * @param event The event to be modified.
+   * @param startDay The new start day for the event.
+   * @param startTime The new start time for the event.
+   * @param endDay The new end day for the event.
+   * @param endTime The new end time for the event.
+   * @throws IllegalArgumentException if the event is null or does not exist in the schedule.
+   */
+  public void modifyEvent(Event event, String startDay, String startTime,
+                          String endDay, String endTime) {
+    this.schedule.modifyEvent(event, startDay, startTime, endDay, endDay);
+  }
+
+  /**
+   * Updates the location details of the specified event.
+   * Validates that the event is not null and exists in the schedule before setting
+   * its new location.
+   *
+   * @param event The event to be modified.
+   * @param isOnline Specifies whether the event is online or not.
+   * @param location The new location of the event if it is not online.
+   * @throws IllegalArgumentException if the event is null or does not exist in the schedule.
+   */
+  public void modifyEvent(Event event, boolean isOnline, String location) {
+    this.schedule.modifyEvent(event, isOnline, location);
+  }
+
+  /**
+   * Updates the list of invitees for the specified event.
+   * Validates that the event is not null and exists in the schedule before modifying its
+   * list of invitees.
+   *
+   * @param event The event to be modified.
+   * @param invitees The new list of invitees for the event.
+   * @throws IllegalArgumentException if the event is null, does not exist in the schedule,
+   *                                  or if any of the invitees are null.
+   */
+  public void modifyEvent(Event event, List<User> invitees) {
+    this.schedule.modifyEvent(event, invitees);
   }
 
   /**

@@ -95,39 +95,66 @@ public class NUPlannerSystem implements PlannerSystem {
   }
 
   @Override
-  public String displayUserSchedule(String userID) {
+  public String displayUserSchedule(String userId) {
+    this.validateUserID(userId);
     return null;
   }
 
   @Override
-  public void createEvent(String userId, String name, String startDay, String startTime, String endDay,
-                          String endTime, boolean isOnline, String location, List<User> invitees) {
-
+  public void createEvent(String userId, String name, String startDay, String startTime,
+                          String endDay, String endTime, boolean isOnline, String location,
+                          List<User> invitees) {
+    this.validateUserID(userId);
+    User currentUser = this.users.get(userId);
+    Event event = new Event();
+    event.setName(name);
+    event.setEventTimes(startDay, startTime, endDay, endTime);
+    event.setLocation(isOnline, location);
+    event.setHost(currentUser);
+    event.addInvitee(currentUser);
+    currentUser.addEvent(event);
+    for(User invited: invitees) {
+      invited.addEvent(event);
+    }
   }
 
   @Override
-  public void modifyEvent(String userId, Event event) {
-
+  public void modifyEvent(String userId, Event event, String name, String startDay,
+                          String startTime, String endDay, String endTime, boolean isOnline,
+                          String location, List<User> invitees) {
+    this.validateUserID(userId);
+    this.modifyEvent(userId, event, name);
+    this.modifyEvent(userId, event, startDay, startTime, endDay, endTime);
+    this.modifyEvent(userId, event, isOnline, location);
+    this.modifyEvent(userId, event, invitees);
   }
 
   @Override
   public void modifyEvent(String userId, Event event, String name) {
+    this.validateUserID(userId);
+    this.users.get(userId).modifyEvent(event, name);
 
   }
 
   @Override
-  public void modifyEvent(String userId, Event event, String startDay, String startTime, String endDay,
-                          String endTime) {
+  public void modifyEvent(String userId, Event event, String startDay, String startTime,
+                          String endDay, String endTime) {
+    this.validateUserID(userId);
+    this.users.get(userId).modifyEvent(event, startDay, startTime, endDay, endTime);
 
   }
 
   @Override
   public void modifyEvent(String userId, Event event, boolean isOnline, String location) {
+    this.validateUserID(userId);
+    this.users.get(userId).modifyEvent(event, isOnline, location);
 
   }
 
   @Override
   public void modifyEvent(String userId, Event event, List<User> invitees) {
+    this.validateUserID(userId);
+    this.users.get(userId).modifyEvent(event, invitees);
 
   }
 
@@ -156,5 +183,14 @@ public class NUPlannerSystem implements PlannerSystem {
     User newUser = new User(id);
     users.put(id, newUser);
     return newUser;
+  }
+
+  private void validateUserID(String userID) {
+    if (userID == null || userID.isEmpty()) {
+      throw new IllegalArgumentException("UserID cannot be null || empty");
+    }
+    if (!this.users.containsKey(userID)) {
+      throw new IllegalArgumentException("User doesn't exist in the system");
+    }
   }
 }
