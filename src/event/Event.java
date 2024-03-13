@@ -195,7 +195,7 @@ public class Event {
    * @return true if the events overlap in time, false otherwise.
    */
   public boolean overlap(Event event) {
-    return this.equals(event) || this.time.overlap(event.getTime());
+    return this.equals(event) || this.time.overlap(event.time);
   }
 
   /**

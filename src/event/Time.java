@@ -197,6 +197,13 @@ public class Time {
         }
       }
     }
+
+    return this.overlapWithDifferentStartDays(time)
+            || time.overlapWithDifferentStartDays(this);
+
+  }
+
+  private boolean overlapWithDifferentStartDays(Time time) {
     if (this.laterDay(this.startDay, time.startDay)) {
       if (time.endNextWeek()) {
         return true;
@@ -208,21 +215,8 @@ public class Time {
         return true;
       }
     }
-    if (this.laterDay(time.startDay, this.startDay)) {
-      if (this.endNextWeek()) {
-        return true;
-      }
-      if (this.laterDay(this.endDay, time.startDay)) {
-        return true;
-      }
-      if (this.sameDay(this.endDay, time.startDay) && this.endTime.isAfter(time.startTime)) {
-        return true;
-      }
-    }
-
     return false;
   }
-
   private boolean endNextWeek() {
     return this.laterDay(this.startDay, this.endDay) || (this.sameDay(this.startDay, this.endDay)
             && this.endTime.isBefore(this.startTime));
@@ -235,6 +229,4 @@ public class Time {
   private boolean laterDay(DayOfWeek day1, DayOfWeek day2) {
     return ((day1.getValue() % 7) > (day2.getValue() % 7));
   }
-
-
 }
