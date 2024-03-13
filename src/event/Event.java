@@ -41,11 +41,10 @@ public class Event {
   }
 
   /**
-   * Sets the name of the event.
-   * The name cannot be null or empty, otherwise an IllegalArgumentException is thrown.
+   * Sets the name of the event. The name cannot be null or empty.
    *
-   * @param name the name to set for this event
-   * @throws IllegalArgumentException if the name is null or empty
+   * @param name The name to set for this event.
+   * @throws IllegalArgumentException if the name is null or empty.
    */
   public void setName(String name) {
     if (name == null || name.isEmpty()) {
@@ -57,20 +56,20 @@ public class Event {
   /**
    * Returns the Time object associated with this event.
    *
-   * @return the time of the event
+   * @return The time of the event.
    */
   public Time getTime() {
     return time;
   }
 
   /**
-   * Sets the start and end times for the event, including the days.
-   * This is a convenience method that sets all time-related fields at once.
+   * Sets the start and end times for the event, including the days. This method
+   * is a convenience method that sets all time-related fields at once.
    *
-   * @param startDay the start day of the event
-   * @param startTime the start time of the event
-   * @param endDay the end day of the event
-   * @param endTime the end time of the event
+   * @param startDay  The start day of the event.
+   * @param startTime The start time of the event.
+   * @param endDay    The end day of the event.
+   * @param endTime   The end time of the event.
    */
   public void setEventTimes(String startDay, String startTime, String endDay, String endTime) {
     this.time.setStartDay(startDay);
@@ -82,8 +81,8 @@ public class Event {
   /**
    * Sets the location for this event.
    *
-   * @param isOnline true if event is online, false otherwise
-   * @param location the location where the event will take place
+   * @param isOnline True if the event is online, false otherwise.
+   * @param location The location where the event will take place.
    */
   public void setLocation(boolean isOnline, String location) {
     this.location.setOnline(isOnline);
@@ -93,16 +92,16 @@ public class Event {
   /**
    * Returns the Location object associated with this event.
    *
-   * @return the location of the event
+   * @return The location of the event.
    */
   public Location getLocation() {
     return this.location;
   }
 
   /**
-   * Returns the Set of Users associated with this event.
+   * Returns the set of Users associated with this event as invitees.
    *
-   * @return the set of invitees for this event
+   * @return The set of invitees for this event.
    */
   public Set<User> getInvitees() {
     return invitees;
@@ -110,11 +109,9 @@ public class Event {
 
   /**
    * Sets the list of invitees for this event. The invitees list cannot be null and
-   * cannot contain null elements. If either of these conditions is not met,
-   * an IllegalArgumentException is thrown. This ensures that the event has a valid
-   * list of invitees.
+   * cannot contain null elements.
    *
-   * @param invitees the list of Users representing the users invited to the event.
+   * @param invitees The list of Users representing the users invited to the event.
    * @throws IllegalArgumentException if the invitees list is null or contains null elements.
    */
   public void setInvitees(List<User> invitees) {
@@ -131,17 +128,16 @@ public class Event {
    * Returns the User object representing the host of this event. The host is the
    * user responsible for creating or managing the event.
    *
-   * @return the User object representing the host of the event.
+   * @return The User object representing the host of the event.
    */
   public User getHost() {
     return host;
   }
 
   /**
-   * Sets the host of this event. The host cannot be null; if a null host is provided,
-   * an IllegalArgumentException is thrown. This ensures that the event always has a valid host.
+   * Sets the host of this event. The host cannot be null.
    *
-   * @param host the User object representing the host of the event.
+   * @param host The User object representing the host of the event.
    * @throws IllegalArgumentException if the host parameter is null.
    */
   public void setHost(User host) {
@@ -151,8 +147,7 @@ public class Event {
   }
 
   /**
-   * Adds a User as an invitee to the event.
-   * Validates that the User is not null before adding.
+   * Adds a User as an invitee to the event. Validates that the User is not null before adding.
    *
    * @param invitee The user to be added as an invitee to the event.
    * @throws IllegalArgumentException if the invitee is null.
@@ -188,11 +183,11 @@ public class Event {
   }
 
   /**
-   * Checks if this event overlaps in time with another event.
-   * Two events overlap if they have the same time or if their time ranges intersect.
+   * Checks if this event overlaps in time with another event. Two events overlap if they
+   * have the same time or if their time ranges intersect.
    *
    * @param event The event to check for overlap with.
-   * @return true if the events overlap in time, false otherwise.
+   * @return True if the events overlap in time, false otherwise.
    */
   public boolean overlap(Event event) {
     return this.equals(event) || this.time.overlap(event.time);
