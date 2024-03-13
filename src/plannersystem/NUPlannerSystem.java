@@ -93,11 +93,13 @@ public class NUPlannerSystem implements PlannerSystem {
 
   @Override
   public void saveUserSchedule() {
+    //TODO: Write users to xml files
   }
 
   @Override
   public String displayUserSchedule(String userId) {
     this.validateUserID(userId);
+    //TODO: String display of user Events.
     return null;
   }
 
@@ -169,11 +171,11 @@ public class NUPlannerSystem implements PlannerSystem {
   }
 
   @Override
-  public void showEvents(String userId, String startDay, String startTime, String endDay,
+  public String showEvent(String userId, String startDay, String startTime, String endDay,
                          String endTime) {
     this.validateUserID(userId);
-
-
+    //TODO:
+    return null;
   }
 
   private User assignUser(String id) {
