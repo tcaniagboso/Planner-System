@@ -145,10 +145,8 @@ public class Schedule {
   }
 
   /**
-   * Removes the specified event from this schedule, ensuring consistency across invitees.
-   * It validates that the event is not null and exists in the schedule. If the user is the
-   * host, the event is also removed from all invitees' schedules. This maintains consistent
-   * state across related users' schedules.
+   * Removes the specified event from this schedule. It validates that the event is not null
+   * and exists in the schedule.
    *
    * @param event The event to be removed. Must not be null and must exist in the schedule.
    * @throws IllegalArgumentException If the event is null or doesn't exist in this schedule.
@@ -156,14 +154,7 @@ public class Schedule {
   public void removeEvent(Event event) {
     this.validateEvent(event);
     this.validateEventExists(event);
-    if (event.getHost().getUserId().equals(this.userId)) {
-      for (User user : event.getInvitees()) {
-        user.removeEvent(event);
-      }
-    }
-    else {
-      events.remove(event);
-    }
+    events.remove(event);
   }
 
   /**
