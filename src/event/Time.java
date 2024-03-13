@@ -165,7 +165,76 @@ public class Time {
   }
 
   public boolean overlap(Time time) {
-    //TODO
+    if (this.sameDay(this.startDay, time.startDay)) {
+      if(time.endNextWeek() && !this.endNextWeek()) {
+        return true;
+      }
+      if (this.endNextWeek()) {
+        if(time.endNextWeek()) {
+          return true;
+        }
+        if(this.laterDay(time.endDay, this.startDay)) {
+          return true;
+        }
+        if(this.sameDay(time.endDay, this.startDay) && time.endTime.isAfter(this.startTime)) {
+          return true;
+        }
+      }
+      if (time.startTime.isAfter(this.startTime)) {
+        if (this.sameDay(time.startDay, this.endDay) && time.startTime.isBefore(this.endTime)) {
+          return true;
+        }
+        if (this.laterDay(this.endDay, time.startDay)) {
+          return true;
+        }
+      }
+      if (this.startTime.isAfter(time.startTime)) {
+        if (this.sameDay(this.startDay, time.endDay) && this.startTime.isBefore(time.endTime)) {
+          return true;
+        }
+        if (this.laterDay(time.endDay, this.startDay)) {
+          return true;
+        }
+      }
+    }
+    if (this.laterDay(this.startDay, time.startDay)) {
+      if (time.endNextWeek()) {
+        return true;
+      }
+      if (this.laterDay(time.endDay, this.startDay)) {
+        return true;
+      }
+      if (this.sameDay(time.endDay, this.startDay) && time.endTime.isAfter(this.startTime)) {
+        return true;
+      }
+    }
+    if (this.laterDay(time.startDay, this.startDay)) {
+      if (this.endNextWeek()) {
+        return true;
+      }
+      if (this.laterDay(this.endDay, time.startDay)) {
+        return true;
+      }
+      if (this.sameDay(this.endDay, time.startDay) && this.endTime.isAfter(time.startTime)) {
+        return true;
+      }
+    }
+
     return false;
   }
+
+  private boolean endNextWeek() {
+    return this.laterDay(this.startDay, this.endDay) || (this.sameDay(this.startDay, this.endDay)
+            && this.endTime.isBefore(this.startTime));
+  }
+
+  private boolean sameDay(DayOfWeek day1, DayOfWeek day2) {
+    return ((day1.getValue() % 7) == (day2.getValue() % 7));
+  }
+
+  private boolean laterDay(DayOfWeek day1, DayOfWeek day2) {
+    return ((day1.getValue() % 7) > (day2.getValue() % 7));
+  }
+
+
 }
