@@ -95,44 +95,44 @@ public class NUPlannerSystem implements PlannerSystem {
   }
 
   @Override
-  public String displayUserSchedule(User user) {
+  public String displayUserSchedule(String userID) {
     return null;
   }
 
   @Override
-  public void createEvent(String name, String startDay, String startTime, String endDay,
+  public void createEvent(String userId, String name, String startDay, String startTime, String endDay,
                           String endTime, boolean isOnline, String location, List<User> invitees) {
 
   }
 
   @Override
-  public void modifyEvent(Event event) {
+  public void modifyEvent(String userId, Event event) {
 
   }
 
   @Override
-  public void modifyEvent(Event event, String name) {
+  public void modifyEvent(String userId, Event event, String name) {
 
   }
 
   @Override
-  public void modifyEvent(Event event, String startDay, String startTime, String endDay,
+  public void modifyEvent(String userId, Event event, String startDay, String startTime, String endDay,
                           String endTime) {
 
   }
 
   @Override
-  public void modifyEvent(Event event, boolean isOnline, String location) {
+  public void modifyEvent(String userId, Event event, boolean isOnline, String location) {
 
   }
 
   @Override
-  public void modifyEvent(Event event, List<User> invitees) {
+  public void modifyEvent(String userId, Event event, List<User> invitees) {
 
   }
 
   @Override
-  public void removeEvent(Event event) {
+  public void removeEvent(String userId, Event event) {
 
   }
 

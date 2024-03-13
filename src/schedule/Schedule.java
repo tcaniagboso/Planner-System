@@ -67,7 +67,6 @@ public class Schedule {
                           String endDay, String endTime, boolean isOnline, String location,
                           List<User> invitees) {
     this.validateEvent(event);
-    // TODO: Implement validation for the arguments
     this.validateEventExists(event);
 
     this.modifyEvent(event, name);
@@ -162,7 +161,9 @@ public class Schedule {
         user.removeEvent(event);
       }
     }
-    events.remove(event);
+    else {
+      events.remove(event);
+    }
   }
 
   /**
