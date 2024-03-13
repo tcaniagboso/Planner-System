@@ -1,6 +1,7 @@
 package event;
 
 import java.time.DayOfWeek;
+import java.time.Duration;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -101,11 +102,23 @@ public class Time {
    *                                  HHmm format or violates event duration constraints.
    */
   public void setEndTime(String endTime) {
-    if (this.startDay == this.endDay && this.startDay != null && this.startTime.equals(endTime)) {
-      throw new IllegalArgumentException("An event cannot last for more than 6 days 23 hours and "
-              + "59 minutes.");
+    LocalTime parsedEndTime = this.validateTime(endTime);
+    if (this.startDay != null) {
+      // Calculate the total duration in minutes from start to end
+      long daysBetween = DayOfWeek.valueOf(this.startDay.name()).getValue()
+              - DayOfWeek.valueOf(this.endDay.name()).getValue();
+      if (daysBetween < 0) { // If end day is in the next week
+        daysBetween += 7;
+      }
+      long durationMinutes = daysBetween * 24 * 60; // Convert days to minutes
+      durationMinutes += Duration.between(this.startTime, parsedEndTime).toMinutes();
+      // Check if duration exceeds 6 days, 23 hours, 59 minutes
+      if (durationMinutes > (6 * 24 * 60) + (23 * 60) + 59) {
+        throw new IllegalArgumentException("Event duration cannot exceed 6 days, "
+                + "23 hours, and 59 minutes.");
+      }
     }
-    this.endTime = this.validateTime(endTime);
+    this.endTime = parsedEndTime;
   }
 
   /**
@@ -145,6 +158,21 @@ public class Time {
     }
   }
 
+  public boolean overlap(Time other) {
+    // Convert start and end times to minutes since start of week for comparison
+    long thisStart = (this.startDay.getValue() % 7) * 1440 + this.startTime.getHour() * 60
+            + this.startTime.getMinute();
+    long thisEnd = (this.endDay.getValue() % 7) * 1440 + this.endTime.getHour() * 60
+            + this.endTime.getMinute();
+    long otherStart = (other.startDay.getValue() % 7) * 1440 + other.startTime.getHour() * 60
+            + other.startTime.getMinute();
+    long otherEnd = (other.endDay.getValue() % 7) * 1440 + other.endTime.getHour() * 60
+            + other.endTime.getMinute();
+
+    // Check for overlap
+    return !(otherEnd <= thisStart || otherStart >= thisEnd);
+  }
+
   @Override
   public boolean equals(Object object) {
     if (object == this) {
@@ -162,71 +190,5 @@ public class Time {
   @Override
   public int hashCode() {
     return Objects.hash(startDay, startTime, endDay, endTime);
-  }
-
-  public boolean overlap(Time time) {
-    if (this.sameDay(this.startDay, time.startDay)) {
-      if(time.endNextWeek() && !this.endNextWeek()) {
-        return true;
-      }
-      if (this.endNextWeek()) {
-        if(time.endNextWeek()) {
-          return true;
-        }
-        if(this.laterDay(time.endDay, this.startDay)) {
-          return true;
-        }
-        if(this.sameDay(time.endDay, this.startDay) && time.endTime.isAfter(this.startTime)) {
-          return true;
-        }
-      }
-      if (time.startTime.isAfter(this.startTime)) {
-        if (this.sameDay(time.startDay, this.endDay) && time.startTime.isBefore(this.endTime)) {
-          return true;
-        }
-        if (this.laterDay(this.endDay, time.startDay)) {
-          return true;
-        }
-      }
-      if (this.startTime.isAfter(time.startTime)) {
-        if (this.sameDay(this.startDay, time.endDay) && this.startTime.isBefore(time.endTime)) {
-          return true;
-        }
-        if (this.laterDay(time.endDay, this.startDay)) {
-          return true;
-        }
-      }
-    }
-
-    return this.overlapWithDifferentStartDays(time)
-            || time.overlapWithDifferentStartDays(this);
-
-  }
-
-  private boolean overlapWithDifferentStartDays(Time time) {
-    if (this.laterDay(this.startDay, time.startDay)) {
-      if (time.endNextWeek()) {
-        return true;
-      }
-      if (this.laterDay(time.endDay, this.startDay)) {
-        return true;
-      }
-      if (this.sameDay(time.endDay, this.startDay) && time.endTime.isAfter(this.startTime)) {
-        return true;
-      }
-    }
-    return false;
-  }
-  private boolean endNextWeek() {
-    return this.laterDay(this.startDay, this.endDay) || (this.sameDay(this.startDay, this.endDay)
-            && this.endTime.isBefore(this.startTime));
-  }
-
-  private boolean sameDay(DayOfWeek day1, DayOfWeek day2) {
-    return ((day1.getValue() % 7) == (day2.getValue() % 7));
-  }
-
-  private boolean laterDay(DayOfWeek day1, DayOfWeek day2) {
-    return ((day1.getValue() % 7) > (day2.getValue() % 7));
   }
 }
