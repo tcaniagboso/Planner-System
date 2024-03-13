@@ -20,7 +20,7 @@ public class Time {
 
 
   /**
-   * Retrieves the start day of the event.
+   * Gets the start day of the event.
    *
    * @return The {@link DayOfWeek} indicating the start day of the event.
    */
@@ -29,40 +29,36 @@ public class Time {
   }
 
   /**
-   * Sets the start day of the event.
-   * The day is validated to ensure it represents a valid day of the week.
+   * Sets the start day of the event. Validates the input to ensure it is a valid day of the week.
    *
    * @param startDay The day of the week as a String that the event starts on.
-   * @throws IllegalArgumentException If the provided string does not represent a valid
-   *                                 {@link DayOfWeek}.
+   * @throws IllegalArgumentException If the input does not correspond to a valid {@link DayOfWeek}.
    */
   public void setStartDay(String startDay) {
     this.startDay = this.validateDay(startDay);
   }
 
   /**
-   * Retrieves the start time of the event.
+   * Gets the start time of the event.
    *
-   * @return A string representing the start time in HHmm format.
+   * @return The start time of the event as {@link LocalTime}.
    */
   public LocalTime getStartTime() {
     return startTime;
   }
 
   /**
-   * Sets the start time of the event.
-   * The time is validated to ensure it follows the HHmm format.
+   * Sets the start time of the event. Validates the input to ensure it follows the HHmm format.
    *
    * @param startTime The start time of the event in HHmm format.
-   * @throws IllegalArgumentException If the provided string does not represent a valid time in
-   *                                  HHmm format.
+   * @throws IllegalArgumentException If the input does not represent a valid time in HHmm format.
    */
   public void setStartTime(String startTime) {
     this.startTime = this.validateTime(startTime);;
   }
 
   /**
-   * Retrieves the end day of the event.
+   * Gets the end day of the event.
    *
    * @return The {@link DayOfWeek} indicating the end day of the event.
    */
@@ -71,49 +67,46 @@ public class Time {
   }
 
   /**
-   * Sets the end day of the event.
-   * The day is validated to ensure it represents a valid day of the week.
+   * Sets the end day of the event. Validates the input to ensure it is a valid day of the week.
    *
-   * @param endDay The day of the week as a String that the event ends on.
-   * @throws IllegalArgumentException If the provided string does not represent a valid
-   *                                  {@link DayOfWeek}.
+   * @param endDay The day of the week that the event ends on, as a String.
+   * @throws IllegalArgumentException If the input does not correspond to a valid {@link DayOfWeek}.
    */
   public void setEndDay(String endDay) {
     this.endDay = this.validateDay(endDay);
   }
 
   /**
-   * Retrieves the end time of the event.
+   * Gets the end time of the event.
    *
-   * @return A string representing the end time in HHmm format.
+   * @return The end time of the event as {@link LocalTime}.
    */
   public LocalTime getEndTime() {
     return endTime;
   }
 
   /**
-   * Sets the end time of the event.
-   * The time is validated to ensure it follows the HHmm format. Additionally,
-   * it checks that the end time does not create an event duration that exceeds
-   * the logical constraints.
+   * Sets the end time of the event. Validates the input to ensure it follows the HHmm format and
+   * does not result in a duration exceeding the maximum allowed (6 days, 23 hours, 59 minutes).
    *
    * @param endTime The end time of the event in HHmm format.
-   * @throws IllegalArgumentException If the provided string does not represent a valid time in
-   *                                  HHmm format or violates event duration constraints.
+   * @throws IllegalArgumentException If the input does not represent a valid time in HHmm format
+   *                                  or if setting this end time would exceed the maximum event
+   *                                  duration.
    */
   public void setEndTime(String endTime) {
     LocalTime parsedEndTime = this.validateTime(endTime);
     if (this.startDay != null) {
       // Calculate the total duration in minutes from start to end
-      long daysBetween = DayOfWeek.valueOf(this.startDay.name()).getValue()
-              - DayOfWeek.valueOf(this.endDay.name()).getValue();
+      long daysBetween = (this.startDay.getValue() % 7)
+              - (this.endDay.getValue() % 7);
       if (daysBetween < 0) { // If end day is in the next week
         daysBetween += 7;
       }
       long durationMinutes = daysBetween * 24 * 60; // Convert days to minutes
       durationMinutes += Duration.between(this.startTime, parsedEndTime).toMinutes();
       // Check if duration exceeds 6 days, 23 hours, 59 minutes
-      if (durationMinutes > (6 * 24 * 60) + (23 * 60) + 59) {
+      if (durationMinutes > ((6 * 24 * 60) + (23 * 60) + 59)) {
         throw new IllegalArgumentException("Event duration cannot exceed 6 days, "
                 + "23 hours, and 59 minutes.");
       }
@@ -125,7 +118,9 @@ public class Time {
    * Validates the provided time string to ensure it represents a valid time in HHmm format.
    *
    * @param timeString The time string to validate.
-   * @throws IllegalArgumentException If the time string is not a valid time in HHmm format.
+   * @return A {@link LocalTime} object representing the validated time.
+   * @throws IllegalArgumentException If the time string does not represent a valid time in HHmm
+   *                                  format.
    */
   private LocalTime validateTime(String timeString) {
     if (timeString == null || timeString.length() != 4) {
@@ -145,7 +140,7 @@ public class Time {
    * @param dayString The day string to validate.
    * @return The validated {@link DayOfWeek}.
    * @throws IllegalArgumentException If the day string does not represent a valid
-   *                                 {@link DayOfWeek}.
+   *                                  {@link DayOfWeek}.
    */
   private DayOfWeek validateDay(String dayString) {
     if (dayString == null || dayString.isEmpty()) {
@@ -158,6 +153,13 @@ public class Time {
     }
   }
 
+
+  /**
+   * Checks if the time period of this Time object overlaps with that of another.
+   *
+   * @param other The other Time object to compare with.
+   * @return true if there is an overlap, false otherwise.
+   */
   public boolean overlap(Time other) {
     // Convert start and end times to minutes since start of week for comparison
     long thisStart = (this.startDay.getValue() % 7) * 1440 + this.startTime.getHour() * 60
