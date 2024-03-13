@@ -21,7 +21,7 @@ import event.Event;
 import user.User;
 
 public class NUPlannerSystem implements PlannerSystem {
-  private Map<String, User> users;
+  private final Map<String, User> users;
 
   public NUPlannerSystem() {
     this.users = new HashMap<>();
@@ -111,11 +111,8 @@ public class NUPlannerSystem implements PlannerSystem {
     event.setEventTimes(startDay, startTime, endDay, endTime);
     event.setLocation(isOnline, location);
     event.setHost(currentUser);
-    event.addInvitee(currentUser);
-    currentUser.addEvent(event);
-    for(User invited: invitees) {
-      invited.addEvent(event);
-    }
+    invitees.add(currentUser);
+    event.setInvitees(invitees);
   }
 
   @Override
@@ -155,12 +152,12 @@ public class NUPlannerSystem implements PlannerSystem {
   public void modifyEvent(String userId, Event event, List<User> invitees) {
     this.validateUserID(userId);
     this.users.get(userId).modifyEvent(event, invitees);
-
   }
 
   @Override
   public void removeEvent(String userId, Event event) {
-
+    this.validateUserID(userId);
+    this.users.get(userId).removeEvent(event);
   }
 
   @Override
@@ -169,7 +166,10 @@ public class NUPlannerSystem implements PlannerSystem {
   }
 
   @Override
-  public void showEvents(String startDay, String startTime, String endDay, String endTime) {
+  public void showEvents(String userId, String startDay, String startTime, String endDay,
+                         String endTime) {
+    this.validateUserID(userId);
+
 
   }
 
@@ -191,6 +191,18 @@ public class NUPlannerSystem implements PlannerSystem {
     }
     if (!this.users.containsKey(userID)) {
       throw new IllegalArgumentException("User doesn't exist in the system");
+    }
+  }
+
+  private void addNewUsers(List<User> userList) {
+    if (userList == null) {
+
+    }
+  }
+
+  private void validateUserList(List<User> userList) {
+    if (userList == null || userList.contains(null)) {
+      throw new IllegalArgumentException("User List is invalid");
     }
   }
 }

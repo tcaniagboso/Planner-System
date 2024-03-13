@@ -122,7 +122,9 @@ public class Event {
       throw new IllegalArgumentException("Invitees list cannot be null and cannot "
               + "contain null elements");
     }
-    this.invitees = new HashSet<>(invitees);
+    for (User invited: invitees) {
+      invited.addEvent(this);
+    }
   }
 
   /**

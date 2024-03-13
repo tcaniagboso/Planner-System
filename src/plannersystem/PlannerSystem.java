@@ -34,7 +34,7 @@ public interface PlannerSystem {
 
   void automaticScheduling(String time);
 
-  void showEvents(String startDay, String startTime, String endDay, String endTime);
+  void showEvents(String userId, String startDay, String startTime, String endDay, String endTime);
 
 
 }
