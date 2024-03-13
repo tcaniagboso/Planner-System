@@ -113,6 +113,7 @@ public class NUPlannerSystem implements PlannerSystem {
     event.setHost(currentUser);
     invitees.add(currentUser);
     event.setInvitees(invitees);
+    this.addNewUsers(invitees);
   }
 
   @Override
@@ -152,6 +153,7 @@ public class NUPlannerSystem implements PlannerSystem {
   public void modifyEvent(String userId, Event event, List<User> invitees) {
     this.validateUserID(userId);
     this.users.get(userId).modifyEvent(event, invitees);
+    this.addNewUsers(invitees);
   }
 
   @Override
@@ -195,8 +197,11 @@ public class NUPlannerSystem implements PlannerSystem {
   }
 
   private void addNewUsers(List<User> userList) {
-    if (userList == null) {
-
+    this.validateUserList(userList);
+    for (User user: userList) {
+      if (!this.users.containsKey(user.getUserId())) {
+        this.users.put(user.getUserId(), user);
+      }
     }
   }
 
