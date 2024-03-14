@@ -21,14 +21,31 @@ import java.util.Map;
 import schedule.Event;
 import schedule.Schedule;
 
-
+/**
+ * Implements the PlannerSystem interface to manage users and their schedules.
+ * This class provides functionality to read, create, modify, and display user schedules
+ * and events from XML files.
+ */
 public class NUPlannerSystem implements PlannerSystem {
   private final Map<String, Schedule> users;
 
+  /**
+   * Constructs a new NUPlannerSystem instance with an empty map of users.
+   */
   public NUPlannerSystem() {
     this.users = new HashMap<>();
   }
 
+  /**
+   * Reads a user's schedule from an XML file and updates the system's user schedule map.
+   * The method parses the XML file to create and add events to the user's schedule.
+   *
+   * @param xmlFile The XML file containing the user's schedule to be read.
+   * @throws IllegalStateException if there's an error creating the document builder, opening the
+   *                               file, or parsing the XML.
+   * @throws IllegalArgumentException if the XML file contains invalid data that doesn't conform to
+   *                                  expected structure.
+   */
   @Override
   public void readUserSchedule(File xmlFile) {
     try {
@@ -58,6 +75,21 @@ public class NUPlannerSystem implements PlannerSystem {
     return null;
   }
 
+  /**
+   * Creates an event and adds it to the schedule of the specified user and all invitees.
+   * Validates event time to prevent schedule conflicts before adding the event.
+   *
+   * @param userId The user ID of the event host.
+   * @param name The name of the event.
+   * @param startDay The start day of the event.
+   * @param startTime The start time of the event.
+   * @param endDay The end day of the event.
+   * @param endTime The end time of the event.
+   * @param isOnline Indicates whether the event is online.
+   * @param location The location of the event (if not online).
+   * @param invitees A list of user IDs of the event invitees.
+   * @throws IllegalArgumentException if event time conflicts with existing schedule.
+   */
   @Override
   public void createEvent(String userId, String name, String startDay, String startTime,
                           String endDay, String endTime, boolean isOnline, String location,
@@ -72,6 +104,22 @@ public class NUPlannerSystem implements PlannerSystem {
     this.addEventToSchedules(newEvent);
   }
 
+  /**
+   * Modifies an existing event with new details in the schedule of the specified user and
+   * all invitees.
+   * Validates the modified event time to prevent schedule conflicts.
+   *
+   * @param userId The user ID of the event host.
+   * @param event The event to be modified.
+   * @param name The new name of the event.
+   * @param startDay The new start day of the event.
+   * @param startTime The new start time of the event.
+   * @param endDay The new end day of the event.
+   * @param endTime The new end time of the event.
+   * @param isOnline Indicates whether the event is online.
+   * @param location The new location of the event (if not online).
+   * @param invitees A new list of user IDs of the event invitees.
+   */
   @Override
   public void modifyEvent(String userId, Event event, String name, String startDay,
                           String startTime, String endDay, String endTime, boolean isOnline,
@@ -90,8 +138,21 @@ public class NUPlannerSystem implements PlannerSystem {
     event.setEventTimes(startDay, startTime, endDay, endTime);
     event.setLocation(isOnline, location);
     event.setInvitees(invitees);
+    this.addEventToSchedules(event);
   }
 
+  /**
+   * Modifies the name of a specified event in the user's schedule and updates it across
+   * all invitees.
+   * Ensures the event exists and is valid before applying the change.
+   *
+   * @param userId The user ID of the person making the modification. This is used to verify user
+   *               existence.
+   * @param event The event to be modified.
+   * @param name The new name to assign to the event.
+   * @throws IllegalArgumentException If the event does not exist in the user's schedule or if the
+   *                                  user does not exist.
+   */
   @Override
   public void modifyEvent(String userId, Event event, String name) {
     this.validateEvent(event);
@@ -104,6 +165,20 @@ public class NUPlannerSystem implements PlannerSystem {
 
   }
 
+  /**
+   * Modifies the time of a specified event in the user's schedule and updates it across all
+   * invitees.
+   * Validates the new event time to prevent scheduling conflicts before applying the modification.
+   *
+   * @param userId The user ID of the person making the modification.
+   * @param event The event to be modified.
+   * @param startDay The new start day for the event.
+   * @param startTime The new start time for the event.
+   * @param endDay The new end day for the event.
+   * @param endTime The new end time for the event.
+   * @throws IllegalArgumentException If the event does not exist, the user does not exist, or the
+   *                                 new time causes scheduling conflicts.
+   */
   @Override
   public void modifyEvent(String userId, Event event, String startDay, String startTime,
                           String endDay, String endTime) {
@@ -116,6 +191,17 @@ public class NUPlannerSystem implements PlannerSystem {
     event.setEventTimes(startDay, startTime, endDay, endTime);
   }
 
+  /**
+   * Modifies the location and online status of a specified event in the user's schedule and
+   * updates it across all invitees.
+   *
+   * @param userId The user ID of the person making the modification.
+   * @param event The event to be modified.
+   * @param isOnline Specifies whether the event is online.
+   * @param location The new location of the event if it's not online.
+   * @throws IllegalArgumentException If the event does not exist in the user's schedule or if
+   *                                  the user does not exist.
+   */
   @Override
   public void modifyEvent(String userId, Event event, boolean isOnline, String location) {
     this.validateEvent(event);
@@ -127,6 +213,19 @@ public class NUPlannerSystem implements PlannerSystem {
 
   }
 
+  /**
+   * Modifies the list of invitees for a specified event in the user's schedule and updates
+   * it across all affected schedules.
+   * Validates the updated event to ensure there are no scheduling conflicts with the new list of
+   * invitees.
+   *
+   * @param userId The user ID of the person making the modification.
+   * @param event The event to be modified.
+   * @param invitees The new list of invitees for the event.
+   * @throws IllegalArgumentException If the event does not exist in the user's schedule, the user
+   *                                  does not exist, or the modification causes scheduling
+   *                                  conflicts.
+   */
   @Override
   public void modifyEvent(String userId, Event event, List<String> invitees) {
     this.validateEvent(event);
@@ -136,8 +235,19 @@ public class NUPlannerSystem implements PlannerSystem {
     clone.setInvitees(invitees);
     this.validateEventTime(clone);
     event.setInvitees(invitees);
+    this.addEventToSchedules(event);
   }
 
+  /**
+   * Removes an event from the user's schedule. If the user is the host of the event,
+   * the event is removed from all invitees' schedules as well. If the user is not the host,
+   * the event is only removed from their schedule.
+   *
+   * @param userId The user ID of the person attempting to remove the event.
+   * @param event The event to be removed.
+   * @throws IllegalArgumentException If the event does not exist in the user's schedule or
+   *                                  if the user does not exist.
+   */
   @Override
   public void removeEvent(String userId, Event event) {
     this.validateEvent(event);
@@ -148,6 +258,7 @@ public class NUPlannerSystem implements PlannerSystem {
     }
     else {
       users.get(userId).removeEvent(event);
+      event.removeInvitee(userId);
     }
   }
 
@@ -162,6 +273,15 @@ public class NUPlannerSystem implements PlannerSystem {
     return null;
   }
 
+  /**
+   * Processes the XML document to extract and add events to the system.
+   * It iterates through all "event" nodes, parses each to create Event objects,
+   * and validates them before adding to the system. If any event fails validation,
+   * the process is aborted, and no events are added.
+   *
+   * @param document The XML Document representing the user's schedule.
+   * @throws IllegalArgumentException If event validation fails for any event.
+   */
   private void processXmlDocument(Document document) {
     List<Event> tempEvents = new ArrayList<>();
     NodeList eventNodes = document.getElementsByTagName("event");
@@ -193,11 +313,12 @@ public class NUPlannerSystem implements PlannerSystem {
   }
 
   /**
-   * Parses an event from an XML element and constructs an Event object.
-   * Sets the host of the event to the first invitee read from the XML.
+   * Parses an individual event element from the XML document and constructs an Event object.
+   * The method extracts event details such as name, time, location, and invitees,
+   * and sets the host of the event to the first invitee read from the XML.
    *
    * @param eventElement The XML Element representing an event.
-   * @return An Event object populated with the details from the XML Element.
+   * @return The constructed Event object populated with details from the XML element.
    */
   private Event parseEventFromElement(Element eventElement) {
     Event event = new Event();
@@ -236,10 +357,18 @@ public class NUPlannerSystem implements PlannerSystem {
     return event;
   }
 
+  /**
+   * Adds a validated event to the schedules of all its invitees.
+   * If the invitee does not have an existing schedule in the system, a new schedule is created.
+   *
+   * @param event The event to be added to the invitees' schedules.
+   */
   private void addEventToSchedules(Event event) {
     for (String user : event.getInvitees()) {
       Schedule schedule = users.getOrDefault(user, new Schedule(user));
-      schedule.addEvent(event);
+      if (!schedule.hasEvent(event)) {
+        schedule.addEvent(event);
+      }
       if (!users.containsKey(user)) {
         users.put(user, schedule);
       }
@@ -247,6 +376,14 @@ public class NUPlannerSystem implements PlannerSystem {
 
   }
 
+  /**
+   * Validates the timing of the event against all invitees' schedules to ensure there are no
+   * conflicts.
+   * If a time conflict is detected for any invitee, an exception is thrown.
+   *
+   * @param event The event whose timing is to be validated.
+   * @throws IllegalArgumentException If a scheduling conflict is detected.
+   */
   private void validateEventTime(Event event) {
     for (String user : event.getInvitees()) {
       if (users.containsKey(user)) {
@@ -257,6 +394,13 @@ public class NUPlannerSystem implements PlannerSystem {
     }
   }
 
+  /**
+   * Validates the existence of a user in the system. Throws an exception if the user does not
+   * exist.
+   *
+   * @param userId The ID of the user to validate.
+   * @throws IllegalArgumentException If the user does not exist in the system.
+   */
   private void validateUserExists(String userId) {
     if (users.get(userId) == null) {
       throw new IllegalArgumentException("User Schedule for " + userId
@@ -264,6 +408,13 @@ public class NUPlannerSystem implements PlannerSystem {
     }
   }
 
+  /**
+   * Validates that the event exists in the specified user's schedule.
+   *
+   * @param userId The ID of the user whose schedule is being checked.
+   * @param event The event to validate for existence.
+   * @throws IllegalArgumentException If the event does not exist in the specified user's schedule.
+   */
   private void validateEventExists(String userId, Event event) {
     this.validateEvent(event);
     this.validateUserExists(userId);
@@ -272,18 +423,31 @@ public class NUPlannerSystem implements PlannerSystem {
     }
   }
 
+  /**
+   * Validates that the provided event object is not null.
+   *
+   * @param event The event to validate.
+   * @throws IllegalArgumentException If the event is null.
+   */
   private void validateEvent(Event event) {
     if (event == null) {
       throw new IllegalArgumentException("Event is null");
     }
   }
 
+  /**
+   * Removes the specified event from the schedules of all its invitees.
+   * If the event is removed from the host's schedule, it is also removed from all invitees'
+   * schedules.
+   *
+   * @param event The event to be removed.
+   */
   private void removeEventFromSchedules(Event event) {
     for (String user : event.getInvitees()) {
       if (users.containsKey(user)) {
         users.get(user).removeEvent(event);
+        event.removeInvitee(user);
       }
     }
   }
-
 }

@@ -28,6 +28,14 @@ public class Schedule {
     this.events = new ArrayList<>();
   }
 
+  public String getUserId() {
+    return userId;
+  }
+
+  public List<Event> getEvents() {
+    return this.events;
+  }
+
   /**
    * Adds an event to the schedule after checking for any time overlap with existing events.
    *
@@ -69,6 +77,26 @@ public class Schedule {
 
   public boolean hasEvent(Event event) {
     return events.contains(event);
+  }
+
+  public void sortSchedule() {
+    events.sort((o1, o2) -> {
+      if ((o1.getTime().getStartDay().getValue() % 7)
+              < (o2.getTime().getStartDay().getValue() % 7)) {
+        return -1;
+      } else if ((o1.getTime().getStartDay().getValue() % 7)
+              > (o2.getTime().getStartDay().getValue() % 7)) {
+        return 1;
+      } else {
+        if (o1.getTime().getStartTime().isBefore(o2.getTime().getStartTime())) {
+          return -1;
+        }
+        if (o1.getTime().getStartTime().isAfter(o2.getTime().getStartTime())) {
+          return 1;
+        }
+      }
+      return 0;
+    });
   }
 
   /**
