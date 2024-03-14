@@ -3,9 +3,6 @@ package schedule;
 import java.util.ArrayList;
 import java.util.List;
 
-import event.Event;
-import event.Time;
-import user.User;
 
 /**
  * Represents a schedule for a user, containing a list of events.
@@ -40,11 +37,6 @@ public class Schedule {
    */
   public void addEvent(Event event) {
     this.validateEvent(event);
-    for (Event cur : events) {
-      if (cur.overlap(event)) {
-        throw new IllegalArgumentException("Time conflict");
-      }
-    }
     this.events.add(event);
   }
 
@@ -65,7 +57,7 @@ public class Schedule {
    */
   public void modifyEvent(Event event, String name, String startDay, String startTime,
                           String endDay, String endTime, boolean isOnline, String location,
-                          List<User> invitees) {
+                          List<String> invitees) {
     this.validateEvent(event);
     this.validateEventExists(event);
 
@@ -135,7 +127,7 @@ public class Schedule {
    * @throws IllegalArgumentException if the event is null, does not exist in the schedule,
    *                                  or if any of the invitees are null.
    */
-  public void modifyEvent(Event event, List<User> invitees) {
+  public void modifyEvent(Event event, List<String> invitees) {
     this.validateEvent(event);
     this.validateEventExists(event);
     event.setInvitees(invitees);
@@ -153,14 +145,16 @@ public class Schedule {
   public void removeEvent(Event event) {
     this.validateEvent(event);
     this.validateEventExists(event);
-    if (event.getHost().getUserId().equals(this.userId)) {
-      for (User user : event.getInvitees()) {
-        user.removeEvent(event);
+    this.events.remove(event);
+  }
+
+  public boolean overlap(Event newEvent) {
+    for (Event event: events) {
+      if (event.overlap(newEvent)) {
+        return true;
       }
     }
-    else {
-      events.remove(event);
-    }
+    return false;
   }
 
   /**

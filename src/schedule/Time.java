@@ -1,4 +1,4 @@
-package event;
+package schedule;
 
 import java.time.DayOfWeek;
 import java.time.Duration;
@@ -11,12 +11,19 @@ import java.util.Objects;
  * Represents time information for an event, including start and end times along with their
  * respective days.
  */
-public class Time {
+class Time {
 
   private DayOfWeek startDay;
   private LocalTime startTime;
   private DayOfWeek endDay;
   private LocalTime endTime;
+
+  protected Time(String startDay, String startTime, String endDay, String endTime) {
+    this.setStartDay(startDay);
+    this.setStartTime(startTime);
+    this.setEndDay(endDay);
+    this.setEndTime(endTime);
+  }
 
 
   /**

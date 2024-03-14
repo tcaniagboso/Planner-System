@@ -1,11 +1,10 @@
-package event;
+package schedule;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import user.User;
 
 /**
  * Represents an event, encapsulating details such as the event's name, timing, location,
@@ -18,8 +17,8 @@ public class Event {
   private String name;
   private Time time;
   private Location location;
-  private User host;
-  private Set<User> invitees;
+  private String host;
+  private Set<String> invitees;
 
   /**
    * Initializes a new Event instance with default Time and Location settings,
@@ -103,7 +102,7 @@ public class Event {
    *
    * @return The set of invitees for this event.
    */
-  public Set<User> getInvitees() {
+  public Set<String> getInvitees() {
     return invitees;
   }
 
@@ -114,14 +113,12 @@ public class Event {
    * @param invitees The list of Users representing the users invited to the event.
    * @throws IllegalArgumentException if the invitees list is null or contains null elements.
    */
-  public void setInvitees(List<User> invitees) {
+  public void setInvitees(List<String> invitees) {
     if (invitees == null || invitees.contains(null)) {
       throw new IllegalArgumentException("Invitees list cannot be null and cannot "
               + "contain null elements");
     }
-    for (User invited: invitees) {
-      invited.addEvent(this);
-    }
+    this.invitees= new HashSet<>(invitees);
   }
 
   /**
@@ -130,7 +127,7 @@ public class Event {
    *
    * @return The User object representing the host of the event.
    */
-  public User getHost() {
+  public String getHost() {
     return host;
   }
 
@@ -140,7 +137,7 @@ public class Event {
    * @param host The User object representing the host of the event.
    * @throws IllegalArgumentException if the host parameter is null.
    */
-  public void setHost(User host) {
+  public void setHost(String host) {
     this.validateUser(host);
 
     this.host = host;
@@ -152,7 +149,7 @@ public class Event {
    * @param invitee The user to be added as an invitee to the event.
    * @throws IllegalArgumentException if the invitee is null.
    */
-  public void addInvitee(User invitee) {
+  public void addInvitee(String invitee) {
     this.validateUser(invitee);
     this.invitees.add(invitee);
 
@@ -165,7 +162,7 @@ public class Event {
    * @param invitee The user to be removed from the event's invitees.
    * @throws IllegalArgumentException if the invitee is null.
    */
-  public void removeInvitee(User invitee) {
+  public void removeInvitee(String invitee) {
     this.validateUser(invitee);
     this.invitees.remove(invitee);
   }
@@ -176,21 +173,14 @@ public class Event {
    * @param user The user to validate.
    * @throws IllegalArgumentException if the user is null.
    */
-  private void validateUser(User user) {
-    if (user == null) {
-      throw new IllegalArgumentException("User cannot be null");
+  private void validateUser(String user) {
+    if (user == null || user.isEmpty()) {
+      throw new IllegalArgumentException("User cannot be null or empty.");
     }
   }
 
-  /**
-   * Checks if this event overlaps in time with another event. Two events overlap if they
-   * have the same time or if their time ranges intersect.
-   *
-   * @param event The event to check for overlap with.
-   * @return True if the events overlap in time, false otherwise.
-   */
   public boolean overlap(Event event) {
-    return this.equals(event) || this.time.overlap(event.time);
+    return this.time.overlap(event.time);
   }
 
   /**

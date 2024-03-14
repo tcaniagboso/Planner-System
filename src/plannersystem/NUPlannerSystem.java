@@ -2,6 +2,7 @@ package plannersystem;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -17,12 +18,13 @@ import org.xml.sax.SAXException;
 import java.util.List;
 import java.util.Map;
 
-import event.Event;
-import user.User;
+import schedule.Event;
+import schedule.Schedule;
+
 
 //TODO make plannerSystem more user friendly by changing list of users to list of strings for methods
 public class NUPlannerSystem implements PlannerSystem {
-  private final Map<String, User> users;
+  private final Map<String, Schedule> users;
 
   public NUPlannerSystem() {
     this.users = new HashMap<>();
@@ -37,8 +39,8 @@ public class NUPlannerSystem implements PlannerSystem {
       document.getDocumentElement().normalize();
       Element scheduleElement = document.getDocumentElement();
       String id = scheduleElement.getAttribute("id");
-      User user = assignUser(id);
-      processXmlDocument(document, user);
+      Schedule schedule = this.users.getOrDefault(id, new Schedule(id));
+      processXmlDocument(document, schedule);
     } catch (ParserConfigurationException ex) {
       throw new IllegalStateException("Error in creating the builder");
     } catch (IOException ioEx) {
@@ -48,121 +50,54 @@ public class NUPlannerSystem implements PlannerSystem {
     }
   }
 
-  private void processXmlDocument(Document document, User user) {
-    //confirm if structure has event tags and inside schedule
-    NodeList eventNodes = document.getElementsByTagName("event");
-    for (int i = 0; i < eventNodes.getLength(); i++) {
-      Node node = eventNodes.item(i);
-      if (node.getNodeType() == Node.ELEMENT_NODE) {
-        Element eventElement = (Element) node;
-        Event event = new Event();
-        event.setName(eventElement.getElementsByTagName("name").item(0).getTextContent());
-        Element timeElement = (Element) eventElement.getElementsByTagName("time").item(0);
-        String startDay = timeElement.getElementsByTagName("start-day").item(0)
-                .getTextContent();
-        String start = timeElement.getElementsByTagName("start").item(0).getTextContent();
-        String endDay = timeElement.getElementsByTagName("end-day").item(0).getTextContent();
-        String end = timeElement.getElementsByTagName("end").item(0).getTextContent();
-        event.setEventTimes(startDay, start, endDay, end);
-
-        // Process location
-        Element locationElement = (Element) eventElement.getElementsByTagName("location")
-                .item(0);
-        boolean online = Boolean.parseBoolean(locationElement.getElementsByTagName("online")
-                .item(0).getTextContent());
-        String place = locationElement.getElementsByTagName("place").item(0).getTextContent();
-        event.setLocation(online, place);
-
-        // Process invitees
-        NodeList userIds = ((Element) eventElement.getElementsByTagName("users").item(0))
-                .getElementsByTagName("uid");
-        for (int j = 0; j < userIds.getLength(); j++) {
-          String uid = userIds.item(j).getTextContent();
-          User invitee = assignUser(uid);
-          try {
-            invitee.addEvent(event);
-            event.addInvitee(invitee);
-          } catch (IllegalArgumentException ignored) {
-            // TODO: Maybe throw an exception?
-          }
-        }
-        user.addEvent(event);
-      }
-    }
-  }
-
   @Override
-  public void saveUserSchedule() {
-    //TODO: Write users to xml files
+  public void saveUserSchedule(String userID) {
+
   }
 
   @Override
   public String displayUserSchedule(String userId) {
-    this.validateUserID(userId);
-    //TODO: String display of user Events.
     return null;
   }
 
   @Override
   public void createEvent(String userId, String name, String startDay, String startTime,
                           String endDay, String endTime, boolean isOnline, String location,
-                          List<User> invitees) {
-    this.validateUserID(userId);
-    User currentUser = this.users.get(userId);
-    Event event = new Event();
-    event.setName(name);
-    event.setEventTimes(startDay, startTime, endDay, endTime);
-    event.setLocation(isOnline, location);
-    event.setHost(currentUser);
-    invitees.add(currentUser);
-    event.setInvitees(invitees);
-    this.addNewUsers(invitees);
+                          List<String> invitees) {
+
   }
 
   @Override
   public void modifyEvent(String userId, Event event, String name, String startDay,
                           String startTime, String endDay, String endTime, boolean isOnline,
-                          String location, List<User> invitees) {
-    this.validateUserID(userId);
-    this.modifyEvent(userId, event, name);
-    this.modifyEvent(userId, event, startDay, startTime, endDay, endTime);
-    this.modifyEvent(userId, event, isOnline, location);
-    this.modifyEvent(userId, event, invitees);
+                          String location, List<String> invitees) {
+
   }
 
   @Override
   public void modifyEvent(String userId, Event event, String name) {
-    this.validateUserID(userId);
-    this.users.get(userId).modifyEvent(event, name);
 
   }
 
   @Override
   public void modifyEvent(String userId, Event event, String startDay, String startTime,
                           String endDay, String endTime) {
-    this.validateUserID(userId);
-    this.users.get(userId).modifyEvent(event, startDay, startTime, endDay, endTime);
 
   }
 
   @Override
   public void modifyEvent(String userId, Event event, boolean isOnline, String location) {
-    this.validateUserID(userId);
-    this.users.get(userId).modifyEvent(event, isOnline, location);
 
   }
 
   @Override
-  public void modifyEvent(String userId, Event event, List<User> invitees) {
-    this.validateUserID(userId);
-    this.users.get(userId).modifyEvent(event, invitees);
-    this.addNewUsers(invitees);
+  public void modifyEvent(String userId, Event event, List<String> invitees) {
+
   }
 
   @Override
   public void removeEvent(String userId, Event event) {
-    this.validateUserID(userId);
-    this.users.get(userId).removeEvent(event);
+
   }
 
   @Override
@@ -172,45 +107,103 @@ public class NUPlannerSystem implements PlannerSystem {
 
   @Override
   public String showEvent(String userId, String startDay, String startTime, String endDay,
-                         String endTime) {
-    this.validateUserID(userId);
-    //TODO:
+                          String endTime) {
     return null;
   }
 
-  private User assignUser(String id) {
-    if (id == null) {
-      throw new IllegalArgumentException("User Id cannot be null");
+  private void processXmlDocument(Document document, Schedule userSchedule) {
+    List<Event> tempEvents = new ArrayList<>();
+    NodeList eventNodes = document.getElementsByTagName("event");
+    boolean validationFailed = false;
+
+    for (int i = 0; i < eventNodes.getLength() && !validationFailed; i++) {
+      Node node = eventNodes.item(i);
+      if (node.getNodeType() == Node.ELEMENT_NODE) {
+        Element eventElement = (Element) node;
+        Event event = parseEventFromElement(eventElement);
+
+        try {
+          this.validateEventTime(event); // Validate the event against all invitees' schedules
+          tempEvents.add(event); // Temporarily store the event if it passes validation
+        } catch (IllegalArgumentException e) {
+          validationFailed = true; // Abort adding events if any validation fails
+        }
+      }
     }
-    if (users.containsKey(id)) {
-      return users.get(id);
+
+    // If all events passed validation, add them to the schedules
+    if (!validationFailed) {
+      for (Event event : tempEvents) {
+        addEventToSchedules(event);
+      }
+    } else {
+      throw new IllegalArgumentException("Event validation failed. No events were added.");
     }
-    User newUser = new User(id);
-    users.put(id, newUser);
-    return newUser;
   }
 
-  private void validateUserID(String userID) {
-    if (userID == null || userID.isEmpty()) {
-      throw new IllegalArgumentException("UserID cannot be null || empty");
+  /**
+   * Parses an event from an XML element and constructs an Event object.
+   * Sets the host of the event to the first invitee read from the XML.
+   *
+   * @param eventElement The XML Element representing an event.
+   * @return An Event object populated with the details from the XML Element.
+   */
+  private Event parseEventFromElement(Element eventElement) {
+    Event event = new Event();
+
+    // Parse and set the event name
+    String eventName = eventElement.getElementsByTagName("name").item(0).getTextContent();
+    event.setName(eventName);
+
+    // Parse and set event times
+    Element timeElement = (Element) eventElement.getElementsByTagName("time").item(0);
+    String startDay = timeElement.getElementsByTagName("start-day").item(0).getTextContent();
+    String startTime = timeElement.getElementsByTagName("start").item(0).getTextContent();
+    String endDay = timeElement.getElementsByTagName("end-day").item(0).getTextContent();
+    String endTime = timeElement.getElementsByTagName("end").item(0).getTextContent();
+    event.setEventTimes(startDay, startTime, endDay, endTime);
+
+    // Parse and set the event location
+    Element locationElement = (Element) eventElement.getElementsByTagName("location").item(0);
+    boolean online = Boolean.parseBoolean(locationElement.getElementsByTagName("online")
+            .item(0).getTextContent());
+    String place = locationElement.getElementsByTagName("place").item(0).getTextContent();
+    event.setLocation(online, place); // Assuming setLocation method exists
+
+    // Parse and add invitees
+    NodeList userIds = ((Element) eventElement.getElementsByTagName("users").item(0))
+            .getElementsByTagName("uid");
+    for (int j = 0; j < userIds.getLength(); j++) {
+      String uid = userIds.item(j).getTextContent();
+      // Add the first invitee as the host
+      if (j == 0) {
+        event.setHost(uid); // Assuming setHost method exists
+      }
+      event.addInvitee(uid);
     }
-    if (!this.users.containsKey(userID)) {
-      throw new IllegalArgumentException("User doesn't exist in the system");
-    }
+
+    return event;
   }
 
-  private void addNewUsers(List<User> userList) {
-    this.validateUserList(userList);
-    for (User user: userList) {
-      if (!this.users.containsKey(user.getUserId())) {
-        this.users.put(user.getUserId(), user);
+  private void addEventToSchedules(Event event) {
+    for (String user: event.getInvitees()) {
+      Schedule schedule = users.getOrDefault(user, new Schedule(user));
+      schedule.addEvent(event);
+      if (!users.containsKey(user)) {
+        users.put(user, schedule);
+      }
+    }
+
+  }
+
+  private void validateEventTime(Event event) {
+    for (String user: event.getInvitees()) {
+      if (users.containsKey(user)) {
+        if (users.get(user).overlap(event)) {
+          throw new IllegalArgumentException("There is a time conflict in " + user + " schedule.");
+        }
       }
     }
   }
 
-  private void validateUserList(List<User> userList) {
-    if (userList == null || userList.contains(null)) {
-      throw new IllegalArgumentException("User List is invalid");
-    }
-  }
 }

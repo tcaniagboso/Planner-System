@@ -1,4 +1,4 @@
-package event;
+package schedule;
 
 import java.util.Objects;
 
