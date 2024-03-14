@@ -11,19 +11,12 @@ import java.util.Objects;
  * Represents time information for an event, including start and end times along with their
  * respective days.
  */
-class Time {
+public class Time {
 
   private DayOfWeek startDay;
   private LocalTime startTime;
   private DayOfWeek endDay;
   private LocalTime endTime;
-
-  protected Time(String startDay, String startTime, String endDay, String endTime) {
-    this.setStartDay(startDay);
-    this.setStartTime(startTime);
-    this.setEndDay(endDay);
-    this.setEndTime(endTime);
-  }
 
 
   /**

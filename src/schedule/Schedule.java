@@ -11,7 +11,7 @@ import java.util.List;
  */
 public class Schedule {
   private final String userId; // The ID of the user owning this schedule
-  private List<Event> events; // A list of events in this schedule
+  private final List<Event> events; // A list of events in this schedule
 
   /**
    * Constructs a new Schedule for the specified user.
@@ -37,100 +37,10 @@ public class Schedule {
    */
   public void addEvent(Event event) {
     this.validateEvent(event);
+    if (this.overlap(event)) {
+      throw new IllegalArgumentException("Time conflict");
+    }
     this.events.add(event);
-  }
-
-  /**
-   * Modifies an existing event in the schedule with new details provided.
-   *
-   * @param event     The event to modify.
-   * @param name      The new name for the event.
-   * @param startDay  The new start day for the event.
-   * @param startTime The new start time for the event.
-   * @param endDay    The new end day for the event.
-   * @param endTime   The new end time for the event.
-   * @param isOnline  The new online status for the event.
-   * @param location  The new location for the event.
-   * @param invitees  The new list of invitees for the event.
-   * @throws IllegalArgumentException If the event does not exist in the schedule
-   * or the new event details are invalid.
-   */
-  public void modifyEvent(Event event, String name, String startDay, String startTime,
-                          String endDay, String endTime, boolean isOnline, String location,
-                          List<String> invitees) {
-    this.validateEvent(event);
-    this.validateEventExists(event);
-
-    this.modifyEvent(event, name);
-    this.modifyEvent(event, startDay, startTime, endDay, endTime);
-    this.modifyEvent(event, isOnline, location);
-    this.modifyEvent(event, invitees);
-  }
-
-  /**
-   * Updates the name of the specified event.
-   * Validates that the event is not null and exists in the schedule before setting its new name.
-   *
-   * @param event The event to be modified.
-   * @param name The new name to assign to the event.
-   * @throws IllegalArgumentException if the event is null or does not exist in the schedule.
-   */
-  public void modifyEvent(Event event, String name) {
-    this.validateEvent(event);
-    this.validateEventExists(event);
-
-    event.setName(name);
-  }
-
-  /**
-   * Updates the timing details of the specified event.
-   * Validates that the event is not null and exists in the schedule before setting
-   * its new time.
-   *
-   * @param event The event to be modified.
-   * @param startDay The new start day for the event.
-   * @param startTime The new start time for the event.
-   * @param endDay The new end day for the event.
-   * @param endTime The new end time for the event.
-   * @throws IllegalArgumentException if the event is null or does not exist in the schedule.
-   */
-  public void modifyEvent(Event event, String startDay, String startTime,
-                          String endDay, String endTime) {
-    this.validateEvent(event);
-    this.validateEventExists(event);
-    event.setEventTimes(startDay, startTime, endDay, endTime);
-  }
-
-  /**
-   * Updates the location details of the specified event.
-   * Validates that the event is not null and exists in the schedule before setting
-   * its new location.
-   *
-   * @param event The event to be modified.
-   * @param isOnline Specifies whether the event is online or not.
-   * @param location The new location of the event if it is not online.
-   * @throws IllegalArgumentException if the event is null or does not exist in the schedule.
-   */
-  public void modifyEvent(Event event, boolean isOnline, String location) {
-    this.validateEvent(event);
-    this.validateEventExists(event);
-    event.setLocation(isOnline, location);
-  }
-
-  /**
-   * Updates the list of invitees for the specified event.
-   * Validates that the event is not null and exists in the schedule before modifying its
-   * list of invitees.
-   *
-   * @param event The event to be modified.
-   * @param invitees The new list of invitees for the event.
-   * @throws IllegalArgumentException if the event is null, does not exist in the schedule,
-   *                                  or if any of the invitees are null.
-   */
-  public void modifyEvent(Event event, List<String> invitees) {
-    this.validateEvent(event);
-    this.validateEventExists(event);
-    event.setInvitees(invitees);
   }
 
   /**
@@ -157,6 +67,10 @@ public class Schedule {
     return false;
   }
 
+  public boolean hasEvent(Event event) {
+    return events.contains(event);
+  }
+
   /**
    * Validates that an event is not null.
    *
@@ -180,4 +94,5 @@ public class Schedule {
       throw new IllegalArgumentException("This event does not exist");
     }
   }
+
 }

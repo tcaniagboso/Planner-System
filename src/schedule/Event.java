@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 
 
 /**
@@ -14,9 +15,10 @@ import java.util.Set;
  */
 public class Event {
 
+  private final UUID id;
   private String name;
-  private Time time;
-  private Location location;
+  private final Time time;
+  private final Location location;
   private String host;
   private Set<String> invitees;
 
@@ -25,9 +27,23 @@ public class Event {
    * and an empty set of invitees.
    */
   public Event() {
+    this.id = UUID.randomUUID();
     this.time = new Time();
     this.location = new Location();
     this.invitees = new HashSet<>();
+  }
+
+  public Event(Event other) {
+    this.id = other.id;
+    this.name = other.name;
+    this.time = other.time;
+    this.location = other.location;
+    this.host = other.host;
+    this.invitees = other.invitees;
+  }
+
+  public UUID getId() {
+    return this.id;
   }
 
   /**
@@ -118,7 +134,10 @@ public class Event {
       throw new IllegalArgumentException("Invitees list cannot be null and cannot "
               + "contain null elements");
     }
-    this.invitees= new HashSet<>(invitees);
+    if (!invitees.contains(this.host)) {
+      throw new IllegalArgumentException("The list of invitees must contain the host of the event");
+    }
+    this.invitees = new HashSet<>(invitees);
   }
 
   /**
@@ -180,7 +199,7 @@ public class Event {
   }
 
   public boolean overlap(Event event) {
-    return this.time.overlap(event.time);
+    return this.time.overlap(event.time) && this.id != event.id;
   }
 
   /**
