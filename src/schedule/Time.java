@@ -54,6 +54,9 @@ public class Time {
    * @throws IllegalArgumentException If the input does not represent a valid time in HHmm format.
    */
   public void setStartTime(String startTime) {
+    if (startDay == null) {
+      throw new IllegalArgumentException("Start day must be set before start time.");
+    }
     this.startTime = this.validateTime(startTime);;
   }
 
@@ -73,6 +76,9 @@ public class Time {
    * @throws IllegalArgumentException If the input does not correspond to a valid {@link DayOfWeek}.
    */
   public void setEndDay(String endDay) {
+    if (startDay == null || startTime == null) {
+      throw new IllegalArgumentException("Start day and start time must be set before end day.");
+    }
     this.endDay = this.validateDay(endDay);
   }
 
@@ -95,21 +101,14 @@ public class Time {
    *                                  duration.
    */
   public void setEndTime(String endTime) {
+    if (startDay == null || startTime == null || endDay == null) {
+      throw new IllegalArgumentException("Start day, start time and end day must be "
+              + "set before end time.");
+    }
     LocalTime parsedEndTime = this.validateTime(endTime);
-    if (this.startDay != null) {
-      // Calculate the total duration in minutes from start to end
-      long daysBetween = (this.startDay.getValue() % 7)
-              - (this.endDay.getValue() % 7);
-      if (daysBetween < 0) { // If end day is in the next week
-        daysBetween += 7;
-      }
-      long durationMinutes = daysBetween * 24 * 60; // Convert days to minutes
-      durationMinutes += Duration.between(this.startTime, parsedEndTime).toMinutes();
-      // Check if duration exceeds 6 days, 23 hours, 59 minutes
-      if (durationMinutes > ((6 * 24 * 60) + (23 * 60) + 59)) {
-        throw new IllegalArgumentException("Event duration cannot exceed 6 days, "
-                + "23 hours, and 59 minutes.");
-      }
+    if (startDay == endDay && startTime == parsedEndTime) {
+      throw new IllegalArgumentException("An event cannot start and end at the same "
+              + "time on the same day.");
     }
     this.endTime = parsedEndTime;
   }
