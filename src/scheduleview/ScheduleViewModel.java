@@ -1,7 +1,6 @@
 package scheduleview;
 
 import java.time.DayOfWeek;
-import java.util.ArrayList;
 import java.util.List;
 
 import schedule.Event;
@@ -39,7 +38,7 @@ public class ScheduleViewModel implements ScheduleView{
           view.append("        online: ").append(event.getLocation().isOnline())
                   .append(System.lineSeparator());
           view.append("        invitees: ");
-          List<String> invitees = new ArrayList<>(event.getInvitees());
+          List<String> invitees = event.getInvitees();
           for (int i = 0; i < event.getInvitees().size(); i++) {
             if (i > 0) {
               view.append("                  ");

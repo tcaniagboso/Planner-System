@@ -1,10 +1,13 @@
 package schedule;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+
+import validationutilities.ValidationUtilities;
 
 
 /**
@@ -43,6 +46,7 @@ public class Event {
   }
 
   public UUID getId() {
+    ValidationUtilities.validateNull(this.id);
     return this.id;
   }
 
@@ -52,6 +56,7 @@ public class Event {
    * @return the name of the event
    */
   public String getName() {
+    ValidationUtilities.validateNull(this.name);
     return name;
   }
 
@@ -74,6 +79,7 @@ public class Event {
    * @return The time of the event.
    */
   public Time getTime() {
+    ValidationUtilities.validateNull(this.time);
     return time;
   }
 
@@ -110,6 +116,7 @@ public class Event {
    * @return The location of the event.
    */
   public Location getLocation() {
+    ValidationUtilities.validateNull(this.location);
     return this.location;
   }
 
@@ -118,8 +125,9 @@ public class Event {
    *
    * @return The set of invitees for this event.
    */
-  public Set<String> getInvitees() {
-    return invitees;
+  public List<String> getInvitees() {
+    ValidationUtilities.validateNull(this.invitees);
+    return new ArrayList<>(invitees);
   }
 
   /**
@@ -147,6 +155,7 @@ public class Event {
    * @return The User object representing the host of the event.
    */
   public String getHost() {
+    ValidationUtilities.validateNull(this.host);
     return host;
   }
 
@@ -224,7 +233,7 @@ public class Event {
     return Objects.equals(this.name, other.getName())
             && Objects.equals(this.time, other.getTime())
             && Objects.equals(this.location, other.getLocation())
-            && Objects.equals(this.invitees, other.getInvitees())
+            && Objects.equals(this.invitees, new HashSet<>(other.getInvitees()))
             && Objects.equals(this.host, other.getHost());
   }
 

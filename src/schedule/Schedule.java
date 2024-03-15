@@ -3,6 +3,8 @@ package schedule;
 import java.util.ArrayList;
 import java.util.List;
 
+import validationutilities.ValidationUtilities;
+
 
 /**
  * Represents a schedule for a user, containing a list of events.
@@ -29,11 +31,18 @@ public class Schedule {
   }
 
   public String getUserId() {
+    ValidationUtilities.validateNull(this.userId);
     return userId;
   }
 
   public List<Event> getEvents() {
-    return this.events;
+    ValidationUtilities.validateNull(this.events);
+
+    List<Event> newEvents = new ArrayList<>();
+    for (Event event : events) {
+      newEvents.add(event);
+    }
+    return newEvents;
   }
 
   /**
@@ -44,7 +53,7 @@ public class Schedule {
    *                                  with an existing event in the schedule.
    */
   public void addEvent(Event event) {
-    this.validateEvent(event);
+    ValidationUtilities.validateNull(event);
     if (this.overlap(event)) {
       throw new IllegalArgumentException("Time conflict");
     }
@@ -61,7 +70,7 @@ public class Schedule {
    * @throws IllegalArgumentException If the event is null or doesn't exist in this schedule.
    */
   public void removeEvent(Event event) {
-    this.validateEvent(event);
+    ValidationUtilities.validateNull(event);
     this.validateEventExists(event);
     this.events.remove(event);
   }
@@ -97,18 +106,6 @@ public class Schedule {
       }
       return 0;
     });
-  }
-
-  /**
-   * Validates that an event is not null.
-   *
-   * @param event The event to validate.
-   * @throws IllegalArgumentException If the event is null.
-   */
-  private void validateEvent(Event event) {
-    if (event == null) {
-      throw new IllegalArgumentException("Event cannot be null");
-    }
   }
 
   /**

@@ -2,6 +2,8 @@ package schedule;
 
 import java.util.Objects;
 
+import validationutilities.ValidationUtilities;
+
 /**
  * Represents the location details of an event, including whether it is an online event
  * and its physical location if applicable.
@@ -38,6 +40,7 @@ public class Location {
    * online.
    */
   public String getLocation() {
+    ValidationUtilities.validateNull(this.location);
     return location;
   }
 

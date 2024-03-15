@@ -6,6 +6,8 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Objects;
 
+import validationutilities.ValidationUtilities;
+
 /**
  * Represents time information for an event, including start and end times along with their
  * respective days.
@@ -34,6 +36,7 @@ public class Time {
    * @return The {@link DayOfWeek} indicating the start day of the event.
    */
   public DayOfWeek getStartDay() {
+    ValidationUtilities.validateNull(this.startDay);
     return startDay;
   }
 
@@ -53,6 +56,7 @@ public class Time {
    * @return The start time of the event as {@link LocalTime}.
    */
   public LocalTime getStartTime() {
+    ValidationUtilities.validateNull(this.startTime);
     return startTime;
   }
 
@@ -76,6 +80,7 @@ public class Time {
    * @return The {@link DayOfWeek} indicating the end day of the event.
    */
   public DayOfWeek getEndDay() {
+    ValidationUtilities.validateNull(this.endDay);
     return endDay;
   }
 
@@ -98,6 +103,7 @@ public class Time {
    * @return The end time of the event as {@link LocalTime}.
    */
   public LocalTime getEndTime() {
+    ValidationUtilities.validateNull(this.endTime);
     return endTime;
   }
 

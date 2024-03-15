@@ -22,6 +22,7 @@ import schedule.Event;
 import schedule.Schedule;
 import scheduleview.ScheduleView;
 import scheduleview.ScheduleViewModel;
+import validationutilities.ValidationUtilities;
 
 /**
  * Implements the PlannerSystem interface to manage users and their schedules.
@@ -50,6 +51,7 @@ public class NUPlannerSystem implements PlannerSystem {
    */
   @Override
   public void readUserSchedule(File xmlFile) {
+    ValidationUtilities.validateNull(xmlFile);
     try {
       DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
       DocumentBuilder builder = factory.newDocumentBuilder();
@@ -128,7 +130,7 @@ public class NUPlannerSystem implements PlannerSystem {
   public void modifyEvent(String userId, Event event, String name, String startDay,
                           String startTime, String endDay, String endTime, boolean isOnline,
                           String location, List<String> invitees) {
-    this.validateEvent(event);
+    ValidationUtilities.validateNull(event);
     this.validateUserExists(userId);
     this.validateEventExists(userId, event);
     Event clone = new Event(event);
@@ -159,7 +161,7 @@ public class NUPlannerSystem implements PlannerSystem {
    */
   @Override
   public void modifyEvent(String userId, Event event, String name) {
-    this.validateEvent(event);
+    ValidationUtilities.validateNull(event);
     this.validateUserExists(userId);
     this.validateEventExists(userId, event);
 
@@ -186,7 +188,7 @@ public class NUPlannerSystem implements PlannerSystem {
   @Override
   public void modifyEvent(String userId, Event event, String startDay, String startTime,
                           String endDay, String endTime) {
-    this.validateEvent(event);
+    ValidationUtilities.validateNull(event);
     this.validateUserExists(userId);
     this.validateEventExists(userId, event);
     Event clone = new Event(event);
@@ -208,7 +210,7 @@ public class NUPlannerSystem implements PlannerSystem {
    */
   @Override
   public void modifyEvent(String userId, Event event, boolean isOnline, String location) {
-    this.validateEvent(event);
+    ValidationUtilities.validateNull(event);
     this.validateUserExists(userId);
     this.validateEventExists(userId, event);
     Event clone = new Event(event);
@@ -232,7 +234,7 @@ public class NUPlannerSystem implements PlannerSystem {
    */
   @Override
   public void modifyEvent(String userId, Event event, List<String> invitees) {
-    this.validateEvent(event);
+    ValidationUtilities.validateNull(event);
     this.validateUserExists(userId);
     this.validateEventExists(userId, event);
     Event clone = new Event(event);
@@ -254,7 +256,7 @@ public class NUPlannerSystem implements PlannerSystem {
    */
   @Override
   public void removeEvent(String userId, Event event) {
-    this.validateEvent(event);
+    ValidationUtilities.validateNull(event);
     this.validateUserExists(userId);
     this.validateEventExists(userId, event);
     if (userId.equals(event.getHost())) {
@@ -406,6 +408,7 @@ public class NUPlannerSystem implements PlannerSystem {
    * @throws IllegalArgumentException If the user does not exist in the system.
    */
   private void validateUserExists(String userId) {
+    ValidationUtilities.validateNull(userId);
     if (users.get(userId) == null) {
       throw new IllegalArgumentException("User Schedule for " + userId
               + " does not exist in system");
@@ -420,24 +423,13 @@ public class NUPlannerSystem implements PlannerSystem {
    * @throws IllegalArgumentException If the event does not exist in the specified user's schedule.
    */
   private void validateEventExists(String userId, Event event) {
-    this.validateEvent(event);
+    ValidationUtilities.validateNull(event);
     this.validateUserExists(userId);
     if (!this.users.get(userId).hasEvent(event)) {
       throw new IllegalArgumentException("Event doesn't exist in user " + userId + " schedule.");
     }
   }
 
-  /**
-   * Validates that the provided event object is not null.
-   *
-   * @param event The event to validate.
-   * @throws IllegalArgumentException If the event is null.
-   */
-  private void validateEvent(Event event) {
-    if (event == null) {
-      throw new IllegalArgumentException("Event is null");
-    }
-  }
 
   /**
    * Removes the specified event from the schedules of all its invitees.
