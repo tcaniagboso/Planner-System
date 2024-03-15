@@ -6,6 +6,7 @@ import java.util.List;
 
 import schedule.Event;
 import schedule.Schedule;
+import schedule.TimeUtilities;
 
 /**
  * Implementation of the ScheduleView interface that provides functionality
@@ -25,13 +26,13 @@ public class ScheduleViewModel implements ScheduleView{
     for (int day = 0; day < 7; day++) {
       int index = (day == 0) ? day + 7 : day;
       DayOfWeek currentDay = DayOfWeek.of(index);
-      view.append(currentDay).append(":").append(System.lineSeparator());
+      view.append(TimeUtilities.formatDay(currentDay)).append(":").append(System.lineSeparator());
       for (Event event: schedule.getEvents()) {
         if (event.getTime().getStartDay() == currentDay) {
           view.append("        name: ").append(event.getName()).append(System.lineSeparator());
-          view.append("        time: ").append(currentDay).append(": ")
+          view.append("        time: ").append(TimeUtilities.formatDay(currentDay)).append(": ")
                   .append(event.getTime().getStartTime()).append(" -> ")
-                  .append(event.getTime().getEndDay()).append(": ")
+                  .append(TimeUtilities.formatDay(event.getTime().getEndDay())).append(": ")
                   .append(event.getTime().getEndTime()).append(System.lineSeparator());
           view.append("        location: ").append(event.getLocation().getLocation())
                   .append(System.lineSeparator());

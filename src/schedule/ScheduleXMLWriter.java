@@ -15,6 +15,7 @@ import javax.xml.transform.OutputKeys;
  * Write schedule info for XML file.
  */
 public class ScheduleXMLWriter {
+
   /**
    * Has the provided schedule object for an XML file at the specific path.
    * @param schedule schedule to write XML
@@ -47,15 +48,23 @@ public class ScheduleXMLWriter {
       eventElement.appendChild(locationElement);
 
       Element usersElement = document.createElement("users");
-      for (String uid : event.getInvitees()) {
-        Element uidElement = document.createElement("uid");
-        uidElement.setTextContent(uid);
-        usersElement.appendChild(uidElement);
+
+      // Add host first
+      Element hostElement = document.createElement("uid");
+      hostElement.setTextContent(event.getHost());
+      usersElement.appendChild(hostElement);
+
+      // Add invitees, avoiding duplication with the host
+      for (String invitee : event.getInvitees()) {
+        if (!invitee.equals(event.getHost())) { // Avoid duplication
+          Element uidElement = document.createElement("uid");
+          uidElement.setTextContent(invitee);
+          usersElement.appendChild(uidElement);
+        }
       }
       eventElement.appendChild(usersElement);
     }
 
-    //  write XML content
     TransformerFactory transformerFactory = TransformerFactory.newInstance();
     Transformer transformer = transformerFactory.newTransformer();
     transformer.setOutputProperty(OutputKeys.INDENT, "yes");
@@ -72,19 +81,19 @@ public class ScheduleXMLWriter {
    */
   private static void appendTimeDetails(Document doc, Element timeElement, Time time) {
     Element startDayElement = doc.createElement("start-day");
-    startDayElement.setTextContent(time.getStartDay().toString());
+    startDayElement.setTextContent(TimeUtilities.formatDay(time.getStartDay()));
     timeElement.appendChild(startDayElement);
 
     Element startElement = doc.createElement("start");
-    startElement.setTextContent(time.getStartTime().toString());
+    startElement.setTextContent(TimeUtilities.formatTime(time.getStartTime()));
     timeElement.appendChild(startElement);
 
     Element endDayElement = doc.createElement("end-day");
-    endDayElement.setTextContent(time.getEndDay().toString());
+    endDayElement.setTextContent(TimeUtilities.formatDay(time.getEndDay()));
     timeElement.appendChild(endDayElement);
 
     Element endElement = doc.createElement("end");
-    endElement.setTextContent(time.getEndTime().toString());
+    endElement.setTextContent(TimeUtilities.formatTime(time.getEndTime()));
     timeElement.appendChild(endElement);
   }
 

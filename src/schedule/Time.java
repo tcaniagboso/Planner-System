@@ -1,7 +1,6 @@
 package schedule;
 
 import java.time.DayOfWeek;
-import java.time.Duration;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -18,6 +17,16 @@ public class Time {
   private DayOfWeek endDay;
   private LocalTime endTime;
 
+
+  public Time(String startDay, String startTime, String endDay, String endTime) {
+    this.setStartDay(startDay);
+    this.setStartTime(startTime);
+    this.setEndDay(endDay);
+    this.setEndTime(endTime);
+  }
+
+  public Time() {
+  }
 
   /**
    * Gets the start day of the event.
@@ -55,9 +64,10 @@ public class Time {
    */
   public void setStartTime(String startTime) {
     if (startDay == null) {
-      throw new IllegalArgumentException("Start day must be set before start time.");
+      throw new IllegalStateException("Start day must be set before start time.");
     }
-    this.startTime = this.validateTime(startTime);;
+    this.startTime = this.validateTime(startTime);
+    ;
   }
 
   /**
@@ -77,7 +87,7 @@ public class Time {
    */
   public void setEndDay(String endDay) {
     if (startDay == null || startTime == null) {
-      throw new IllegalArgumentException("Start day and start time must be set before end day.");
+      throw new IllegalStateException("Start day and start time must be set before end day.");
     }
     this.endDay = this.validateDay(endDay);
   }
@@ -102,11 +112,11 @@ public class Time {
    */
   public void setEndTime(String endTime) {
     if (startDay == null || startTime == null || endDay == null) {
-      throw new IllegalArgumentException("Start day, start time and end day must be "
+      throw new IllegalStateException("Start day, start time and end day must be "
               + "set before end time.");
     }
     LocalTime parsedEndTime = this.validateTime(endTime);
-    if (startDay == endDay && startTime == parsedEndTime) {
+    if (startDay.equals(endDay) && startTime.equals(parsedEndTime)) {
       throw new IllegalArgumentException("An event cannot start and end at the same "
               + "time on the same day.");
     }
@@ -160,18 +170,31 @@ public class Time {
    * @return true if there is an overlap, false otherwise.
    */
   public boolean overlap(Time other) {
-    // Convert start and end times to minutes since start of week for comparison
-    long thisStart = (this.startDay.getValue() % 7) * 1440 + this.startTime.getHour() * 60
-            + this.startTime.getMinute();
-    long thisEnd = (this.endDay.getValue() % 7) * 1440 + this.endTime.getHour() * 60
-            + this.endTime.getMinute();
-    long otherStart = (other.startDay.getValue() % 7) * 1440 + other.startTime.getHour() * 60
-            + other.startTime.getMinute();
-    long otherEnd = (other.endDay.getValue() % 7) * 1440 + other.endTime.getHour() * 60
-            + other.endTime.getMinute();
+    if (this.equals(other)) {
+      return true;
+    }
+    int daysInWeek = 7;
+    int minutesInDay = 1440; // 24 hours * 60 minutes
 
-    // Check for overlap
-    return !(otherEnd <= thisStart || otherStart >= thisEnd);
+    // Convert start and end times to minutes since the start of the week, considering Sunday as 0
+    long thisStartMinutes = (this.startDay.getValue() % 7) * minutesInDay
+            + this.startTime.getHour() * 60 + this.startTime.getMinute();
+    long thisEndMinutes = (this.endDay.getValue() % 7) * minutesInDay
+            + this.endTime.getHour() * 60 + this.endTime.getMinute();
+    if (thisEndMinutes < thisStartMinutes) {
+      thisEndMinutes += daysInWeek * minutesInDay; // Adjust for wrap-around
+    }
+
+    long otherStartMinutes = (other.startDay.getValue() % 7) * minutesInDay
+            + other.startTime.getHour() * 60 + other.startTime.getMinute();
+    long otherEndMinutes = (other.endDay.getValue() % 7) * minutesInDay + other.endTime.getHour()
+            * 60 + other.endTime.getMinute();
+    if (otherEndMinutes < otherStartMinutes) {
+      otherEndMinutes += daysInWeek * minutesInDay; // Adjust for wrap-around
+    }
+
+    // Check for overlap considering wrap-around
+    return !(otherEndMinutes <= thisStartMinutes || otherStartMinutes >= thisEndMinutes);
   }
 
   @Override
