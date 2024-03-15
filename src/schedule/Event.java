@@ -230,11 +230,11 @@ public class Event {
       return false;
     }
     Event other = (Event) object;
-    return Objects.equals(this.name, other.getName())
-            && Objects.equals(this.time, other.getTime())
-            && Objects.equals(this.location, other.getLocation())
-            && Objects.equals(this.invitees, new HashSet<>(other.getInvitees()))
-            && Objects.equals(this.host, other.getHost());
+    return Objects.equals(this.name, other.name)
+            && Objects.equals(this.time, other.time)
+            && Objects.equals(this.location, other.location)
+            && Objects.equals(this.invitees, other.invitees)
+            && Objects.equals(this.host, other.host);
   }
 
   /**

@@ -20,6 +20,7 @@ import java.util.Map;
 
 import schedule.Event;
 import schedule.Schedule;
+import schedule.ScheduleXMLWriter;
 import scheduleview.ScheduleView;
 import scheduleview.ScheduleViewModel;
 import validationutilities.ValidationUtilities;
@@ -70,8 +71,15 @@ public class NUPlannerSystem implements PlannerSystem {
   }
 
   @Override
-  public void saveUserSchedule(String userID) {
-
+  public void saveUserSchedule(String userId) {
+    this.validateUserExists(userId);
+    String fileName = userId + ".xml";
+    try {
+      ScheduleXMLWriter.writeScheduleToXML(users.get(userId), fileName);
+    }
+    catch (Exception e) {
+      throw new IllegalStateException(e.getMessage());
+    }
   }
 
   @Override

@@ -9,7 +9,7 @@ public interface PlannerSystem {
 
   void readUserSchedule(File xmlFile);
 
-  void saveUserSchedule(String userID);
+  void saveUserSchedule(String userId);
 
   String displayUserSchedule(String userId);
 
