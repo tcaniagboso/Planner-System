@@ -100,11 +100,8 @@ public class ScheduleXMLWriter {
     onlineElement.setTextContent(String.valueOf(location.isOnline()));
     locationElement.appendChild(onlineElement);
 
-    if (!location.isOnline()) {
-      Element placeElement = doc.createElement("place");
-      placeElement.setTextContent(location.getLocation());
-      locationElement.appendChild(placeElement);
-    }
+    Element placeElement = doc.createElement("place");
+    placeElement.setTextContent(location.getLocation());
+    locationElement.appendChild(placeElement);
   }
-  //if you have more helpers you can add them here @tcani
 }

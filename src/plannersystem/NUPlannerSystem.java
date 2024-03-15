@@ -20,6 +20,8 @@ import java.util.Map;
 
 import schedule.Event;
 import schedule.Schedule;
+import scheduleview.ScheduleView;
+import scheduleview.ScheduleViewModel;
 
 /**
  * Implements the PlannerSystem interface to manage users and their schedules.
@@ -72,7 +74,9 @@ public class NUPlannerSystem implements PlannerSystem {
 
   @Override
   public String displayUserSchedule(String userId) {
-    return null;
+    this.validateUserExists(userId);
+    ScheduleView scheduleView = new ScheduleViewModel();
+    return scheduleView.render(this.users.get(userId));
   }
 
   /**
