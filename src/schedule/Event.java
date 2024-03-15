@@ -45,18 +45,13 @@ public class Event {
     this.invitees = other.invitees;
   }
 
-  public UUID getId() {
-    ValidationUtilities.validateNull(this.id);
-    return this.id;
-  }
-
   /**
    * Returns the name of the event.
    *
    * @return the name of the event
    */
   public String getName() {
-    ValidationUtilities.validateNull(this.name);
+    ValidationUtilities.validateGetNull(this.name);
     return name;
   }
 
@@ -79,7 +74,6 @@ public class Event {
    * @return The time of the event.
    */
   public Time getTime() {
-    ValidationUtilities.validateNull(this.time);
     return time;
   }
 
@@ -116,7 +110,6 @@ public class Event {
    * @return The location of the event.
    */
   public Location getLocation() {
-    ValidationUtilities.validateNull(this.location);
     return this.location;
   }
 
@@ -126,7 +119,6 @@ public class Event {
    * @return The set of invitees for this event.
    */
   public List<String> getInvitees() {
-    ValidationUtilities.validateNull(this.invitees);
     return new ArrayList<>(invitees);
   }
 
@@ -142,7 +134,10 @@ public class Event {
       throw new IllegalArgumentException("Invitees list cannot be null and cannot "
               + "contain null elements");
     }
-    if (!invitees.contains(this.host)) {
+    if (this.host == null) {
+      throw new IllegalStateException("Host is null");
+    }
+    if (!invitees.contains(this.host.toLowerCase())) {
       throw new IllegalArgumentException("The list of invitees must contain the host of the event");
     }
     this.invitees = new HashSet<>(invitees);
@@ -155,7 +150,7 @@ public class Event {
    * @return The User object representing the host of the event.
    */
   public String getHost() {
-    ValidationUtilities.validateNull(this.host);
+    ValidationUtilities.validateGetNull(this.host);
     return host;
   }
 
@@ -168,7 +163,7 @@ public class Event {
   public void setHost(String host) {
     this.validateUser(host);
 
-    this.host = host;
+    this.host = host.toLowerCase();
   }
 
   /**
@@ -195,20 +190,8 @@ public class Event {
     this.invitees.remove(invitee);
   }
 
-  /**
-   * Validates that a User object is not null.
-   *
-   * @param user The user to validate.
-   * @throws IllegalArgumentException if the user is null.
-   */
-  private void validateUser(String user) {
-    if (user == null || user.isEmpty()) {
-      throw new IllegalArgumentException("User cannot be null or empty.");
-    }
-  }
-
   public boolean overlap(Event event) {
-    return this.time.overlap(event.time) && this.id != event.id;
+    return this.id != event.id && this.time.overlap(event.time);
   }
 
   /**
@@ -250,4 +233,15 @@ public class Event {
     return Objects.hash(this.name, this.time, this.location, this.invitees, this.host);
   }
 
+  /**
+   * Validates that a User object is not null.
+   *
+   * @param user The user to validate.
+   * @throws IllegalArgumentException if the user is null.
+   */
+  private void validateUser(String user) {
+    if (user == null || user.isEmpty()) {
+      throw new IllegalArgumentException("User cannot be null or empty.");
+    }
+  }
 }

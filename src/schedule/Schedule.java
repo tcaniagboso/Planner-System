@@ -23,21 +23,18 @@ public class Schedule {
    * @throws IllegalArgumentException If the user ID is null.
    */
   public Schedule(String userId) {
-    if (userId == null) {
-      throw new IllegalArgumentException("User ID cannot be null");
+    if (userId == null || userId.isEmpty()) {
+      throw new IllegalArgumentException("User ID cannot be null ot empty");
     }
     this.userId = userId;
     this.events = new ArrayList<>();
   }
 
   public String getUserId() {
-    ValidationUtilities.validateNull(this.userId);
     return userId;
   }
 
   public List<Event> getEvents() {
-    ValidationUtilities.validateNull(this.events);
-
     List<Event> newEvents = new ArrayList<>();
     for (Event event : events) {
       newEvents.add(event);

@@ -36,6 +36,7 @@ public class LocationTest {
   public void testSetGetLocation() {
     Assert.assertThrows(IllegalArgumentException.class, () -> location.setLocation(null));
     Assert.assertThrows(IllegalArgumentException.class, () -> location.setLocation(""));
+    Assert.assertThrows(IllegalStateException.class, () -> location.getLocation());
 
     location.setLocation("International Village");
     Assert.assertEquals("International Village", location.getLocation());

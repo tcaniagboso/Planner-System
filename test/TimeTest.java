@@ -6,15 +6,33 @@ import java.time.DayOfWeek;
 
 import schedule.Time;
 
+/**
+ * A test class for the {@link schedule.Time} class.
+ * This class tests cases that validate the functionality of the Time class, including its setters,
+ * getters, and business logic methods.
+ * It aims to ensure that Time objects are correctly initialized, modified, and compared
+ * with proper validation of the input data.
+ */
 public class TimeTest {
 
   private Time time;
 
+  /**
+   * Initializes a fresh {@link schedule.Time} object before each test method.
+   * This setup provides a clean state for each test to run independently.
+   */
   @Before
   public void init() {
     time = new Time();
   }
 
+  /**
+   * Tests the setter and getter methods of the {@link schedule.Time} class,
+   * including validation of day and time inputs.
+   * It verifies the enforcement of valid days of the week and correct time formats,
+   * ensuring that the class reacts appropriately to invalid inputs by throwing
+   * IllegalArgumentExceptions, and correctly updates and retrieves valid values.
+   */
   @Test
   public void testTimeSettersGetters() {
 
@@ -54,8 +72,21 @@ public class TimeTest {
     Assert.assertThrows(IllegalStateException.class, () -> newTime.setEndDay("wednesday"));
     newTime.setStartTime("1250");
     Assert.assertThrows(IllegalStateException.class, () -> newTime.setEndTime("1300"));
+
+    Time other = new Time();
+    Assert.assertThrows(IllegalStateException.class, other::getStartTime);
+    Assert.assertThrows(IllegalStateException.class, other::getStartDay);
+    Assert.assertThrows(IllegalStateException.class, other::getEndTime);
+    Assert.assertThrows(IllegalStateException.class, other::getEndDay);
   }
 
+  /**
+   * Tests the overlap detection logic within the {@link schedule.Time} class.
+   * This test covers various scenarios to ensure accurate detection of time overlaps
+   * between different Time objects, including edge cases and multi-day events.
+   * It validates the overlap logic against overlapping and non-overlapping events,
+   * ensuring that the method correctly identifies when two events' times conflict.
+   */
   @Test
   public void testOverlap() {
     time = new Time("monday", "1000", "monday", "1100");
@@ -94,6 +125,13 @@ public class TimeTest {
 
   }
 
+  /**
+   * Tests the equals method of the {@link schedule.Time} class.
+   * This test verifies that two Time objects are considered equal if they have the same
+   * start and end days and times, and correctly identifies unequal objects when their
+   * start or end times differ. It ensures that the equals method adheres to the contract
+   * of equality as expected for Time objects.
+   */
   @Test
   public void testEquals() {
     time = new Time("monday", "1000", "monday", "1100");

@@ -40,7 +40,7 @@ public class Location {
    * online.
    */
   public String getLocation() {
-    ValidationUtilities.validateNull(this.location);
+    ValidationUtilities.validateGetNull(this.location);
     return location;
   }
 

@@ -7,4 +7,10 @@ public class ValidationUtilities {
       throw new IllegalArgumentException("Argument is null");
     }
   }
+
+  public static void validateGetNull(Object obj) {
+    if (obj == null) {
+      throw new IllegalStateException("Field is null.");
+    }
+  }
 }

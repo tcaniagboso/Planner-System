@@ -45,8 +45,8 @@ public class NUPlannerSystem implements PlannerSystem {
    * The method parses the XML file to create and add events to the user's schedule.
    *
    * @param xmlFile The XML file containing the user's schedule to be read.
-   * @throws IllegalStateException if there's an error creating the document builder, opening the
-   *                               file, or parsing the XML.
+   * @throws IllegalStateException    if there's an error creating the document builder, opening the
+   *                                  file, or parsing the XML.
    * @throws IllegalArgumentException if the XML file contains invalid data that doesn't conform to
    *                                  expected structure.
    */
@@ -73,11 +73,10 @@ public class NUPlannerSystem implements PlannerSystem {
   @Override
   public void saveUserSchedule(String userId) {
     this.validateUserExists(userId);
-    String fileName = userId + ".xml";
+    String fileName = userId.toLowerCase() + ".xml";
     try {
-      ScheduleXMLWriter.writeScheduleToXML(users.get(userId), fileName);
-    }
-    catch (Exception e) {
+      ScheduleXMLWriter.writeScheduleToXML(users.get(userId.toLowerCase()), fileName);
+    } catch (Exception e) {
       throw new IllegalStateException(e.getMessage());
     }
   }
@@ -86,22 +85,22 @@ public class NUPlannerSystem implements PlannerSystem {
   public String displayUserSchedule(String userId) {
     this.validateUserExists(userId);
     ScheduleView scheduleView = new ScheduleViewModel();
-    return scheduleView.render(this.users.get(userId));
+    return scheduleView.render(this.users.get(userId.toLowerCase()));
   }
 
   /**
    * Creates an event and adds it to the schedule of the specified user and all invitees.
    * Validates event time to prevent schedule conflicts before adding the event.
    *
-   * @param userId The user ID of the event host.
-   * @param name The name of the event.
-   * @param startDay The start day of the event.
+   * @param userId    The user ID of the event host.
+   * @param name      The name of the event.
+   * @param startDay  The start day of the event.
    * @param startTime The start time of the event.
-   * @param endDay The end day of the event.
-   * @param endTime The end time of the event.
-   * @param isOnline Indicates whether the event is online.
-   * @param location The location of the event (if not online).
-   * @param invitees A list of user IDs of the event invitees.
+   * @param endDay    The end day of the event.
+   * @param endTime   The end time of the event.
+   * @param isOnline  Indicates whether the event is online.
+   * @param location  The location of the event (if not online).
+   * @param invitees  A list of user IDs of the event invitees.
    * @throws IllegalArgumentException if event time conflicts with existing schedule.
    */
   @Override
@@ -123,16 +122,16 @@ public class NUPlannerSystem implements PlannerSystem {
    * all invitees.
    * Validates the modified event time to prevent schedule conflicts.
    *
-   * @param userId The user ID of the event host.
-   * @param event The event to be modified.
-   * @param name The new name of the event.
-   * @param startDay The new start day of the event.
+   * @param userId    The user ID of the event host.
+   * @param event     The event to be modified.
+   * @param name      The new name of the event.
+   * @param startDay  The new start day of the event.
    * @param startTime The new start time of the event.
-   * @param endDay The new end day of the event.
-   * @param endTime The new end time of the event.
-   * @param isOnline Indicates whether the event is online.
-   * @param location The new location of the event (if not online).
-   * @param invitees A new list of user IDs of the event invitees.
+   * @param endDay    The new end day of the event.
+   * @param endTime   The new end time of the event.
+   * @param isOnline  Indicates whether the event is online.
+   * @param location  The new location of the event (if not online).
+   * @param invitees  A new list of user IDs of the event invitees.
    */
   @Override
   public void modifyEvent(String userId, Event event, String name, String startDay,
@@ -162,8 +161,8 @@ public class NUPlannerSystem implements PlannerSystem {
    *
    * @param userId The user ID of the person making the modification. This is used to verify user
    *               existence.
-   * @param event The event to be modified.
-   * @param name The new name to assign to the event.
+   * @param event  The event to be modified.
+   * @param name   The new name to assign to the event.
    * @throws IllegalArgumentException If the event does not exist in the user's schedule or if the
    *                                  user does not exist.
    */
@@ -184,14 +183,14 @@ public class NUPlannerSystem implements PlannerSystem {
    * invitees.
    * Validates the new event time to prevent scheduling conflicts before applying the modification.
    *
-   * @param userId The user ID of the person making the modification.
-   * @param event The event to be modified.
-   * @param startDay The new start day for the event.
+   * @param userId    The user ID of the person making the modification.
+   * @param event     The event to be modified.
+   * @param startDay  The new start day for the event.
    * @param startTime The new start time for the event.
-   * @param endDay The new end day for the event.
-   * @param endTime The new end time for the event.
+   * @param endDay    The new end day for the event.
+   * @param endTime   The new end time for the event.
    * @throws IllegalArgumentException If the event does not exist, the user does not exist, or the
-   *                                 new time causes scheduling conflicts.
+   *                                  new time causes scheduling conflicts.
    */
   @Override
   public void modifyEvent(String userId, Event event, String startDay, String startTime,
@@ -209,8 +208,8 @@ public class NUPlannerSystem implements PlannerSystem {
    * Modifies the location and online status of a specified event in the user's schedule and
    * updates it across all invitees.
    *
-   * @param userId The user ID of the person making the modification.
-   * @param event The event to be modified.
+   * @param userId   The user ID of the person making the modification.
+   * @param event    The event to be modified.
    * @param isOnline Specifies whether the event is online.
    * @param location The new location of the event if it's not online.
    * @throws IllegalArgumentException If the event does not exist in the user's schedule or if
@@ -233,8 +232,8 @@ public class NUPlannerSystem implements PlannerSystem {
    * Validates the updated event to ensure there are no scheduling conflicts with the new list of
    * invitees.
    *
-   * @param userId The user ID of the person making the modification.
-   * @param event The event to be modified.
+   * @param userId   The user ID of the person making the modification.
+   * @param event    The event to be modified.
    * @param invitees The new list of invitees for the event.
    * @throws IllegalArgumentException If the event does not exist in the user's schedule, the user
    *                                  does not exist, or the modification causes scheduling
@@ -258,7 +257,7 @@ public class NUPlannerSystem implements PlannerSystem {
    * the event is only removed from their schedule.
    *
    * @param userId The user ID of the person attempting to remove the event.
-   * @param event The event to be removed.
+   * @param event  The event to be removed.
    * @throws IllegalArgumentException If the event does not exist in the user's schedule or
    *                                  if the user does not exist.
    */
@@ -269,8 +268,7 @@ public class NUPlannerSystem implements PlannerSystem {
     this.validateEventExists(userId, event);
     if (userId.equals(event.getHost())) {
       this.removeEventFromSchedules(event);
-    }
-    else {
+    } else {
       users.get(userId).removeEvent(event);
       event.removeInvitee(userId);
     }
@@ -379,12 +377,13 @@ public class NUPlannerSystem implements PlannerSystem {
    */
   private void addEventToSchedules(Event event) {
     for (String user : event.getInvitees()) {
-      Schedule schedule = users.getOrDefault(user, new Schedule(user));
+      String userId = user.toLowerCase();
+      Schedule schedule = users.getOrDefault(userId, new Schedule(userId));
       if (!schedule.hasEvent(event)) {
         schedule.addEvent(event);
       }
-      if (!users.containsKey(user)) {
-        users.put(user, schedule);
+      if (!users.containsKey(userId)) {
+        users.put(userId, schedule);
       }
     }
 
@@ -400,8 +399,8 @@ public class NUPlannerSystem implements PlannerSystem {
    */
   private void validateEventTime(Event event) {
     for (String user : event.getInvitees()) {
-      if (users.containsKey(user)) {
-        if (users.get(user).overlap(event)) {
+      if (users.containsKey(user.toLowerCase())) {
+        if (users.get(user.toLowerCase()).overlap(event)) {
           throw new IllegalArgumentException("There is a time conflict in " + user + " schedule.");
         }
       }
@@ -417,7 +416,7 @@ public class NUPlannerSystem implements PlannerSystem {
    */
   private void validateUserExists(String userId) {
     ValidationUtilities.validateNull(userId);
-    if (users.get(userId) == null) {
+    if (users.get(userId.toLowerCase()) == null) {
       throw new IllegalArgumentException("User Schedule for " + userId
               + " does not exist in system");
     }
@@ -427,13 +426,13 @@ public class NUPlannerSystem implements PlannerSystem {
    * Validates that the event exists in the specified user's schedule.
    *
    * @param userId The ID of the user whose schedule is being checked.
-   * @param event The event to validate for existence.
+   * @param event  The event to validate for existence.
    * @throws IllegalArgumentException If the event does not exist in the specified user's schedule.
    */
   private void validateEventExists(String userId, Event event) {
     ValidationUtilities.validateNull(event);
     this.validateUserExists(userId);
-    if (!this.users.get(userId).hasEvent(event)) {
+    if (!this.users.get(userId.toLowerCase()).hasEvent(event)) {
       throw new IllegalArgumentException("Event doesn't exist in user " + userId + " schedule.");
     }
   }
@@ -448,9 +447,10 @@ public class NUPlannerSystem implements PlannerSystem {
    */
   private void removeEventFromSchedules(Event event) {
     for (String user : event.getInvitees()) {
-      if (users.containsKey(user)) {
-        users.get(user).removeEvent(event);
-        event.removeInvitee(user);
+      String format = user.toLowerCase();
+      if (users.containsKey(format)) {
+        users.get(format).removeEvent(event);
+        event.removeInvitee(format);
       }
     }
   }
