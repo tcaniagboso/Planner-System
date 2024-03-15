@@ -105,6 +105,15 @@ public class Schedule {
     });
   }
 
+  public Event findEvent(String day, String time) {
+    for (Event event: events) {
+      if (event.occurs(day, time)) {
+        return event;
+      }
+    }
+    return null;
+  }
+
   /**
    * Validates that an event exists within the schedule.
    *

@@ -194,6 +194,10 @@ public class Event {
     return this.id != event.id && this.time.overlap(event.time);
   }
 
+  public boolean occurs(String day, String time) {
+    return this.time.occurs(day, time);
+  }
+
   /**
    * Compares this event with the specified object for equality. Two events are considered equal
    * if all their respective fields (name, time, location, invitees, and host) are equal. This

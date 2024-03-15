@@ -130,6 +130,79 @@ public class Time {
   }
 
   /**
+   * Checks if the time period of this Time object overlaps with that of another.
+   *
+   * @param other The other Time object to compare with.
+   * @return true if there is an overlap, false otherwise.
+   */
+  public boolean overlap(Time other) {
+    if (this.equals(other)) {
+      return true;
+    }
+    int daysInWeek = 7;
+    int minutesInDay = 1440;
+
+    // Convert start and end times to minutes since the start of the week, considering Sunday as 0
+    long thisStartMinutes = this.getMinutes(this.startDay, this.startTime);
+    long thisEndMinutes = this.getMinutes(this.endDay, this.endTime);
+    if (thisEndMinutes < thisStartMinutes) {
+      thisEndMinutes += daysInWeek * minutesInDay; // Adjust for wrap-around
+    }
+
+    long otherStartMinutes = this.getMinutes(other.startDay, other.startTime);
+    long otherEndMinutes = this.getMinutes(other.endDay, other.endTime);
+    if (otherEndMinutes < otherStartMinutes) {
+      otherEndMinutes += daysInWeek * minutesInDay; // Adjust for wrap-around
+    }
+
+    // Check for overlap considering wrap-around
+    return !(otherEndMinutes <= thisStartMinutes || otherStartMinutes >= thisEndMinutes);
+  }
+
+  public boolean occurs(String day, String time) {
+    DayOfWeek givenDay = DayOfWeek.valueOf(day.toUpperCase());
+    LocalTime givenTime = LocalTime.parse(time, DateTimeFormatter.ofPattern("HHmm"));
+
+    int daysInWeek = 7;
+    int minutesInDay = 1440; // 24 hours * 60 minutes
+
+    // Convert the event's start and end times to minutes since the start of the week
+    long eventStartMinutes = this.getMinutes(this.startDay, this.startTime);
+    long eventEndMinutes = this.getMinutes(this.endDay, this.endTime);
+
+    if (eventEndMinutes < eventStartMinutes) {
+      eventEndMinutes += daysInWeek * minutesInDay; // Adjust for wrap-around
+    }
+
+    // Convert the given day and time to minutes since the start of the week
+    long givenMinutes = (givenDay.getValue() % 7) * minutesInDay
+            + givenTime.getHour() * 60 + givenTime.getMinute();
+
+    // Check if the given day and time occur during the event
+    // It occurs if it's after the start and strictly before the end
+    return givenMinutes >= eventStartMinutes && givenMinutes < eventEndMinutes;
+  }
+
+  @Override
+  public boolean equals(Object object) {
+    if (object == this) {
+      return true;
+    }
+    if (!(object instanceof Time)) {
+      return false;
+    }
+
+    Time other = (Time) object;
+    return this.startTime.equals(other.getStartTime()) && this.endTime.equals(other.getEndTime())
+            && this.startDay.equals(other.getStartDay()) && this.endDay.equals(other.getEndDay());
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(startDay, startTime, endDay, endTime);
+  }
+
+  /**
    * Validates the provided time string to ensure it represents a valid time in HHmm format.
    *
    * @param timeString The time string to validate.
@@ -168,57 +241,8 @@ public class Time {
     }
   }
 
-
-  /**
-   * Checks if the time period of this Time object overlaps with that of another.
-   *
-   * @param other The other Time object to compare with.
-   * @return true if there is an overlap, false otherwise.
-   */
-  public boolean overlap(Time other) {
-    if (this.equals(other)) {
-      return true;
-    }
-    int daysInWeek = 7;
-    int minutesInDay = 1440; // 24 hours * 60 minutes
-
-    // Convert start and end times to minutes since the start of the week, considering Sunday as 0
-    long thisStartMinutes = (this.startDay.getValue() % 7) * minutesInDay
-            + this.startTime.getHour() * 60 + this.startTime.getMinute();
-    long thisEndMinutes = (this.endDay.getValue() % 7) * minutesInDay
-            + this.endTime.getHour() * 60 + this.endTime.getMinute();
-    if (thisEndMinutes < thisStartMinutes) {
-      thisEndMinutes += daysInWeek * minutesInDay; // Adjust for wrap-around
-    }
-
-    long otherStartMinutes = (other.startDay.getValue() % 7) * minutesInDay
-            + other.startTime.getHour() * 60 + other.startTime.getMinute();
-    long otherEndMinutes = (other.endDay.getValue() % 7) * minutesInDay + other.endTime.getHour()
-            * 60 + other.endTime.getMinute();
-    if (otherEndMinutes < otherStartMinutes) {
-      otherEndMinutes += daysInWeek * minutesInDay; // Adjust for wrap-around
-    }
-
-    // Check for overlap considering wrap-around
-    return !(otherEndMinutes <= thisStartMinutes || otherStartMinutes >= thisEndMinutes);
-  }
-
-  @Override
-  public boolean equals(Object object) {
-    if (object == this) {
-      return true;
-    }
-    if (!(object instanceof Time)) {
-      return false;
-    }
-
-    Time other = (Time) object;
-    return this.startTime.equals(other.getStartTime()) && this.endTime.equals(other.getEndTime())
-            && this.startDay.equals(other.getStartDay()) && this.endDay.equals(other.getEndDay());
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(startDay, startTime, endDay, endTime);
+  private long getMinutes(DayOfWeek day, LocalTime time) {
+    return (day.getValue() % 7) * 1440
+            + time.getHour() * 60 + time.getMinute();
   }
 }

@@ -75,7 +75,7 @@ public class NUPlannerSystem implements PlannerSystem {
     this.validateUserExists(userId);
     String fileName = userId.toLowerCase() + ".xml";
     try {
-      ScheduleXMLWriter.writeScheduleToXML(users.get(userId.toLowerCase()), fileName);
+      ScheduleXMLWriter.writeScheduleToXML(this.getSchedule(userId), fileName);
     } catch (Exception e) {
       throw new IllegalStateException(e.getMessage());
     }
@@ -85,7 +85,7 @@ public class NUPlannerSystem implements PlannerSystem {
   public String displayUserSchedule(String userId) {
     this.validateUserExists(userId);
     ScheduleView scheduleView = new ScheduleViewModel();
-    return scheduleView.render(this.users.get(userId.toLowerCase()));
+    return scheduleView.render(this.getSchedule(userId));
   }
 
   /**
@@ -269,20 +269,36 @@ public class NUPlannerSystem implements PlannerSystem {
     if (userId.equals(event.getHost())) {
       this.removeEventFromSchedules(event);
     } else {
-      users.get(userId).removeEvent(event);
+      this.getSchedule(userId).removeEvent(event);
       event.removeInvitee(userId);
     }
   }
 
   @Override
-  public void automaticScheduling(String time) {
+  public void automaticScheduling(String userId, String name, boolean isOnline,
+                                  String location, List<String> invitees) {
 
   }
 
   @Override
-  public String showEvent(String userId, String startDay, String startTime, String endDay,
-                          String endTime) {
-    return null;
+  public String showEvent(String userId, String day, String time) {
+    this.validateUserExists(userId);
+    ValidationUtilities.validateNull(day);
+    ValidationUtilities.validateNull(time);
+    Event event = this.getSchedule(userId).findEvent(day, time);
+    StringBuilder eventString = new StringBuilder();
+    if (event == null) {
+      eventString.append("No event exists at this time");
+    }
+    else {
+     eventString.append(event.getName()).append(" happens at this time");
+    }
+    return eventString.toString();
+  }
+
+  public Schedule getSchedule(String userId) {
+    this.validateUserExists(userId);
+    return users.get(userId.toLowerCase());
   }
 
   /**
@@ -400,7 +416,7 @@ public class NUPlannerSystem implements PlannerSystem {
   private void validateEventTime(Event event) {
     for (String user : event.getInvitees()) {
       if (users.containsKey(user.toLowerCase())) {
-        if (users.get(user.toLowerCase()).overlap(event)) {
+        if (this.getSchedule(user).overlap(event)) {
           throw new IllegalArgumentException("There is a time conflict in " + user + " schedule.");
         }
       }
@@ -432,7 +448,7 @@ public class NUPlannerSystem implements PlannerSystem {
   private void validateEventExists(String userId, Event event) {
     ValidationUtilities.validateNull(event);
     this.validateUserExists(userId);
-    if (!this.users.get(userId.toLowerCase()).hasEvent(event)) {
+    if (!this.getSchedule(userId).hasEvent(event)) {
       throw new IllegalArgumentException("Event doesn't exist in user " + userId + " schedule.");
     }
   }

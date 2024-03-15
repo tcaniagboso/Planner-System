@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.List;
 
 import schedule.Event;
+import schedule.Schedule;
 
 public interface PlannerSystem {
 
@@ -31,9 +32,11 @@ public interface PlannerSystem {
 
   void removeEvent(String userId, Event event);
 
-  void automaticScheduling(String time);
+  void automaticScheduling(String userId, String name, boolean isOnline,
+                           String location, List<String> invitees);
 
-  String showEvent(String userId, String startDay, String startTime, String endDay, String endTime);
+  String showEvent(String userId, String day, String time);
 
+  Schedule getSchedule(String userId);
 
 }
