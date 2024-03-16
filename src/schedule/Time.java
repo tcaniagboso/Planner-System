@@ -9,8 +9,9 @@ import java.util.Objects;
 import validationutilities.ValidationUtilities;
 
 /**
- * Represents time information for an event, including start and end times along with their
- * respective days.
+ * Represents the timing information for an event, including start and end times along with
+ * their respective days. This class is responsible for managing time-related data for events,
+ * ensuring time validity, and providing methods for time comparison.
  */
 public class Time {
 
@@ -19,7 +20,14 @@ public class Time {
   private DayOfWeek endDay;
   private LocalTime endTime;
 
-
+  /**
+   * Constructs a new Time object with specified start and end times for convenient testing.
+   *
+   * @param startDay  The start day as a string.
+   * @param startTime The start time in HHmm format.
+   * @param endDay    The end day as a string.
+   * @param endTime   The end time in HHmm format.
+   */
   public Time(String startDay, String startTime, String endDay, String endTime) {
     this.setStartDay(startDay);
     this.setStartTime(startTime);
@@ -27,6 +35,9 @@ public class Time {
     this.setEndTime(endTime);
   }
 
+  /**
+   * Default constructor for Time object. Initializes an instance without specific time details.
+   */
   public Time() {
   }
 
@@ -71,7 +82,6 @@ public class Time {
       throw new IllegalStateException("Start day must be set before start time.");
     }
     this.startTime = this.validateTime(startTime);
-    ;
   }
 
   /**
@@ -159,6 +169,13 @@ public class Time {
     return !(otherEndMinutes <= thisStartMinutes || otherStartMinutes >= thisEndMinutes);
   }
 
+  /**
+   * Determines whether this Time instance occurs on a specific day and time.
+   *
+   * @param day  The day to check, as a string.
+   * @param time The time to check, in HHmm format.
+   * @return true if this Time occurs at the specified day and time, false otherwise.
+   */
   public boolean occurs(String day, String time) {
     DayOfWeek givenDay = DayOfWeek.valueOf(day.toUpperCase());
     LocalTime givenTime = LocalTime.parse(time, DateTimeFormatter.ofPattern("HHmm"));
@@ -241,6 +258,14 @@ public class Time {
     }
   }
 
+  /**
+   * Calculates the total minutes from the start of the week for a given day and time.
+   * This method is used for internal calculations related to event scheduling and overlap checks.
+   *
+   * @param day  The day of the week.
+   * @param time The time of day.
+   * @return The total number of minutes from the start of the week to the specified day and time.
+   */
   private long getMinutes(DayOfWeek day, LocalTime time) {
     return (day.getValue() % 7) * 1440
             + time.getHour() * 60 + time.getMinute();

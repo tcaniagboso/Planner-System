@@ -11,7 +11,7 @@ import schedule.TimeUtilities;
  * Implementation of the ScheduleView interface that provides functionality
  * to render a Schedule object into a human-readable string representation.
  */
-public class ScheduleViewModel implements ScheduleView{
+public class ScheduleViewModel implements ScheduleView {
 
   @Override
   public String render(Schedule schedule) {
@@ -25,8 +25,11 @@ public class ScheduleViewModel implements ScheduleView{
     for (int day = 0; day < 7; day++) {
       int index = (day == 0) ? day + 7 : day;
       DayOfWeek currentDay = DayOfWeek.of(index);
-      view.append(TimeUtilities.formatDay(currentDay)).append(":").append(System.lineSeparator());
-      for (Event event: schedule.getEvents()) {
+      view.append(TimeUtilities.formatDay(currentDay)).append(":");
+      if (day < 6) {
+        view.append(System.lineSeparator());
+      }
+      for (Event event : schedule.getEvents()) {
         if (event.getTime().getStartDay() == currentDay) {
           view.append("        name: ").append(event.getName()).append(System.lineSeparator());
           view.append("        time: ").append(TimeUtilities.formatDay(currentDay)).append(": ")
@@ -46,7 +49,6 @@ public class ScheduleViewModel implements ScheduleView{
             view.append(invitees.get(i)).append(System.lineSeparator());
           }
         }
-        view.append(System.lineSeparator());
       }
     }
     return view.toString();

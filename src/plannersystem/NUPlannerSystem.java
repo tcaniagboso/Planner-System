@@ -2,7 +2,6 @@ package plannersystem;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -22,6 +21,7 @@ import java.util.Map;
 import schedule.Event;
 import schedule.Schedule;
 import schedule.ScheduleXMLWriter;
+import schedule.TimeUtilities;
 import scheduleview.ScheduleView;
 import scheduleview.ScheduleViewModel;
 import validationutilities.ValidationUtilities;
@@ -41,16 +41,7 @@ public class NUPlannerSystem implements PlannerSystem {
     this.users = new HashMap<>();
   }
 
-  /**
-   * Reads a user's schedule from an XML file and updates the system's user schedule map.
-   * The method parses the XML file to create and add events to the user's schedule.
-   *
-   * @param xmlFile The XML file containing the user's schedule to be read.
-   * @throws IllegalStateException    if there's an error creating the document builder, opening the
-   *                                  file, or parsing the XML.
-   * @throws IllegalArgumentException if the XML file contains invalid data that doesn't conform to
-   *                                  expected structure.
-   */
+
   @Override
   public void readUserSchedule(File xmlFile) {
     ValidationUtilities.validateNull(xmlFile);
@@ -61,13 +52,10 @@ public class NUPlannerSystem implements PlannerSystem {
       document.getDocumentElement().normalize();
       processXmlDocument(document);
     } catch (ParserConfigurationException ex) {
-      ex.printStackTrace();
       throw new IllegalStateException("Error in creating the builder");
     } catch (IOException ioEx) {
-      ioEx.printStackTrace();
       throw new IllegalStateException("Error in opening the file");
     } catch (SAXException saxEx) {
-      saxEx.printStackTrace();
       throw new IllegalStateException("Error in parsing the file");
     } catch (IllegalArgumentException e) {
       throw new IllegalArgumentException(e.getMessage());
@@ -92,21 +80,6 @@ public class NUPlannerSystem implements PlannerSystem {
     return scheduleView.render(this.getSchedule(userId));
   }
 
-  /**
-   * Creates an event and adds it to the schedule of the specified user and all invitees.
-   * Validates event time to prevent schedule conflicts before adding the event.
-   *
-   * @param userId    The user ID of the event host.
-   * @param name      The name of the event.
-   * @param startDay  The start day of the event.
-   * @param startTime The start time of the event.
-   * @param endDay    The end day of the event.
-   * @param endTime   The end time of the event.
-   * @param isOnline  Indicates whether the event is online.
-   * @param location  The location of the event (if not online).
-   * @param invitees  A list of user IDs of the event invitees.
-   * @throws IllegalArgumentException if event time conflicts with existing schedule.
-   */
   @Override
   public void createEvent(String userId, String name, String startDay, String startTime,
                           String endDay, String endTime, boolean isOnline, String location,
@@ -121,22 +94,6 @@ public class NUPlannerSystem implements PlannerSystem {
     this.addEventToSchedules(newEvent);
   }
 
-  /**
-   * Modifies an existing event with new details in the schedule of the specified user and
-   * all invitees.
-   * Validates the modified event time to prevent schedule conflicts.
-   *
-   * @param userId    The user ID of the event host.
-   * @param event     The event to be modified.
-   * @param name      The new name of the event.
-   * @param startDay  The new start day of the event.
-   * @param startTime The new start time of the event.
-   * @param endDay    The new end day of the event.
-   * @param endTime   The new end time of the event.
-   * @param isOnline  Indicates whether the event is online.
-   * @param location  The new location of the event (if not online).
-   * @param invitees  A new list of user IDs of the event invitees.
-   */
   @Override
   public void modifyEvent(String userId, Event event, String name, String startDay,
                           String startTime, String endDay, String endTime, boolean isOnline,
@@ -144,137 +101,138 @@ public class NUPlannerSystem implements PlannerSystem {
     ValidationUtilities.validateNull(event);
     this.validateUserExists(userId);
     this.validateEventExists(userId, event);
-    Event clone = new Event(event);
-    clone.setName(name);
-    clone.setEventTimes(startDay, startTime, endDay, endTime);
-    clone.setLocation(isOnline, location);
-    clone.setInvitees(invitees);
-    this.validateEventTime(clone);
 
-    event.setName(name);
-    event.setEventTimes(startDay, startTime, endDay, endTime);
-    event.setLocation(isOnline, location);
-    event.setInvitees(invitees);
-    this.addEventToSchedules(event);
+    Event existingEvent = this.getSchedule(userId).getEvent(event);
+
+    // Backup the original state
+    String oldStartDay = TimeUtilities.formatDay(existingEvent.getTime().getStartDay());
+    String oldEndDay = TimeUtilities.formatDay(existingEvent.getTime().getEndDay());
+    String oldStartTime = TimeUtilities.formatTime(existingEvent.getTime().getStartTime());
+    String oldEndTime = TimeUtilities.formatTime(existingEvent.getTime().getEndTime());
+    String oldName = existingEvent.getName();
+    String oldHost = existingEvent.getHost();
+    boolean oldOnline = existingEvent.getLocation().isOnline();
+    String oldPlace = existingEvent.getLocation().getLocation();
+    List<String> oldInvitees = existingEvent.getInvitees();
+
+    // Remove the event from all schedules
+    removeEventFromSchedules(existingEvent);
+
+    try {
+      // Modify the event
+      existingEvent.setName(name);
+      existingEvent.setEventTimes(startDay, startTime, endDay, endTime);
+      existingEvent.setLocation(isOnline, location);
+      existingEvent.setInvitees(new ArrayList<>(invitees));
+      // Re-validate and add the modified event to schedules
+      this.validateEventTime(event);
+      this.addEventToSchedules(event);
+    } catch (IllegalArgumentException e) {
+      existingEvent.setName(oldName);
+      existingEvent.setEventTimes(oldStartDay, oldStartTime, oldEndDay, oldEndTime);
+      existingEvent.setHost(oldHost);
+      existingEvent.setLocation(oldOnline, oldPlace);
+      existingEvent.setInvitees(oldInvitees);
+      this.addEventToSchedules(existingEvent);
+      throw e;
+    }
   }
 
-  /**
-   * Modifies the name of a specified event in the user's schedule and updates it across
-   * all invitees.
-   * Ensures the event exists and is valid before applying the change.
-   *
-   * @param userId The user ID of the person making the modification. This is used to verify user
-   *               existence.
-   * @param event  The event to be modified.
-   * @param name   The new name to assign to the event.
-   * @throws IllegalArgumentException If the event does not exist in the user's schedule or if the
-   *                                  user does not exist.
-   */
   @Override
   public void modifyEvent(String userId, Event event, String name) {
     ValidationUtilities.validateNull(event);
     this.validateUserExists(userId);
     this.validateEventExists(userId, event);
 
-    Event clone = new Event(event);
-    clone.setName(name);
-    event.setName(name);
+    String oldName = event.getName();
+    Event existingEvent = this.getSchedule(userId).getEvent(event);
 
+    try {
+      existingEvent.setName(name);
+    } catch (IllegalArgumentException e) {
+      existingEvent.setName(oldName);
+      throw e;
+    }
   }
 
-  /**
-   * Modifies the time of a specified event in the user's schedule and updates it across all
-   * invitees.
-   * Validates the new event time to prevent scheduling conflicts before applying the modification.
-   *
-   * @param userId    The user ID of the person making the modification.
-   * @param event     The event to be modified.
-   * @param startDay  The new start day for the event.
-   * @param startTime The new start time for the event.
-   * @param endDay    The new end day for the event.
-   * @param endTime   The new end time for the event.
-   * @throws IllegalArgumentException If the event does not exist, the user does not exist, or the
-   *                                  new time causes scheduling conflicts.
-   */
   @Override
   public void modifyEvent(String userId, Event event, String startDay, String startTime,
                           String endDay, String endTime) {
     ValidationUtilities.validateNull(event);
     this.validateUserExists(userId);
     this.validateEventExists(userId, event);
-    Event clone = new Event(event);
-    clone.setEventTimes(startDay, startTime, endDay, endTime);
-    this.validateEventTime(clone);
-    event.setEventTimes(startDay, startTime, endDay, endTime);
+    Event existingEvent = this.getSchedule(userId).getEvent(event);
+
+    // Backup the original state
+    String oldStartDay = TimeUtilities.formatDay(existingEvent.getTime().getStartDay());
+    String oldEndDay = TimeUtilities.formatDay(existingEvent.getTime().getEndDay());
+    String oldStartTime = TimeUtilities.formatTime(existingEvent.getTime().getStartTime());
+    String oldEndTime = TimeUtilities.formatTime(existingEvent.getTime().getEndTime());
+
+    removeEventFromSchedules(existingEvent); // Remove the event
+
+    try {
+      existingEvent.setEventTimes(startDay, startTime, endDay, endTime); // Modify the event
+
+      this.validateEventTime(existingEvent); // Re-validate
+      this.addEventToSchedules(existingEvent); // Re-add the modified event
+    } catch (IllegalArgumentException e) {
+      existingEvent.setEventTimes(oldStartDay, oldStartTime, oldEndDay, oldEndTime);
+      this.addEventToSchedules(existingEvent); // Re-add the original event
+      throw e;
+    }
   }
 
-  /**
-   * Modifies the location and online status of a specified event in the user's schedule and
-   * updates it across all invitees.
-   *
-   * @param userId   The user ID of the person making the modification.
-   * @param event    The event to be modified.
-   * @param isOnline Specifies whether the event is online.
-   * @param location The new location of the event if it's not online.
-   * @throws IllegalArgumentException If the event does not exist in the user's schedule or if
-   *                                  the user does not exist.
-   */
   @Override
   public void modifyEvent(String userId, Event event, boolean isOnline, String location) {
     ValidationUtilities.validateNull(event);
     this.validateUserExists(userId);
     this.validateEventExists(userId, event);
-    Event clone = new Event(event);
-    clone.setLocation(isOnline, location);
-    event.setLocation(isOnline, location);
+    Event existingEvent = this.getSchedule(userId).getEvent(event);
+    boolean oldOnline = existingEvent.getLocation().isOnline();
+    String oldPlace = existingEvent.getLocation().getLocation();
 
+    try {
+      existingEvent.setLocation(isOnline, location);
+    } catch (IllegalArgumentException e) {
+      existingEvent.setLocation(oldOnline, oldPlace);
+      throw e;
+    }
   }
 
-  /**
-   * Modifies the list of invitees for a specified event in the user's schedule and updates
-   * it across all affected schedules.
-   * Validates the updated event to ensure there are no scheduling conflicts with the new list of
-   * invitees.
-   *
-   * @param userId   The user ID of the person making the modification.
-   * @param event    The event to be modified.
-   * @param invitees The new list of invitees for the event.
-   * @throws IllegalArgumentException If the event does not exist in the user's schedule, the user
-   *                                  does not exist, or the modification causes scheduling
-   *                                  conflicts.
-   */
   @Override
   public void modifyEvent(String userId, Event event, List<String> invitees) {
     ValidationUtilities.validateNull(event);
     this.validateUserExists(userId);
     this.validateEventExists(userId, event);
-    Event clone = new Event(event);
-    clone.setInvitees(invitees);
-    this.validateEventTime(clone);
-    event.setInvitees(invitees);
-    this.addEventToSchedules(event);
+
+    Event existingEvent = this.getSchedule(userId).getEvent(event);
+    List<String> oldInvitees = existingEvent.getInvitees();
+    removeEventFromSchedules(existingEvent); // Remove the event
+
+    try {
+      existingEvent.setInvitees(new ArrayList<>(invitees)); // Modify the event
+
+      this.validateEventTime(existingEvent); // Re-validate
+      this.addEventToSchedules(existingEvent); // Re-add the modified event
+    } catch (IllegalArgumentException e) {
+      existingEvent.setInvitees(oldInvitees);
+      this.addEventToSchedules(existingEvent); // Re-add the original event
+      throw e;
+    }
   }
 
-  /**
-   * Removes an event from the user's schedule. If the user is the host of the event,
-   * the event is removed from all invitees' schedules as well. If the user is not the host,
-   * the event is only removed from their schedule.
-   *
-   * @param userId The user ID of the person attempting to remove the event.
-   * @param event  The event to be removed.
-   * @throws IllegalArgumentException If the event does not exist in the user's schedule or
-   *                                  if the user does not exist.
-   */
   @Override
   public void removeEvent(String userId, Event event) {
     ValidationUtilities.validateNull(event);
     this.validateUserExists(userId);
     this.validateEventExists(userId, event);
-    if (userId.equals(event.getHost())) {
-      this.removeEventFromSchedules(event);
+    Event existingEvent = this.getSchedule(userId).getEvent(event);
+    if (userId.equals(existingEvent.getHost())) {
+      this.removeEventFromSchedules(existingEvent);
     } else {
-      this.getSchedule(userId).removeEvent(event);
-      event.removeInvitee(userId);
+      this.getSchedule(userId).removeEvent(existingEvent);
+      existingEvent.removeInvitee(userId);
     }
   }
 

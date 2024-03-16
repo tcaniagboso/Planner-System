@@ -13,6 +13,9 @@ public class Location {
   private boolean isOnline;
   private String location;
 
+  public Location() {
+
+  }
 
   /**
    * Checks if the event is an online event.

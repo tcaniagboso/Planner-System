@@ -1,55 +1,40 @@
 package schedule;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.UUID;
 
 import validationutilities.ValidationUtilities;
 
-
 /**
- * Represents an event, encapsulating details such as the event's name, timing, location,
- * host, and a list of invitees.
- * This class provides mechanisms to manage event details including adding and
- * removing invitees and checking for time overlaps with other events.
+ * Represents an event within a user's schedule, encapsulating all necessary details such as
+ * event name, timing, location, host, and invitees. This class provides functionality to manage
+ * these details efficiently, including the ability to check for time overlaps with other events.
  */
 public class Event {
-
-  private final UUID id;
   private String name;
   private final Time time;
   private final Location location;
   private String host;
-  private Set<String> invitees;
+  private final Set<String> invitees;
 
   /**
-   * Initializes a new Event instance with default Time and Location settings,
-   * and an empty set of invitees.
+   * Constructs a new Event instance with default settings for time and location,
+   * initializing with an empty set of invitees.
    */
   public Event() {
-    this.id = UUID.randomUUID();
     this.time = new Time();
     this.location = new Location();
     this.invitees = new LinkedHashSet<>();
   }
 
-  public Event(Event other) {
-    this.id = other.id;
-    this.name = other.name;
-    this.time = other.time;
-    this.location = other.location;
-    this.host = other.host;
-    this.invitees = other.invitees;
-  }
-
   /**
-   * Returns the name of the event.
+   * Retrieves the name of the event.
    *
-   * @return the name of the event
+   * @return The name of the event.
+   * @throws IllegalStateException If the event name has not been set.
    */
   public String getName() {
     ValidationUtilities.validateGetNull(this.name);
@@ -57,10 +42,10 @@ public class Event {
   }
 
   /**
-   * Sets the name of the event. The name cannot be null or empty.
+   * Sets the name of the event. The name must not be null or empty.
    *
-   * @param name The name to set for this event.
-   * @throws IllegalArgumentException if the name is null or empty.
+   * @param name The name to assign to this event.
+   * @throws IllegalArgumentException If the name is null or empty.
    */
   public void setName(String name) {
     if (name == null || name.isEmpty()) {
@@ -70,17 +55,18 @@ public class Event {
   }
 
   /**
-   * Returns the Time object associated with this event.
+   * Retrieves the time details associated with this event.
    *
-   * @return The time of the event.
+   * @return The {@link Time} object representing the event's timing.
    */
   public Time getTime() {
     return time;
   }
 
+
   /**
-   * Sets the start and end times for the event, including the days. This method
-   * is a convenience method that sets all time-related fields at once.
+   * Sets the start and end times for the event, including the days. This is a convenience
+   * method to update all time-related fields in one call.
    *
    * @param startDay  The start day of the event.
    * @param startTime The start time of the event.
@@ -95,10 +81,10 @@ public class Event {
   }
 
   /**
-   * Sets the location for this event.
+   * Configures the location details for this event.
    *
-   * @param isOnline True if the event is online, false otherwise.
-   * @param location The location where the event will take place.
+   * @param isOnline Indicates whether the event is held online.
+   * @param location The physical location of the event if it's not online.
    */
   public void setLocation(boolean isOnline, String location) {
     this.location.setOnline(isOnline);
@@ -106,29 +92,30 @@ public class Event {
   }
 
   /**
-   * Returns the Location object associated with this event.
+   * Retrieves the location details for this event.
    *
-   * @return The location of the event.
+   * @return The {@link Location} object representing the event's location.
    */
   public Location getLocation() {
     return this.location;
   }
 
   /**
-   * Returns the set of Users associated with this event as invitees.
+   * Retrieves a list of invitees to this event.
    *
-   * @return The set of invitees for this event.
+   * @return A list containing the invitees' IDs.
    */
   public List<String> getInvitees() {
     return new ArrayList<>(invitees);
   }
 
   /**
-   * Sets the list of invitees for this event. The invitees list cannot be null and
-   * cannot contain null elements.
+   * Updates the list of invitees for this event. The provided list must not be null and must
+   * include the host.
    *
-   * @param invitees The list of Users representing the users invited to the event.
-   * @throws IllegalArgumentException if the invitees list is null or contains null elements.
+   * @param invitees The new list of invitees' IDs.
+   * @throws IllegalArgumentException If the list is null, contains null elements,
+   *                                  or does not include the host.
    */
   public void setInvitees(List<String> invitees) {
     if (invitees == null || invitees.contains(null)) {
@@ -147,10 +134,10 @@ public class Event {
   }
 
   /**
-   * Returns the User object representing the host of this event. The host is the
-   * user responsible for creating or managing the event.
+   * Retrieves the host's ID for this event.
    *
-   * @return The User object representing the host of the event.
+   * @return The host's ID.
+   * @throws IllegalStateException If the host has not been set.
    */
   public String getHost() {
     ValidationUtilities.validateGetNull(this.host);
@@ -193,23 +180,38 @@ public class Event {
     this.invitees.remove(invitee.toLowerCase());
   }
 
+  /**
+   * Determines if this event overlaps with another event in terms of time.
+   * Overlapping is determined based on the start and end times of both events.
+   *
+   * @param event The event to check for an overlap with.
+   * @return true if the events overlap in time, false otherwise.
+   */
   public boolean overlap(Event event) {
-    return this.id != event.id && this.time.overlap(event.time);
+    return this.time.overlap(event.time);
   }
 
+  /**
+   * Checks if this event occurs on a specific day and time.
+   * This method is used to find if an event matches a given day and time,
+   * useful for querying events in a schedule.
+   *
+   * @param day  The day to check the event against.
+   * @param time The time to check the event against.
+   * @return true if the event occurs on the specified day and time, false otherwise.
+   */
   public boolean occurs(String day, String time) {
     return this.time.occurs(day, time);
   }
 
   /**
-   * Compares this event with the specified object for equality. Two events are considered equal
-   * if all their respective fields (name, time, location, invitees, and host) are equal. This
-   * method uses {@link Objects#equals(Object, Object)} for field comparisons to handle nulls
-   * gracefully.
+   * Compares this event with another object for equality. Two events are considered equal
+   * if their names, times, locations, lists of invitees, and hosts are all equal.
+   * This method allows for null-safe comparisons of event fields.
    *
-   * @param object the object to be compared for equality with this event.
-   * @return true if the specified object is equal to this event based on the criteria defined
-   * above.
+   * @param object The object to compare this event with.
+   * @return true if the provided object represents an event equivalent to this one, false
+   * otherwise.
    */
   @Override
   public boolean equals(Object object) {
@@ -228,12 +230,10 @@ public class Event {
   }
 
   /**
-   * Returns a hash code value for this event. The hash code is generated by combining the hash
-   * codes of all the event's fields using {@link Objects#hash(Object...)} method. This ensures that
-   * {@code hashCode} is consistent with {@code equals} as per the contract specified in
-   * {@link Object#hashCode()}.
+   * Generates a hash code for this event. The hash code is calculated using all the event's
+   * fields to ensure consistency with the {@code equals} method.
    *
-   * @return a hash code value for this event.
+   * @return A hash code value for this event.
    */
   @Override
   public int hashCode() {
@@ -241,10 +241,11 @@ public class Event {
   }
 
   /**
-   * Validates that a User object is not null.
+   * Validates that the given string representing a user is not null or empty. This method
+   * is used to ensure that user-related parameters in event operations are valid.
    *
-   * @param user The user to validate.
-   * @throws IllegalArgumentException if the user is null.
+   * @param user The string representing the user to validate.
+   * @throws IllegalArgumentException if the user string is null or empty.
    */
   private void validateUser(String user) {
     if (user == null || user.isEmpty()) {

@@ -2,25 +2,39 @@ package schedule;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+
 import java.io.File;
+
 import javax.xml.transform.OutputKeys;
 
 /**
- * Write schedule info for XML file.
+ * Provides functionality to write schedule information into an XML file.
+ * This class enables the serialization of a {@link Schedule} object to XML, preserving
+ * event details, including names, times, locations, hosts, and invitees.
  */
 public class ScheduleXMLWriter {
 
+
   /**
-   * Has the provided schedule object for an XML file at the specific path.
-   * @param schedule schedule to write XML
-   * @param filePath filepath where XML should be saved
-   * @throws Exception if an error happens during doc building
+   * Writes the provided {@link Schedule} object to an XML file at the specified file path.
+   * This method serializes the entire schedule, including all events and their details,
+   * into an XML structure and saves it to a file.
+   *
+   * @param schedule The {@link Schedule} object to be serialized to XML.
+   * @param filePath The file path where the XML file will be saved.
+   * @throws Exception if an error occurs during document building, XML serialization,
+   *                   or file writing. Specific exceptions might include
+   *                   {@link javax.xml.parsers.ParserConfigurationException},
+   *                   {@link javax.xml.transform.TransformerConfigurationException},
+   *                   {@link javax.xml.transform.TransformerException},
+   *                   and others related to IO operations.
    */
   public static void writeScheduleToXML(Schedule schedule, String filePath) throws Exception {
     DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();
@@ -74,10 +88,13 @@ public class ScheduleXMLWriter {
   }
 
   /**
-   * Appends the time details for an event XML element.
-   * @param doc XML document
-   * @param timeElement XML element for where the details will append
-   * @param time time object containing the details
+   * Appends time details of an event to the provided time XML element.
+   * This helper method constructs and appends XML elements representing the start and end times
+   * (including days and times) of an event to a parent time XML element.
+   *
+   * @param doc         The XML {@link Document} being constructed.
+   * @param timeElement The parent XML {@link Element} to which time details are appended.
+   * @param time        The {@link Time} object containing the event's time details.
    */
   private static void appendTimeDetails(Document doc, Element timeElement, Time time) {
     Element startDayElement = doc.createElement("start-day");
@@ -98,10 +115,13 @@ public class ScheduleXMLWriter {
   }
 
   /**
-   * Appends the location details for an XML file.
-   * @param doc the XML file
-   * @param locationElement location XML element where details will append
-   * @param location location object that has details
+   * Appends location details of an event to the provided location XML element.
+   * This helper method constructs and appends XML elements representing whether the event is online
+   * and its physical location (if applicable) to a parent location XML element.
+   *
+   * @param doc             The XML {@link Document} being constructed.
+   * @param locationElement The parent XML {@link Element} to which location details are appended.
+   * @param location        The {@link Location} object containing the event's location details.
    */
   private static void appendLocationDetails(Document doc, Element locationElement,
                                             Location location) {

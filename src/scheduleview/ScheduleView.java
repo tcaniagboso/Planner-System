@@ -18,8 +18,8 @@ public interface ScheduleView {
    *
    * @param schedule The Schedule object to be rendered.
    * @return A human-readable String representation of the Schedule, organized
-   *         by day of the week and listing details of each event.
+   * by day of the week and listing details of each event.
    * @throws IllegalArgumentException if the provided Schedule is null.
    */
-  String render (Schedule schedule);
+  String render(Schedule schedule);
 }
