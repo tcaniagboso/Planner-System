@@ -5,10 +5,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
 public class TimeUtilities {
-  public static String formatTime(LocalTime Time) {
-    // Example LocalTime
-    LocalTime time = LocalTime.of(11, 50);
-
+  public static String formatTime(LocalTime time) {
     // Formatter to remove the colon
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HHmm");
 

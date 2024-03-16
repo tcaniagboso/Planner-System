@@ -2,6 +2,7 @@ package plannersystem;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -60,10 +61,13 @@ public class NUPlannerSystem implements PlannerSystem {
       document.getDocumentElement().normalize();
       processXmlDocument(document);
     } catch (ParserConfigurationException ex) {
+      ex.printStackTrace();
       throw new IllegalStateException("Error in creating the builder");
     } catch (IOException ioEx) {
+      ioEx.printStackTrace();
       throw new IllegalStateException("Error in opening the file");
     } catch (SAXException saxEx) {
+      saxEx.printStackTrace();
       throw new IllegalStateException("Error in parsing the file");
     } catch (IllegalArgumentException e) {
       throw new IllegalArgumentException(e.getMessage());
@@ -289,9 +293,8 @@ public class NUPlannerSystem implements PlannerSystem {
     StringBuilder eventString = new StringBuilder();
     if (event == null) {
       eventString.append("No event exists at this time");
-    }
-    else {
-     eventString.append(event.getName()).append(" happens at this time");
+    } else {
+      eventString.append(event.getName()).append(" happens at this time");
     }
     return eventString.toString();
   }

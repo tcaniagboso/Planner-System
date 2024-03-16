@@ -2,6 +2,7 @@ package schedule;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -33,7 +34,7 @@ public class Event {
     this.id = UUID.randomUUID();
     this.time = new Time();
     this.location = new Location();
-    this.invitees = new HashSet<>();
+    this.invitees = new LinkedHashSet<>();
   }
 
   public Event(Event other) {
@@ -140,7 +141,9 @@ public class Event {
     if (!invitees.contains(this.host.toLowerCase())) {
       throw new IllegalArgumentException("The list of invitees must contain the host of the event");
     }
-    this.invitees = new HashSet<>(invitees);
+    for (String string : invitees) {
+      this.invitees.add(string.toLowerCase());
+    }
   }
 
   /**
@@ -174,7 +177,7 @@ public class Event {
    */
   public void addInvitee(String invitee) {
     this.validateUser(invitee);
-    this.invitees.add(invitee);
+    this.invitees.add(invitee.toLowerCase());
 
   }
 
@@ -187,7 +190,7 @@ public class Event {
    */
   public void removeInvitee(String invitee) {
     this.validateUser(invitee);
-    this.invitees.remove(invitee);
+    this.invitees.remove(invitee.toLowerCase());
   }
 
   public boolean overlap(Event event) {

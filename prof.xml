@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <schedule id="Prof. Lucia">
 	<event>
-		<name>"CS3500 Morning Lecture"</name>
+		<name>CS3500 Morning Lecture</name>
 		<time>
 			<start-day>Tuesday</start-day>
 			<start>0950</start>
@@ -10,16 +10,16 @@
 		</time>
 		<location>
 			<online>false</online>
-			<place>"Churchill Hall 101"</place>
+			<place>Churchill Hall 101</place>
 		</location>
 		<users>
-			<uid>"Prof. Lucia"</uid>
-			<uid>"Student Anon"</uid>
-			<uid>"Chat"</uid>
+			<uid>Prof. Lucia</uid>
+			<uid>Student Anon</uid>
+			<uid>Chat</uid>
 		</users>
 	</event>
 	<event>
-		<name>"CS3500 Afternoon Lecture"</name>
+		<name>CS3500 Afternoon Lecture</name>
 		<time>
 			<start-day>Tuesday</start-day>
 			<start>1335</start>
@@ -28,11 +28,11 @@
 		</time>
 		<location>
 			<online>false</online>
-			<place>"Churchill Hall 101"</place>
+			<place>Churchill Hall 101</place>
 		</location>
 		<users>
-			<uid>"Prof. Lucia"</uid>
-			<uid>"Chat"</uid>
+			<uid>Prof. Lucia</uid>
+			<uid>Chat</uid>
 		</users>
 	</event>
 	<event>
@@ -48,7 +48,7 @@
 			<place>Home</place>
 		</location>
 		<users>
-			<uid>"Prof. Lucia"</uid>
+			<uid>Prof. Lucia</uid>
 		</users>
 	</event>
 </schedule>
