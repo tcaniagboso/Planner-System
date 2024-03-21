@@ -1,4 +1,4 @@
-package schedule;
+package plannersystem;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -13,6 +13,12 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 
 import javax.xml.transform.OutputKeys;
+
+import schedule.Event;
+import schedule.Location;
+import schedule.Schedule;
+import schedule.Time;
+import schedule.TimeUtilities;
 
 /**
  * Provides functionality to write schedule information into an XML file.

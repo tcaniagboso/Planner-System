@@ -148,8 +148,8 @@ public class Schedule {
    * @throws IllegalArgumentException If the event does not exist in the schedule.
    */
   private void validateEventExists(Event event) {
-    if (!events.contains(event)) {
-      throw new IllegalArgumentException("This event does not exist");
+    if (!this.hasEvent(event)) {
+      throw new IllegalArgumentException("This event does not exist in " + userId + " schedule");
     }
   }
 

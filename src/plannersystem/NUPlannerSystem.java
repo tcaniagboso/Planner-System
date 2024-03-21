@@ -20,8 +20,6 @@ import java.util.Map;
 
 import schedule.Event;
 import schedule.Schedule;
-import schedule.ScheduleXMLWriter;
-import schedule.TimeUtilities;
 import scheduleview.ScheduleView;
 import scheduleview.ScheduleViewModel;
 import validationutilities.ValidationUtilities;
@@ -103,15 +101,7 @@ public class NUPlannerSystem implements PlannerSystem {
     this.validateEventExists(userId, event);
 
     // Backup the original state
-    String oldStartDay = TimeUtilities.formatDay(event.getTime().getStartDay());
-    String oldEndDay = TimeUtilities.formatDay(event.getTime().getEndDay());
-    String oldStartTime = TimeUtilities.formatTime(event.getTime().getStartTime());
-    String oldEndTime = TimeUtilities.formatTime(event.getTime().getEndTime());
-    String oldName = event.getName();
-    String oldHost = event.getHost();
-    boolean oldOnline = event.getLocation().isOnline();
-    String oldPlace = event.getLocation().getLocation();
-    List<String> oldInvitees = event.getInvitees();
+    EventBackup backup = this.backupEventDetails(event);
 
     // Remove the event from all schedules
     removeEventFromSchedules(event);
@@ -126,11 +116,7 @@ public class NUPlannerSystem implements PlannerSystem {
       this.validateEventTime(event);
       this.addEventToSchedules(event);
     } catch (IllegalArgumentException e) {
-      event.setName(oldName);
-      event.setEventTimes(oldStartDay, oldStartTime, oldEndDay, oldEndTime);
-      event.setHost(oldHost);
-      event.setLocation(oldOnline, oldPlace);
-      event.setInvitees(oldInvitees);
+      this.restoreEventFromBackup(event, backup);
       this.addEventToSchedules(event);
       throw e;
     }
@@ -160,10 +146,7 @@ public class NUPlannerSystem implements PlannerSystem {
     this.validateEventExists(userId, event);
 
     // Backup the original state
-    String oldStartDay = TimeUtilities.formatDay(event.getTime().getStartDay());
-    String oldEndDay = TimeUtilities.formatDay(event.getTime().getEndDay());
-    String oldStartTime = TimeUtilities.formatTime(event.getTime().getStartTime());
-    String oldEndTime = TimeUtilities.formatTime(event.getTime().getEndTime());
+    EventBackup backup = this.backupEventDetails(event);
 
     removeEventFromSchedules(event); // Remove the event
 
@@ -173,7 +156,7 @@ public class NUPlannerSystem implements PlannerSystem {
       this.validateEventTime(event); // Re-validate
       this.addEventToSchedules(event); // Re-add the modified event
     } catch (IllegalArgumentException e) {
-      event.setEventTimes(oldStartDay, oldStartTime, oldEndDay, oldEndTime);
+      this.restoreEventFromBackup(event, backup);
       this.addEventToSchedules(event); // Re-add the original event
       throw e;
     }
@@ -423,5 +406,17 @@ public class NUPlannerSystem implements PlannerSystem {
         event.removeInvitee(format);
       }
     }
+  }
+
+  private EventBackup backupEventDetails(Event event) {
+    return new EventBackup(event);
+  }
+
+  private void restoreEventFromBackup(Event event, EventBackup backup) {
+    event.setEventTimes(backup.startDay, backup.startTime, backup.endDay, backup.endTime);
+    event.setName(backup.name);
+    event.setHost(backup.host);
+    event.setLocation(backup.isOnline, backup.place);
+    event.setInvitees(backup.invitees);
   }
 }
