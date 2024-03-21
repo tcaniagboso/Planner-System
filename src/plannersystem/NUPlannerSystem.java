@@ -102,38 +102,36 @@ public class NUPlannerSystem implements PlannerSystem {
     this.validateUserExists(userId);
     this.validateEventExists(userId, event);
 
-    Event existingEvent = this.getSchedule(userId).getEvent(event);
-
     // Backup the original state
-    String oldStartDay = TimeUtilities.formatDay(existingEvent.getTime().getStartDay());
-    String oldEndDay = TimeUtilities.formatDay(existingEvent.getTime().getEndDay());
-    String oldStartTime = TimeUtilities.formatTime(existingEvent.getTime().getStartTime());
-    String oldEndTime = TimeUtilities.formatTime(existingEvent.getTime().getEndTime());
-    String oldName = existingEvent.getName();
-    String oldHost = existingEvent.getHost();
-    boolean oldOnline = existingEvent.getLocation().isOnline();
-    String oldPlace = existingEvent.getLocation().getLocation();
-    List<String> oldInvitees = existingEvent.getInvitees();
+    String oldStartDay = TimeUtilities.formatDay(event.getTime().getStartDay());
+    String oldEndDay = TimeUtilities.formatDay(event.getTime().getEndDay());
+    String oldStartTime = TimeUtilities.formatTime(event.getTime().getStartTime());
+    String oldEndTime = TimeUtilities.formatTime(event.getTime().getEndTime());
+    String oldName = event.getName();
+    String oldHost = event.getHost();
+    boolean oldOnline = event.getLocation().isOnline();
+    String oldPlace = event.getLocation().getLocation();
+    List<String> oldInvitees = event.getInvitees();
 
     // Remove the event from all schedules
-    removeEventFromSchedules(existingEvent);
+    removeEventFromSchedules(event);
 
     try {
       // Modify the event
-      existingEvent.setName(name);
-      existingEvent.setEventTimes(startDay, startTime, endDay, endTime);
-      existingEvent.setLocation(isOnline, location);
-      existingEvent.setInvitees(new ArrayList<>(invitees));
+      event.setName(name);
+      event.setEventTimes(startDay, startTime, endDay, endTime);
+      event.setLocation(isOnline, location);
+      event.setInvitees(new ArrayList<>(invitees));
       // Re-validate and add the modified event to schedules
       this.validateEventTime(event);
       this.addEventToSchedules(event);
     } catch (IllegalArgumentException e) {
-      existingEvent.setName(oldName);
-      existingEvent.setEventTimes(oldStartDay, oldStartTime, oldEndDay, oldEndTime);
-      existingEvent.setHost(oldHost);
-      existingEvent.setLocation(oldOnline, oldPlace);
-      existingEvent.setInvitees(oldInvitees);
-      this.addEventToSchedules(existingEvent);
+      event.setName(oldName);
+      event.setEventTimes(oldStartDay, oldStartTime, oldEndDay, oldEndTime);
+      event.setHost(oldHost);
+      event.setLocation(oldOnline, oldPlace);
+      event.setInvitees(oldInvitees);
+      this.addEventToSchedules(event);
       throw e;
     }
   }
@@ -145,12 +143,11 @@ public class NUPlannerSystem implements PlannerSystem {
     this.validateEventExists(userId, event);
 
     String oldName = event.getName();
-    Event existingEvent = this.getSchedule(userId).getEvent(event);
 
     try {
-      existingEvent.setName(name);
+      event.setName(name);
     } catch (IllegalArgumentException e) {
-      existingEvent.setName(oldName);
+      event.setName(oldName);
       throw e;
     }
   }
@@ -161,24 +158,23 @@ public class NUPlannerSystem implements PlannerSystem {
     ValidationUtilities.validateNull(event);
     this.validateUserExists(userId);
     this.validateEventExists(userId, event);
-    Event existingEvent = this.getSchedule(userId).getEvent(event);
 
     // Backup the original state
-    String oldStartDay = TimeUtilities.formatDay(existingEvent.getTime().getStartDay());
-    String oldEndDay = TimeUtilities.formatDay(existingEvent.getTime().getEndDay());
-    String oldStartTime = TimeUtilities.formatTime(existingEvent.getTime().getStartTime());
-    String oldEndTime = TimeUtilities.formatTime(existingEvent.getTime().getEndTime());
+    String oldStartDay = TimeUtilities.formatDay(event.getTime().getStartDay());
+    String oldEndDay = TimeUtilities.formatDay(event.getTime().getEndDay());
+    String oldStartTime = TimeUtilities.formatTime(event.getTime().getStartTime());
+    String oldEndTime = TimeUtilities.formatTime(event.getTime().getEndTime());
 
-    removeEventFromSchedules(existingEvent); // Remove the event
+    removeEventFromSchedules(event); // Remove the event
 
     try {
-      existingEvent.setEventTimes(startDay, startTime, endDay, endTime); // Modify the event
+      event.setEventTimes(startDay, startTime, endDay, endTime); // Modify the event
 
-      this.validateEventTime(existingEvent); // Re-validate
-      this.addEventToSchedules(existingEvent); // Re-add the modified event
+      this.validateEventTime(event); // Re-validate
+      this.addEventToSchedules(event); // Re-add the modified event
     } catch (IllegalArgumentException e) {
-      existingEvent.setEventTimes(oldStartDay, oldStartTime, oldEndDay, oldEndTime);
-      this.addEventToSchedules(existingEvent); // Re-add the original event
+      event.setEventTimes(oldStartDay, oldStartTime, oldEndDay, oldEndTime);
+      this.addEventToSchedules(event); // Re-add the original event
       throw e;
     }
   }
@@ -188,14 +184,13 @@ public class NUPlannerSystem implements PlannerSystem {
     ValidationUtilities.validateNull(event);
     this.validateUserExists(userId);
     this.validateEventExists(userId, event);
-    Event existingEvent = this.getSchedule(userId).getEvent(event);
-    boolean oldOnline = existingEvent.getLocation().isOnline();
-    String oldPlace = existingEvent.getLocation().getLocation();
+    boolean oldOnline = event.getLocation().isOnline();
+    String oldPlace = event.getLocation().getLocation();
 
     try {
-      existingEvent.setLocation(isOnline, location);
+      event.setLocation(isOnline, location);
     } catch (IllegalArgumentException e) {
-      existingEvent.setLocation(oldOnline, oldPlace);
+      event.setLocation(oldOnline, oldPlace);
       throw e;
     }
   }
@@ -206,18 +201,17 @@ public class NUPlannerSystem implements PlannerSystem {
     this.validateUserExists(userId);
     this.validateEventExists(userId, event);
 
-    Event existingEvent = this.getSchedule(userId).getEvent(event);
-    List<String> oldInvitees = existingEvent.getInvitees();
-    removeEventFromSchedules(existingEvent); // Remove the event
+    List<String> oldInvitees = event.getInvitees();
+    removeEventFromSchedules(event); // Remove the event
 
     try {
-      existingEvent.setInvitees(new ArrayList<>(invitees)); // Modify the event
+      event.setInvitees(invitees); // Modify the event
 
-      this.validateEventTime(existingEvent); // Re-validate
-      this.addEventToSchedules(existingEvent); // Re-add the modified event
+      this.validateEventTime(event); // Re-validate
+      this.addEventToSchedules(event); // Re-add the modified event
     } catch (IllegalArgumentException e) {
-      existingEvent.setInvitees(oldInvitees);
-      this.addEventToSchedules(existingEvent); // Re-add the original event
+      event.setInvitees(oldInvitees);
+      this.addEventToSchedules(event); // Re-add the original event
       throw e;
     }
   }
@@ -227,12 +221,11 @@ public class NUPlannerSystem implements PlannerSystem {
     ValidationUtilities.validateNull(event);
     this.validateUserExists(userId);
     this.validateEventExists(userId, event);
-    Event existingEvent = this.getSchedule(userId).getEvent(event);
-    if (userId.equals(existingEvent.getHost())) {
-      this.removeEventFromSchedules(existingEvent);
+    if (userId.equals(event.getHost())) {
+      this.removeEventFromSchedules(event);
     } else {
-      this.getSchedule(userId).removeEvent(existingEvent);
-      existingEvent.removeInvitee(userId);
+      this.getSchedule(userId).removeEvent(event);
+      event.removeInvitee(userId);
     }
   }
 

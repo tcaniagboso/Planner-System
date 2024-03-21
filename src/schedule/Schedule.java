@@ -66,21 +66,6 @@ public class Schedule {
   }
 
   /**
-   * Attempts to find and return a specific event in the schedule.
-   *
-   * @param event The event to find.
-   * @return The event if found, otherwise null.
-   */
-  public Event getEvent(Event event) {
-    for (Event ev : events) {
-      if (ev.equals(event)) {
-        return event;
-      }
-    }
-    return null;
-  }
-
-  /**
    * Removes a specified event from the schedule after validating its presence.
    *
    * @param event The event to remove.
