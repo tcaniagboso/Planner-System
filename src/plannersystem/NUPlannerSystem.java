@@ -39,6 +39,23 @@ public class NUPlannerSystem implements PlannerSystem {
     this.users = new HashMap<>();
   }
 
+  /**
+   * Initializes a new NUPlannerSystem with a list of schedules. It ensures all user schedules
+   * are added to the system at instantiation. The constructor validates the input list to ensure
+   * it neither is null nor contains null elements, maintaining the integrity of the planner system.
+   *
+   * @param schedules A list of {@link Schedule} objects, each representing a user's schedule.
+   * @throws IllegalArgumentException if `schedules` is null or contains null, indicating an
+   *                                  invalid input.
+   */
+  public NUPlannerSystem(List<Schedule> schedules) {
+    if (schedules == null || schedules.contains(null)) {
+      throw new IllegalArgumentException("Invalid list of schedules");
+    }
+    this.users = new HashMap<>();
+    this.addSchedules(schedules);
+  }
+
 
   @Override
   public void readUserSchedule(File xmlFile) {
@@ -233,6 +250,7 @@ public class NUPlannerSystem implements PlannerSystem {
     return eventString.toString();
   }
 
+  @Override
   public Schedule getSchedule(String userId) {
     this.validateUserExists(userId);
     return users.get(userId.toLowerCase());
@@ -405,6 +423,13 @@ public class NUPlannerSystem implements PlannerSystem {
         users.get(format).removeEvent(event);
         event.removeInvitee(format);
       }
+    }
+  }
+
+  // newly added
+  private void addSchedules(List<Schedule> schedules) {
+    for (Schedule schedule: schedules) {
+      users.put(schedule.getUserId().toLowerCase(), schedule);
     }
   }
 

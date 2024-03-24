@@ -4,9 +4,14 @@ import java.io.File;
 import java.util.List;
 
 import schedule.Event;
-import schedule.Schedule;
 
-public interface PlannerSystem {
+/**
+ * The PlannerSystem interface defines the contract for a system managing schedules and events for
+ * users.
+ * It provides functionalities to read and save user schedules from/to XML files, display schedules,
+ * create, modify, and remove events, and even perform automatic scheduling.
+ */
+public interface PlannerSystem extends ReadonlyPlannerSystem{
 
   /**
    * Reads a user's schedule from an XML file and updates the system's user schedule map.
@@ -28,15 +33,6 @@ public interface PlannerSystem {
    *                               the original exception message.
    */
   void saveUserSchedule(String userId);
-
-  /**
-   * Generates and returns a string representation of a user's schedule, formatted for display.
-   *
-   * @param userId The ID of the user whose schedule is to be displayed.
-   * @return A string representation of the user's schedule.
-   * @throws IllegalArgumentException if the specified user does not exist.
-   */
-  String displayUserSchedule(String userId);
 
   /**
    * Creates an event and adds it to the schedule of the specified user and all invitees.
@@ -160,28 +156,4 @@ public interface PlannerSystem {
    */
   void automaticScheduling(String userId, String name, boolean isOnline,
                            String location, List<String> invitees);
-
-  /**
-   * Searches for and displays information about an event occurring at a specified time and day
-   * for a given user.
-   *
-   * @param userId The ID of the user whose schedule is being queried.
-   * @param day    The day of the event.
-   * @param time   The time of the event.
-   * @return A string indicating whether an event exists at the specified time and its details,
-   * or a message stating no event exists at that time.
-   * @throws IllegalArgumentException if the specified user does not exist or if day/time
-   *                                  parameters are null.
-   */
-  String showEvent(String userId, String day, String time);
-
-  /**
-   * Retrieves the schedule for a specified user.
-   *
-   * @param userId The ID of the user whose schedule is requested.
-   * @return The {@link Schedule} associated with the given user ID.
-   * @throws IllegalArgumentException if no schedule exists for the specified user.
-   */
-  Schedule getSchedule(String userId);
-
 }
