@@ -32,17 +32,18 @@ public class SchedulePanel extends JPanel {
 
 
     // Draw the times on the leftmost column
-    g.setFont(new Font("Aptos", Font.BOLD, 20));
+    g.setFont(new Font("Aptos", Font.BOLD, 15));
     for (int i = 1; i <= NUM_HOURS; i++) {
       String time = String.format("%02d:00", i - 1);
-      g.drawString(time, 5, cellHeight * i + g.getFontMetrics().getAscent() + 10);
+      g.drawString(time, 5, cellHeight * i + g.getFontMetrics().getAscent() / 2 - 2);
     }
 
     // Draw the days of the week
     g.setFont(new Font("Aptos", Font.BOLD, 20));
     for (int i = 0; i < NUM_DAYS; i++) {
-      g.drawString(daysOfWeek[i], cellWidth * (i + 1) +
-              (columnWidth - g.getFontMetrics().stringWidth(daysOfWeek[i])) / 2, cellHeight / 2);
+      g.drawString(daysOfWeek[i], cellWidth * (i + 1)
+              + (columnWidth - g.getFontMetrics().stringWidth(daysOfWeek[i])) / 2,
+              cellHeight - 10);
     }
 
     // Draw horizontal lines

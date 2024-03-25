@@ -200,6 +200,16 @@ public class Time {
     return givenMinutes >= eventStartMinutes && givenMinutes < eventEndMinutes;
   }
 
+  /**
+   * Checks if an event time continues into a new week.
+   *
+   * @return true if an event time continues into a new week otherwise return false.
+   */
+  public boolean wrapsAround() {
+    return ((this.endDay.getValue() % 7) < (this.startDay.getValue() % 7))
+            || (this.startDay.equals(this.endDay) && this.endTime.isBefore(this.startTime));
+  }
+
   @Override
   public boolean equals(Object object) {
     if (object == this) {

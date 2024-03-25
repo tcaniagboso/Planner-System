@@ -205,6 +205,15 @@ public class Event {
   }
 
   /**
+   * Checks if an event continues into a new week.
+   *
+   * @return true if an event continues into a new week otherwise return false.
+   */
+  public boolean wrapsAround() {
+    return this.time.wrapsAround();
+  }
+
+  /**
    * Compares this event with another object for equality. Two events are considered equal
    * if their names, times, locations, lists of invitees, and hosts are all equal.
    * This method allows for null-safe comparisons of event fields.
