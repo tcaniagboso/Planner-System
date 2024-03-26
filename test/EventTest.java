@@ -72,27 +72,27 @@ public class EventTest {
         () -> event.setHost(""));
 
     event.setHost("Jack");
-    Assert.assertEquals("jack", event.getHost());
+    Assert.assertEquals("Jack", event.getHost());
 
     Assert.assertThrows(IllegalStateException.class,
         () -> new Event().setInvitees(new ArrayList<>()));
     Assert.assertThrows(IllegalArgumentException.class, () -> event.setInvitees(null));
     Assert.assertThrows(IllegalArgumentException.class,
         () -> event.setInvitees(new ArrayList<>(Arrays.asList(null, null))));
-    List<String> invitees = new ArrayList<>(Arrays.asList("john", "james", "peter"));
+    List<String> invitees = new ArrayList<>(Arrays.asList("John", "James", "Peter"));
 
     Assert.assertThrows(IllegalArgumentException.class, () -> event.setInvitees(invitees));
 
-    invitees.add("jack");
+    invitees.add("Jack");
     event.setInvitees(invitees);
-    Assert.assertTrue(event.getInvitees().contains("jack"));
-    Assert.assertTrue(event.getInvitees().contains("john"));
-    Assert.assertTrue(event.getInvitees().contains("james"));
-    Assert.assertTrue(event.getInvitees().contains("peter"));
+    Assert.assertTrue(event.getInvitees().contains("Jack"));
+    Assert.assertTrue(event.getInvitees().contains("John"));
+    Assert.assertTrue(event.getInvitees().contains("James"));
+    Assert.assertTrue(event.getInvitees().contains("Peter"));
 
     // try mutating the invitees list
-    event.getInvitees().add("ron");
-    Assert.assertFalse(event.getInvitees().contains("ron"));
+    event.getInvitees().add("Ron");
+    Assert.assertFalse(event.getInvitees().contains("Ron"));
   }
 
 
@@ -107,15 +107,15 @@ public class EventTest {
     event.setName("Reading week");
     event.setEventTimes("Monday", "1100", "Monday", "1000");
     event.setLocation(true, "Ryder");
-    event.setHost("john");
-    event.setInvitees(new ArrayList<>(Arrays.asList("john", "james", "jack")));
+    event.setHost("John");
+    event.setInvitees(new ArrayList<>(Arrays.asList("John", "James", "Jack")));
 
     Event other = new Event();
     other.setName("Reading");
     other.setEventTimes("Sunday", "1100", "Monday", "1100");
     other.setLocation(true, "Ryder");
-    other.setHost("john");
-    other.setInvitees(new ArrayList<>(Arrays.asList("john", "james", "jack")));
+    other.setHost("John");
+    other.setInvitees(new ArrayList<>(Arrays.asList("John", "James", "Jack")));
 
     Assert.assertFalse(event.overlap(other));
     other.setEventTimes("Tuesday", "1100", "Monday", "1100");
@@ -124,14 +124,14 @@ public class EventTest {
     Assert.assertThrows(IllegalArgumentException.class, () -> event.removeInvitee(null));
     Assert.assertThrows(IllegalArgumentException.class, () -> event.removeInvitee(""));
 
-    event.removeInvitee("james");
-    Assert.assertFalse(event.getInvitees().contains("james"));
+    event.removeInvitee("James");
+    Assert.assertFalse(event.getInvitees().contains("James"));
 
     Assert.assertThrows(IllegalArgumentException.class, () -> event.addInvitee(null));
     Assert.assertThrows(IllegalArgumentException.class, () -> event.addInvitee(""));
 
-    event.addInvitee("james");
-    Assert.assertTrue(event.getInvitees().contains("james"));
+    event.addInvitee("James");
+    Assert.assertTrue(event.getInvitees().contains("James"));
 
     Assert.assertEquals(event, event);
     Assert.assertNotEquals(event, other);

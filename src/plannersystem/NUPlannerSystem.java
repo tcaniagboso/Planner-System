@@ -17,6 +17,7 @@ import org.xml.sax.SAXException;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import schedule.Event;
 import schedule.Schedule;
@@ -253,7 +254,12 @@ public class NUPlannerSystem implements PlannerSystem {
   @Override
   public Schedule getSchedule(String userId) {
     this.validateUserExists(userId);
-    return users.get(userId.toLowerCase());
+    return users.get(userId);
+  }
+
+  @Override
+  public Set<String> getUsers() {
+    return users.keySet();
   }
 
   /**
@@ -348,13 +354,12 @@ public class NUPlannerSystem implements PlannerSystem {
    */
   private void addEventToSchedules(Event event) {
     for (String user : event.getInvitees()) {
-      String userId = user.toLowerCase();
-      Schedule schedule = users.getOrDefault(userId, new Schedule(userId));
+      Schedule schedule = users.getOrDefault(user, new Schedule(user));
       if (!schedule.hasEvent(event)) {
         schedule.addEvent(event);
       }
-      if (!users.containsKey(userId)) {
-        users.put(userId, schedule);
+      if (!users.containsKey(user)) {
+        users.put(user, schedule);
       }
     }
 
@@ -370,7 +375,7 @@ public class NUPlannerSystem implements PlannerSystem {
    */
   private void validateEventTime(Event event) {
     for (String user : event.getInvitees()) {
-      if (users.containsKey(user.toLowerCase())) {
+      if (users.containsKey(user)) {
         if (this.getSchedule(user).overlap(event)) {
           throw new IllegalArgumentException("There is a time conflict in " + user + " schedule.");
         }
@@ -387,7 +392,7 @@ public class NUPlannerSystem implements PlannerSystem {
    */
   private void validateUserExists(String userId) {
     ValidationUtilities.validateNull(userId);
-    if (users.get(userId.toLowerCase()) == null) {
+    if (users.get(userId) == null) {
       throw new IllegalArgumentException("User Schedule for " + userId
               + " does not exist in system");
     }
@@ -418,10 +423,9 @@ public class NUPlannerSystem implements PlannerSystem {
    */
   private void removeEventFromSchedules(Event event) {
     for (String user : event.getInvitees()) {
-      String format = user.toLowerCase();
-      if (users.containsKey(format)) {
-        users.get(format).removeEvent(event);
-        event.removeInvitee(format);
+      if (users.containsKey(user)) {
+        users.get(user).removeEvent(event);
+        event.removeInvitee(user);
       }
     }
   }
@@ -429,7 +433,7 @@ public class NUPlannerSystem implements PlannerSystem {
   // newly added
   private void addSchedules(List<Schedule> schedules) {
     for (Schedule schedule: schedules) {
-      users.put(schedule.getUserId().toLowerCase(), schedule);
+      users.put(schedule.getUserId(), schedule);
     }
   }
 

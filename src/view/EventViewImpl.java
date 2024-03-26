@@ -18,6 +18,8 @@ import javax.swing.JComboBox;
 import javax.swing.JTextArea;
 import javax.swing.JScrollPane;
 
+import schedule.Event;
+
 public class EventViewImpl extends JFrame implements EventView {
 
   private final static int WIDTH = 600;
@@ -26,7 +28,13 @@ public class EventViewImpl extends JFrame implements EventView {
   private final static String[] labels = {"Event name:", "Location:", "Starting Day:",
           "Starting time:", "Ending Day:", "Ending time:", "Available users:"};
 
-  public EventViewImpl() {
+  private final Event event;
+
+  public EventViewImpl(Event event) {
+    if (event == null) {
+      throw new IllegalArgumentException("Event is null.");
+    }
+    this.event = event;
     this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     this.setResizable(false);
     this.setSize(WIDTH, HEIGHT);

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<schedule id="prof. lucia">
+<schedule id="Prof. Lucia">
     <event>
         <name>CS3500 Morning Lecture</name>
         <time>
@@ -13,9 +13,9 @@
             <place>Churchill Hall 101</place>
         </location>
         <users>
-            <uid>prof. lucia</uid>
-            <uid>student anon</uid>
-            <uid>chat</uid>
+            <uid>Prof. Lucia</uid>
+            <uid>Student Anon</uid>
+            <uid>Chat</uid>
         </users>
     </event>
     <event>
@@ -31,8 +31,8 @@
             <place>Churchill Hall 101</place>
         </location>
         <users>
-            <uid>prof. lucia</uid>
-            <uid>chat</uid>
+            <uid>Prof. Lucia</uid>
+            <uid>Chat</uid>
         </users>
     </event>
     <event>
@@ -48,7 +48,7 @@
             <place>Home</place>
         </location>
         <users>
-            <uid>prof. lucia</uid>
+            <uid>Prof. Lucia</uid>
         </users>
     </event>
 </schedule>

@@ -125,12 +125,10 @@ public class Event {
     if (this.host == null) {
       throw new IllegalStateException("Host is null");
     }
-    if (!invitees.contains(this.host.toLowerCase())) {
+    if (!invitees.contains(this.host)) {
       throw new IllegalArgumentException("The list of invitees must contain the host of the event");
     }
-    for (String string : invitees) {
-      this.invitees.add(string.toLowerCase());
-    }
+    this.invitees.addAll(invitees);
   }
 
   /**
@@ -153,7 +151,7 @@ public class Event {
   public void setHost(String host) {
     this.validateUser(host);
 
-    this.host = host.toLowerCase();
+    this.host = host;
   }
 
   /**
@@ -164,7 +162,7 @@ public class Event {
    */
   public void addInvitee(String invitee) {
     this.validateUser(invitee);
-    this.invitees.add(invitee.toLowerCase());
+    this.invitees.add(invitee);
 
   }
 
@@ -177,7 +175,7 @@ public class Event {
    */
   public void removeInvitee(String invitee) {
     this.validateUser(invitee);
-    this.invitees.remove(invitee.toLowerCase());
+    this.invitees.remove(invitee);
   }
 
   /**

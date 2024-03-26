@@ -1,5 +1,7 @@
 package plannersystem;
 
+import java.util.Set;
+
 import schedule.Schedule;
 
 /**
@@ -45,4 +47,6 @@ public interface ReadonlyPlannerSystem {
    * @throws IllegalArgumentException if no schedule exists for the specified user.
    */
   Schedule getSchedule(String userId);
+
+  Set<String> getUsers();
 }
