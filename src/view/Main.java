@@ -3,13 +3,27 @@ package view;
 import java.util.ArrayList;
 import java.util.List;
 
-import plannersystem.NUPlannerSystem;
-import plannersystem.ReadonlyPlannerSystem;
 import schedule.Event;
 import schedule.Schedule;
 
+import plannersystem.ReadonlyPlannerSystem;
+import plannersystem.NUPlannerSystem;
+
+/**
+ * The Main class serves as the entry point for the Planner System application.
+ * It demonstrates the functionality of the system by creating events, schedules,
+ * and initializing the planner system view.
+ */
 public class Main {
+
+  /**
+   * The main method initializes the Planner System application by creating events,
+   * schedules, and initializing the planner system view.
+   *
+   * @param args The command-line arguments (not used).
+   */
   public static void main(String[] args) {
+    // Creating events
     Event event1 = new Event();
     event1.setName("CS3500 Lecture Morning");
     event1.setEventTimes("Tuesday", "0950", "Tuesday", "1130");
@@ -27,10 +41,11 @@ public class Main {
     Event event3 = new Event();
     event3.setName("Football");
     event3.setEventTimes("Wednesday", "0950", "Thursday", "1130");
-    event3.setLocation(true, "Carter Field");
+    event3.setLocation(false, "Carter Field");
     event3.setHost("Tobe");
     event3.setInvitees(new ArrayList<>(List.of("Tobe")));
 
+    // Creating schedules for users
     Schedule tobeSchedule = new Schedule("Tobe");
     Schedule karinaSchedule = new Schedule("Karina");
     tobeSchedule.addEvent(event1);
@@ -39,9 +54,14 @@ public class Main {
     karinaSchedule.addEvent(event1);
     karinaSchedule.addEvent(event2);
 
+    // Creating a list of schedules
     List<Schedule> schedules = new ArrayList<>(List.of(tobeSchedule, karinaSchedule));
 
+    // Creating a read-only planner system with the provided schedules
     ReadonlyPlannerSystem system = new NUPlannerSystem(schedules);
-    PlannerSystemView systemView = new PlannerSystemViewImpl(system);
+
+    // Initializing the planner system view
+    PlannerSystemView systemView = new PlannerSystemView(system);
+    systemView.setVisible(true);
   }
 }
