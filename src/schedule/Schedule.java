@@ -140,6 +140,18 @@ public class Schedule {
     return null;
   }
 
+  /**
+   * Retrieves a specific event from the schedule if it exists.
+   * This method checks for the presence of an event in the schedule by comparing it with
+   * the provided event parameter. The comparison is based on the implementation of the
+   * {@code equals} method in the {@code Event} class. If the event is found, it is returned;
+   * otherwise, {@code null} is returned.
+   *
+   * @param event The event to be retrieved from the schedule.
+   * @return The matching event from the schedule if it exists; otherwise, {@code null}.
+   * @throws IllegalArgumentException if the provided event is {@code null} or does not exist
+   *                                  in the schedule.
+   */
   public Event getEvent(Event event) {
     ValidationUtilities.validateNull(event);
     this.validateEventExists(event);

@@ -109,6 +109,7 @@ These classes include:
 
 EventClickListener: A listener for mouse click events on the schedule panel, enabling the selection
 and interaction with events displayed on the schedule.
+
 EventView: A comprehensive GUI for viewing and interacting with events. Users can create, modify,
 and remove events through a user-friendly interface.
 

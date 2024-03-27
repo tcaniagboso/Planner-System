@@ -20,7 +20,7 @@ public interface ScheduleView {
    * @param user the identifier of the user whose schedule is to be rendered;
    *             must not be null.
    * @return a string representation of the user's schedule, formatted by day
-   * of the week with details for each event.
+   *         of the week with details for each event.
    * @throws IllegalArgumentException if the user argument is null.
    */
   String render(String user);

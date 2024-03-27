@@ -11,7 +11,7 @@ import schedule.Event;
  * It provides functionalities to read and save user schedules from/to XML files, display schedules,
  * create, modify, and remove events, and even perform automatic scheduling.
  */
-public interface PlannerSystem extends ReadonlyPlannerSystem{
+public interface PlannerSystem extends ReadonlyPlannerSystem {
 
   /**
    * Reads a user's schedule from an XML file and updates the system's user schedule map.

@@ -222,7 +222,7 @@ public class Event {
    *
    * @param object The object to compare this event with.
    * @return true if the provided object represents an event equivalent to this one, false
-   * otherwise.
+   *         otherwise.
    */
   @Override
   public boolean equals(Object object) {

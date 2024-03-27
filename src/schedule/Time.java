@@ -39,6 +39,7 @@ public class Time {
    * Default constructor for Time object. Initializes an instance without specific time details.
    */
   public Time() {
+    // to represent an empty time constructor since there is a non-empty one, I had to declare this
   }
 
   /**

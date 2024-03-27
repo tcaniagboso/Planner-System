@@ -55,7 +55,7 @@ public interface ReadonlyPlannerSystem {
    * iterating over the users to perform read-only actions.
    *
    * @return A {@link Set} of {@link String} objects, each representing a unique user ID in the
-   * system.
+   *         system.
    */
   Set<String> getUsers();
 }

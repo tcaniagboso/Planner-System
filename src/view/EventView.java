@@ -31,7 +31,7 @@ public class EventView extends JFrame implements ActionListener {
   private final static int HEIGHT = 850;
 
   private static final String[] daysOfWeek = {"Sunday", "Monday", "Tuesday", "Wednesday",
-          "Thursday", "Friday", "Saturday"};
+      "Thursday", "Friday", "Saturday"};
 
   private JButton createEventButton;
   private JButton modifyEventButton;
@@ -406,13 +406,13 @@ public class EventView extends JFrame implements ActionListener {
         JTextField textField = (JTextField) component;
         String text = textField.getText().trim();
         if (text.isEmpty()) {
-          throw new IllegalStateException("All fields must be filled.");
+          throw new IllegalStateException("All event fields must be filled.");
         }
       } else if (component instanceof JTextArea) {
         JTextArea textArea = (JTextArea) ((JScrollPane) component).getViewport().getView();
         String text = textArea.getText().trim();
         if (text.isEmpty()) {
-          throw new IllegalStateException("All fields must be filled.");
+          throw new IllegalStateException("All event fields must be filled.");
         }
       }
     }

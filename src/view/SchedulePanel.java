@@ -22,7 +22,7 @@ public class SchedulePanel extends JPanel {
   private static final int HOUR_INTERVAL = 4;
   private static final int NUM_DAYS = 7;
   private static final String[] daysOfWeek = {"Sunday", "Monday", "Tuesday", "Wednesday",
-          "Thursday", "Friday", "Saturday"};
+      "Thursday", "Friday", "Saturday"};
 
   private Schedule schedule;
 

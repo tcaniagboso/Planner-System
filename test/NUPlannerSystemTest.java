@@ -268,14 +268,14 @@ public class NUPlannerSystemTest {
 
     // testing null event
     Assert.assertThrows(IllegalArgumentException.class,
-            () -> system.modifyEvent("Student Anon", null, "CS3500 Revision",
+        () -> system.modifyEvent("Student Anon", null, "CS3500 Revision",
                     "Tuesday", "0950", "Tuesday", "1130",
                     true, "ChurchHill 101",
                     new ArrayList<>(Arrays.asList("Prof. Lucia", "Student Anon", "Chat"))));
 
     // testing user doesn't exist
     Assert.assertThrows(IllegalArgumentException.class,
-            () -> system.modifyEvent("Student Anon", event, "CS3500 Revision",
+        () -> system.modifyEvent("Student Anon", event, "CS3500 Revision",
                     "Tuesday", "0950", "Tuesday", "1130",
                     true, "ChurchHill 101",
                     new ArrayList<>(Arrays.asList("Prof. Lucia", "Student Anon", "Chat"))));

@@ -160,6 +160,7 @@ public class NUPlannerSystem implements PlannerSystem {
   @Override
   public void automaticScheduling(String userId, String name, boolean isOnline,
                                   String location, List<String> invitees) {
+    // To be implemented later
   }
 
   @Override

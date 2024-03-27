@@ -13,10 +13,6 @@ public class Location {
   private boolean isOnline;
   private String location;
 
-  public Location() {
-
-  }
-
   /**
    * Checks if the event is an online event.
    *
@@ -40,7 +36,7 @@ public class Location {
    * not online.
    *
    * @return A string representing the physical location of the event, or null if the event is
-   * online.
+   *         online.
    */
   public String getLocation() {
     ValidationUtilities.validateGetNull(this.location);

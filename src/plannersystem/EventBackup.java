@@ -19,7 +19,13 @@ import schedule.TimeUtilities;
  * {@code Event} object after the backup is made.</p>
  */
 class EventBackup {
-  String startDay, startTime, endDay, endTime, name, host, place;
+  String startDay;
+  String startTime;
+  String endDay;
+  String endTime;
+  String name;
+  String host;
+  String place;
   boolean isOnline;
   List<String> invitees;
 
