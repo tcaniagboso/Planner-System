@@ -46,7 +46,6 @@ public class ScheduleXMLWriter {
     DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();
     DocumentBuilder documentBuilder = documentFactory.newDocumentBuilder();
     Document document = documentBuilder.newDocument();
-
     Element root = document.createElement("schedule");
     root.setAttribute("id", schedule.getUserId());
     document.appendChild(root);
@@ -69,12 +68,10 @@ public class ScheduleXMLWriter {
 
       Element usersElement = document.createElement("users");
 
-      // Add host first
       Element hostElement = document.createElement("uid");
       hostElement.setTextContent(event.getHost());
       usersElement.appendChild(hostElement);
 
-      // Add invitees, avoiding duplication with the host
       for (String invitee : event.getInvitees()) {
         if (!invitee.equals(event.getHost())) { // Avoid duplication
           Element uidElement = document.createElement("uid");
@@ -92,6 +89,7 @@ public class ScheduleXMLWriter {
     StreamResult streamResult = new StreamResult(new File(filePath));
     transformer.transform(domSource, streamResult);
   }
+
 
   /**
    * Appends time details of an event to the provided time XML element.

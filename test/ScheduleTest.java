@@ -68,6 +68,7 @@ public class ScheduleTest {
     Assert.assertThrows(IllegalArgumentException.class, () -> schedule.addEvent(null));
     schedule.addEvent(event);
     Assert.assertTrue(schedule.hasEvent(event));
+    Assert.assertEquals(schedule.getEvent(event), event);
 
     Event other = new Event();
     other.setName("something");
@@ -79,6 +80,7 @@ public class ScheduleTest {
     Assert.assertTrue(event.overlap(other));
     Assert.assertThrows(IllegalArgumentException.class, () -> schedule.addEvent(other));
     Assert.assertFalse(schedule.hasEvent(other));
+    Assert.assertThrows(IllegalArgumentException.class, () -> schedule.getEvent(other));
 
     Event something = new Event();
     something.setName("something");
@@ -91,7 +93,6 @@ public class ScheduleTest {
     Assert.assertTrue(schedule.hasEvent(something));
 
     Assert.assertThrows(IllegalArgumentException.class, () -> schedule.removeEvent(null));
-    Assert.assertThrows(IllegalArgumentException.class, () -> schedule.removeEvent(other));
     schedule.removeEvent(something);
     Assert.assertFalse(schedule.hasEvent(something));
 

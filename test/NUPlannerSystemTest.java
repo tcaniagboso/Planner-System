@@ -24,7 +24,8 @@ public class NUPlannerSystemTest {
   private PlannerSystem system;
 
   /**
-   * Initializes a new instance of {@link NUPlannerSystem} before each test.
+   * Initializes testing environment before each test case. This method sets up a new instance
+   * of {@link NUPlannerSystem}, ensuring a clean state for every test.
    */
   @Before
   public void init() {
@@ -32,15 +33,19 @@ public class NUPlannerSystemTest {
   }
 
   /**
-   * Tests the ability of the system to read and load a user's schedule from an XML file.
-   * This test verifies that the schedule is correctly parsed and that the events match
-   * the expected values.
+   * Tests the system's ability to correctly parse and load events from an XML file into
+   * a user's schedule. Verifies that the loaded events match expected values, including
+   * checking for correct parsing of event details and handling of multiple users' schedules.
+   * Additionally, tests the system's response to XML files with overlapping events,
+   * expecting an {@link IllegalArgumentException}.
    */
   @Test
   public void testReadUserSchedule() {
     File xmlFile = new File("prof.xml");
     system.readUserSchedule(xmlFile);
     Schedule schedule = system.getSchedule("Prof. Lucia");
+    Schedule anonSchedule = system.getSchedule("Student Anon");
+    Schedule chatSchedule = system.getSchedule("Chat");
 
     Assert.assertEquals("Prof. Lucia", schedule.getUserId());
 
@@ -67,6 +72,9 @@ public class NUPlannerSystemTest {
 
     List<Event> events = new ArrayList<>(Arrays.asList(event, event2, event3));
     Assert.assertEquals(schedule.getEvents(), events);
+    Assert.assertTrue(anonSchedule.hasEvent(event));
+    Assert.assertFalse(anonSchedule.hasEvent(event2));
+    Assert.assertTrue(chatSchedule.hasEvent(event2));
 
     File xmlFile2 = new File("prof2.xml");
 
@@ -101,14 +109,15 @@ public class NUPlannerSystemTest {
   }
 
   /**
-   * Tests the system's ability to save a user's schedule to an XML file. This test ensures
-   * that schedules are correctly serialized and can be reloaded to match the original schedule.
+   * Ensures the system can accurately save a user's schedule to an XML file and that
+   * this file correctly reflects the schedule's state. Tests serialization of events
+   * into XML format and subsequent reloading of these events, verifying data integrity
+   * and consistency.
    */
   @Test
   public void testSaveSchedule() {
     Assert.assertThrows(IllegalArgumentException.class,
         () -> system.saveUserSchedule("Prof. Lucia"));
-    // Convert URL to File
     File xmlFile = new File("prof.xml");
     system.readUserSchedule(xmlFile);
 
@@ -118,6 +127,7 @@ public class NUPlannerSystemTest {
     PlannerSystem other = new NUPlannerSystem();
     other.readUserSchedule(file);
     Schedule schedule = other.getSchedule("Prof. Lucia");
+    Schedule anonSchedule = other.getSchedule("Student Anon");
 
     Assert.assertEquals("Prof. Lucia", schedule.getUserId());
 
@@ -144,11 +154,13 @@ public class NUPlannerSystemTest {
 
     List<Event> events = new ArrayList<>(Arrays.asList(event, event2, event3));
     Assert.assertEquals(schedule.getEvents(), events);
+    Assert.assertTrue(anonSchedule.hasEvent(event));
   }
 
   /**
-   * Tests displaying a user's schedule as a formatted string. This test verifies that the
-   * schedule view correctly represents the schedule's events and their details.
+   * Confirms the display functionality accurately represents a user's schedule, including
+   * event details and ordering. This test checks the system's ability to format the schedule
+   * and events into a human-readable string that matches expected output.
    */
   @Test
   public void testDisplay() {
@@ -186,8 +198,10 @@ public class NUPlannerSystemTest {
   }
 
   /**
-   * Tests the creation of new events and their addition to user schedules, including handling
-   * of scheduling conflicts and invitee management.
+   * Validates the system's capability to create new events and add them to the appropriate
+   * user schedules. This includes testing for correct event creation, handling of scheduling
+   * conflicts, and management of event invitees. Also tests scenarios where events cannot
+   * be added due to conflicts or invalid parameters, expecting an {@link IllegalArgumentException}.
    */
   @Test
   public void testCreateEvent() {
@@ -238,15 +252,186 @@ public class NUPlannerSystemTest {
   }
 
   /**
-   * Tests the functionality to display details of a specific event based on a given time and day.
-   * This includes checking for events that exist at the specified time as well as handling
-   * cases where no event is scheduled.
+   * Examines the functionality to modify existing events within user schedules. Checks that
+   * modifications to event details are accurately reflected in the schedules, and that the
+   * system correctly handles invalid modification attempts. Includes testing modification
+   * of various event attributes and validation of resulting event states.
    */
   @Test
-  public void testShowEvent() {
+  public void testModifyEvent() {
+    Event event = new Event();
+    event.setName("CS3500 Morning Lecture");
+    event.setEventTimes("Tuesday", "0950", "Tuesday", "1130");
+    event.setLocation(false, "Churchill Hall 101");
+    event.setHost("Prof. Lucia");
+    event.setInvitees(new ArrayList<>(Arrays.asList("Prof. Lucia", "Student Anon", "Chat")));
+
+    // testing null event
+    Assert.assertThrows(IllegalArgumentException.class,
+            () -> system.modifyEvent("Student Anon", null, "CS3500 Revision",
+                    "Tuesday", "0950", "Tuesday", "1130",
+                    true, "ChurchHill 101",
+                    new ArrayList<>(Arrays.asList("Prof. Lucia", "Student Anon", "Chat"))));
+
+    // testing user doesn't exist
+    Assert.assertThrows(IllegalArgumentException.class,
+            () -> system.modifyEvent("Student Anon", event, "CS3500 Revision",
+                    "Tuesday", "0950", "Tuesday", "1130",
+                    true, "ChurchHill 101",
+                    new ArrayList<>(Arrays.asList("Prof. Lucia", "Student Anon", "Chat"))));
+
+    // adding user by creating an event then checking if user has this event we want to modify
+    system.createEvent("Student Anon", "OH", "Monday", "0950",
+            "Monday", "1030", false, "ChurchHill Hall 101",
+            new ArrayList<>(Arrays.asList("Student Anon", "Prof. Lucia", "Chat")));
+
+    // testing if user contains the CS3500 morning lecture
+    Assert.assertThrows(IllegalArgumentException.class,
+        () -> system.modifyEvent("Student Anon", event, "CS3500 Revision",
+                    "Tuesday", "0950", "Tuesday", "1130",
+                    true, "ChurchHill 101",
+                    new ArrayList<>(Arrays.asList("Prof. Lucia", "Student Anon", "Chat"))));
+
+    // adding the events to the system through a xml file
     File xmlFile = new File("prof.xml");
     system.readUserSchedule(xmlFile);
 
+    Schedule anonSchedule = system.getSchedule("Student Anon");
+    Assert.assertNotNull(anonSchedule);
+    Assert.assertTrue(anonSchedule.hasEvent(event));
+
+    //modifying event's name wrongly
+    Assert.assertThrows(IllegalArgumentException.class,
+        () -> system.modifyEvent("Student Anon", event, "", "Tuesday",
+                "0950", "Tuesday", "1130", true,
+                "ChurchHill 101", new ArrayList<>(Arrays.asList("Prof. Lucia",
+                        "Student Anon", "Chat"))));
+
+    // check if event changed
+    Assert.assertEquals(event.getName(), "CS3500 Morning Lecture");
+    Assert.assertTrue(anonSchedule.hasEvent(event));
+
+    // successful modification
+    system.modifyEvent("Student Anon", event, "CS3500 Revision", "Tuesday",
+            "0950", "Tuesday", "1130", true,
+            "ChurchHill 101", new ArrayList<>(Arrays.asList("Prof. Lucia", "Student Anon",
+                    "Chat")));
+    Assert.assertEquals(event.getName(), "CS3500 Revision");
+
+    // try modifying a time that is busy in another user's schedule
+    Assert.assertThrows(IllegalArgumentException.class,
+        () -> system.modifyEvent("Student Anon", event, "CS3500 Revision",
+                "Tuesday", "1200", "Tuesday", "1340", true,
+                "ChurchHill 101", new ArrayList<>(Arrays.asList("Prof. Lucia",
+                        "Student Anon", "Chat"))));
+
+    // good time modification
+    system.modifyEvent("Student Anon", event, "CS3500 Revision", "Tuesday",
+            "1200", "Tuesday", "1315", true,
+            "ChurchHill 101", new ArrayList<>(Arrays.asList("Prof. Lucia", "Student Anon",
+                    "Chat")));
+    Assert.assertEquals(event.getTime(), new Time("Tuesday", "1200",
+            "Tuesday", "1315"));
+
+    // bad location modification
+    Assert.assertThrows(IllegalArgumentException.class,
+        () -> system.modifyEvent("Student Anon", event, "CS3500 Revision",
+                "Tuesday", "1200", "Tuesday", "1315", true,
+                "", new ArrayList<>(Arrays.asList("Prof. Lucia", "Student Anon", "Chat"))));
+
+    system.modifyEvent("Student Anon", event, "CS3500 Revision",
+            "Tuesday", "1200", "Tuesday", "1315", true,
+            "Ryder Hall", new ArrayList<>(Arrays.asList("Prof. Lucia", "Student Anon",
+                    "Chat")));
+    Assert.assertEquals("Ryder Hall", event.getLocation().getLocation());
+
+    // bad invitees modification
+    Assert.assertThrows(IllegalArgumentException.class,
+        () -> system.modifyEvent("Student Anon", event, "CS3500 Revision",
+                "Tuesday", "1200", "Tuesday", "1315", true,
+                "Ryder Hall", new ArrayList<>(Arrays.asList("Student Anon", "Chat"))));
+
+    system.modifyEvent("Student Anon", event, "CS3500 Revision", "Tuesday",
+            "1200", "Tuesday", "1315", true, "Ryder Hall",
+            new ArrayList<>(List.of("Prof. Lucia")));
+
+    Assert.assertEquals(event.getInvitees(), new ArrayList<>(List.of("Prof. Lucia")));
+  }
+
+  /**
+   * Tests the system's process for removing events from user schedules, including special
+   * handling for event cancellation by the host. Verifies that removed events are correctly
+   * omitted from all relevant schedules and that invitee lists are updated accordingly.
+   * Also tests removal in scenarios with invalid parameters, expecting an
+   * {@link IllegalArgumentException}.
+   */
+  @Test
+  public void testRemoveEvent() {
+    Event event = new Event();
+    event.setName("CS3500 Morning Lecture");
+    event.setEventTimes("Tuesday", "0950", "Tuesday", "1130");
+    event.setLocation(false, "Churchill Hall 101");
+    event.setHost("Prof. Lucia");
+    event.setInvitees(new ArrayList<>(Arrays.asList("Prof. Lucia", "Student Anon", "Chat")));
+
+    Assert.assertThrows(IllegalArgumentException.class,
+        () -> system.removeEvent("Prof. Lucia", null));
+    Assert.assertThrows(IllegalArgumentException.class,
+        () -> system.removeEvent("Prof. Lucia", event));
+
+    // adding user by creating an event then checking if user has this event we want to modify
+    system.createEvent("Student Anon", "OH", "Monday", "0950",
+            "Monday", "1030", false, "ChurchHill Hall 101",
+            new ArrayList<>(Arrays.asList("Student Anon", "Prof. Lucia", "Chat")));
+    Assert.assertThrows(IllegalArgumentException.class,
+        () -> system.removeEvent("Prof. Lucia", event));
+
+    // adding the events to the system through a xml file
+    File xmlFile = new File("prof.xml");
+    system.readUserSchedule(xmlFile);
+
+    Event event2 = new Event();
+    event2.setName("CS3500 Afternoon Lecture");
+    event2.setEventTimes("Tuesday", "1335", "Tuesday", "1515");
+    event2.setLocation(false, "Churchill Hall 101");
+    event2.setHost("Prof. Lucia");
+    event2.setInvitees(new ArrayList<>(Arrays.asList("Prof. Lucia", "Chat")));
+
+    Schedule chatSchedule = system.getSchedule("Chat");
+    Schedule profSchedule = system.getSchedule("Prof. Lucia");
+    Schedule anonSchedule = system.getSchedule("Student Anon");
+    system.removeEvent("Chat", event2);
+
+    Assert.assertEquals(new ArrayList<>(List.of("Prof. Lucia")), event2.getInvitees());
+    Assert.assertFalse(chatSchedule.hasEvent(event2));
+    System.out.println(profSchedule.getEvents());
+    Assert.assertTrue(profSchedule.hasEvent(event2));
+
+    Assert.assertTrue(anonSchedule.hasEvent(event));
+    Assert.assertTrue(profSchedule.hasEvent(event));
+    Assert.assertTrue(chatSchedule.hasEvent(event));
+
+    system.removeEvent("Prof. Lucia", event);
+    Assert.assertFalse(anonSchedule.hasEvent(event));
+    Assert.assertFalse(profSchedule.hasEvent(event));
+    Assert.assertFalse(chatSchedule.hasEvent(event));
+  }
+
+  /**
+   * Confirms the system's ability to accurately identify and display events occurring at a
+   * specified time and day. Tests both the detection of scheduled events and handling of
+   * periods with no scheduled events, ensuring the system provides appropriate feedback.
+   */
+  @Test
+  public void testShowEvent() {
+    Assert.assertThrows(IllegalArgumentException.class,
+        () -> system.showEvent("Prof. Lucia", "Tuesday", "1000"));
+    File xmlFile = new File("prof.xml");
+    system.readUserSchedule(xmlFile);
+    Assert.assertThrows(IllegalArgumentException.class,
+        () -> system.showEvent("Prof. Lucia", null, "1000"));
+    Assert.assertThrows(IllegalArgumentException.class,
+        () -> system.showEvent("Prof. Lucia", "Tuesday", null));
     Assert.assertEquals("CS3500 Morning Lecture happens at this time",
             system.showEvent("Prof. Lucia", "tuesday", "1000"));
     Assert.assertEquals("No event exists at this time",

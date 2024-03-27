@@ -74,65 +74,6 @@ public interface PlannerSystem extends ReadonlyPlannerSystem{
                    List<String> invitees);
 
   /**
-   * Modifies the name of a specified event in the user's schedule and updates it across
-   * all invitees.
-   * Ensures the event exists and is valid before applying the change.
-   *
-   * @param userId The user ID of the person making the modification. This is used to verify user
-   *               existence.
-   * @param event  The event to be modified.
-   * @param name   The new name to assign to the event.
-   * @throws IllegalArgumentException If the event does not exist in the user's schedule or if the
-   *                                  user does not exist.
-   */
-  void modifyEvent(String userId, Event event, String name);
-
-  /**
-   * Modifies the time of a specified event in the user's schedule and updates it across all
-   * invitees.
-   * Validates the new event time to prevent scheduling conflicts before applying the modification.
-   *
-   * @param userId    The user ID of the person making the modification.
-   * @param event     The event to be modified.
-   * @param startDay  The new start day for the event.
-   * @param startTime The new start time for the event.
-   * @param endDay    The new end day for the event.
-   * @param endTime   The new end time for the event.
-   * @throws IllegalArgumentException If the event does not exist, the user does not exist, or the
-   *                                  new time causes scheduling conflicts.
-   */
-  void modifyEvent(String userId, Event event, String startDay, String startTime, String endDay,
-                   String endTime);
-
-  /**
-   * Modifies the location and online status of a specified event in the user's schedule and
-   * updates it across all invitees.
-   *
-   * @param userId   The user ID of the person making the modification.
-   * @param event    The event to be modified.
-   * @param isOnline Specifies whether the event is online.
-   * @param location The new location of the event if it's not online.
-   * @throws IllegalArgumentException If the event does not exist in the user's schedule or if
-   *                                  the user does not exist.
-   */
-  void modifyEvent(String userId, Event event, boolean isOnline, String location);
-
-  /**
-   * Modifies the list of invitees for a specified event in the user's schedule and updates
-   * it across all affected schedules.
-   * Validates the updated event to ensure there are no scheduling conflicts with the new list of
-   * invitees.
-   *
-   * @param userId   The user ID of the person making the modification.
-   * @param event    The event to be modified.
-   * @param invitees The new list of invitees for the event.
-   * @throws IllegalArgumentException If the event does not exist in the user's schedule, the user
-   *                                  does not exist, or the modification causes scheduling
-   *                                  conflicts.
-   */
-  void modifyEvent(String userId, Event event, List<String> invitees);
-
-  /**
    * Removes an event from the user's schedule. If the user is the host of the event,
    * the event is removed from all invitees' schedules as well. If the user is not the host,
    * the event is only removed from their schedule.

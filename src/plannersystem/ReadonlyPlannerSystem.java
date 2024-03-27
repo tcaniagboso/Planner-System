@@ -48,5 +48,14 @@ public interface ReadonlyPlannerSystem {
    */
   Schedule getSchedule(String userId);
 
+  /**
+   * Retrieves a set of user IDs that have schedules within the planner system. This method provides
+   * a straightforward way to access the list of all users in the system without altering any data.
+   * It is particularly useful for operations that require a quick check of all users or for
+   * iterating over the users to perform read-only actions.
+   *
+   * @return A {@link Set} of {@link String} objects, each representing a unique user ID in the
+   * system.
+   */
   Set<String> getUsers();
 }

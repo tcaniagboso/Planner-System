@@ -57,6 +57,14 @@ public class LocationTest {
     Assert.assertTrue(location.isOnline());
   }
 
+  /**
+   * Tests the equality and inequality of {@link Location} objects. This test first verifies that
+   * two {@link Location} instances with different online statuses are not considered equal,
+   * even if they share the same physical location. It then updates one {@link Location} instance to
+   * have the same online status as the other, and verifies that the two locations are considered
+   * equal. This ensures the {@link Location#equals(Object)} method correctly evaluates both the
+   * online status and the physical location string in determining equality.
+   */
   @Test
   public void testEquals() {
     Location spot = new Location();

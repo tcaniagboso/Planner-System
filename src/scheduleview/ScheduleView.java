@@ -1,25 +1,27 @@
 package scheduleview;
 
-import schedule.Schedule;
-
 /**
  * The ScheduleView interface defines a method for rendering a schedule into a string
  * representation.
  */
 public interface ScheduleView {
 
+
   /**
-   * Renders the provided Schedule object into a String format that includes
-   * details about each event organized by day of the week.
+   * Renders the schedule of a specified user into a string representation.
+   * The method retrieves the user's schedule from the PlannerSystem, sorts
+   * it, and formats it into a readable string that lists events by day of
+   * the week, including details for each event.
    *
-   * <p>The method iterates over each day of the week and for each day, lists all
-   * events occurring on that day along with their details such as name, time,
-   * location, online status, and invitees. Events are sorted prior to rendering.
+   * <p>Event details include the event name, start and end times (with days),
+   * location (with a distinction between physical and online locations),
+   * and a list of invitees. Times are formatted using the TimeUtilities class.</p>
    *
-   * @param schedule The Schedule object to be rendered.
-   * @return A human-readable String representation of the Schedule, organized
-   * by day of the week and listing details of each event.
-   * @throws IllegalArgumentException if the provided Schedule is null.
+   * @param user the identifier of the user whose schedule is to be rendered;
+   *             must not be null.
+   * @return a string representation of the user's schedule, formatted by day
+   * of the week with details for each event.
+   * @throws IllegalArgumentException if the user argument is null.
    */
-  String render(Schedule schedule);
+  String render(String user);
 }

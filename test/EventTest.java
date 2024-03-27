@@ -100,7 +100,8 @@ public class EventTest {
    * Tests other methods of the {@link schedule.Event} class,
    * including the ability to add and remove invitees, check for event overlap,
    * and clone events. It also tests the new equals method It verifies that the methods
-   * behave correctly under various scenarios, including handling of invalid inputs.
+   * behave correctly under various scenarios, including handling of invalid inputs. It also tests
+   * the wrapAround method.
    */
   @Test
   public void testOtherMethods() {
@@ -110,12 +111,15 @@ public class EventTest {
     event.setHost("John");
     event.setInvitees(new ArrayList<>(Arrays.asList("John", "James", "Jack")));
 
+    Assert.assertTrue(event.wrapsAround());
+
     Event other = new Event();
     other.setName("Reading");
     other.setEventTimes("Sunday", "1100", "Monday", "1100");
     other.setLocation(true, "Ryder");
     other.setHost("John");
     other.setInvitees(new ArrayList<>(Arrays.asList("John", "James", "Jack")));
+    Assert.assertFalse(other.wrapsAround());
 
     Assert.assertFalse(event.overlap(other));
     other.setEventTimes("Tuesday", "1100", "Monday", "1100");

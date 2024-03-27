@@ -69,11 +69,10 @@ public class Schedule {
    * Removes a specified event from the schedule after validating its presence.
    *
    * @param event The event to remove.
-   * @throws IllegalArgumentException If the event is null or does not exist in the schedule.
+   * @throws IllegalArgumentException If the event is null
    */
   public void removeEvent(Event event) {
     ValidationUtilities.validateNull(event);
-    this.validateEventExists(event);
     this.events.remove(event);
   }
 
@@ -135,6 +134,17 @@ public class Schedule {
   public Event findEvent(String day, String time) {
     for (Event event : events) {
       if (event.occurs(day, time)) {
+        return event;
+      }
+    }
+    return null;
+  }
+
+  public Event getEvent(Event event) {
+    ValidationUtilities.validateNull(event);
+    this.validateEventExists(event);
+    for (Event e: events) {
+      if (e.equals(event)) {
         return event;
       }
     }

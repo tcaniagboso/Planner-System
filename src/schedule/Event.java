@@ -178,6 +178,10 @@ public class Event {
     this.invitees.remove(invitee);
   }
 
+  public void clearInvitees() {
+    this.invitees.clear();
+  }
+
   /**
    * Determines if this event overlaps with another event in terms of time.
    * Overlapping is determined based on the start and end times of both events.

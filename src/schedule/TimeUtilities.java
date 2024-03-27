@@ -6,7 +6,8 @@ import java.time.format.DateTimeFormatter;
 
 /**
  * Provides utility methods for formatting time-related information.
- * This class includes methods for formatting instances of {@link LocalTime} and {@link DayOfWeek} into strings.
+ * This class includes methods for formatting instances of {@link LocalTime} and {@link DayOfWeek}
+ * into strings.
  */
 public class TimeUtilities {
 

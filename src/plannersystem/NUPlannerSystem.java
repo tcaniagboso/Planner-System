@@ -92,8 +92,8 @@ public class NUPlannerSystem implements PlannerSystem {
   @Override
   public String displayUserSchedule(String userId) {
     this.validateUserExists(userId);
-    ScheduleView scheduleView = new ScheduleViewModel();
-    return scheduleView.render(this.getSchedule(userId));
+    ScheduleView scheduleView = new ScheduleViewModel(this);
+    return scheduleView.render(userId);
   }
 
   @Override
@@ -123,96 +123,18 @@ public class NUPlannerSystem implements PlannerSystem {
 
     // Remove the event from all schedules
     removeEventFromSchedules(event);
-
     try {
       // Modify the event
       event.setName(name);
       event.setEventTimes(startDay, startTime, endDay, endTime);
       event.setLocation(isOnline, location);
-      event.setInvitees(new ArrayList<>(invitees));
+      event.setInvitees(invitees);
       // Re-validate and add the modified event to schedules
       this.validateEventTime(event);
       this.addEventToSchedules(event);
-    } catch (IllegalArgumentException e) {
+    } catch (Exception e) {
       this.restoreEventFromBackup(event, backup);
       this.addEventToSchedules(event);
-      throw e;
-    }
-  }
-
-  @Override
-  public void modifyEvent(String userId, Event event, String name) {
-    ValidationUtilities.validateNull(event);
-    this.validateUserExists(userId);
-    this.validateEventExists(userId, event);
-
-    String oldName = event.getName();
-
-    try {
-      event.setName(name);
-    } catch (IllegalArgumentException e) {
-      event.setName(oldName);
-      throw e;
-    }
-  }
-
-  @Override
-  public void modifyEvent(String userId, Event event, String startDay, String startTime,
-                          String endDay, String endTime) {
-    ValidationUtilities.validateNull(event);
-    this.validateUserExists(userId);
-    this.validateEventExists(userId, event);
-
-    // Backup the original state
-    EventBackup backup = this.backupEventDetails(event);
-
-    removeEventFromSchedules(event); // Remove the event
-
-    try {
-      event.setEventTimes(startDay, startTime, endDay, endTime); // Modify the event
-
-      this.validateEventTime(event); // Re-validate
-      this.addEventToSchedules(event); // Re-add the modified event
-    } catch (IllegalArgumentException e) {
-      this.restoreEventFromBackup(event, backup);
-      this.addEventToSchedules(event); // Re-add the original event
-      throw e;
-    }
-  }
-
-  @Override
-  public void modifyEvent(String userId, Event event, boolean isOnline, String location) {
-    ValidationUtilities.validateNull(event);
-    this.validateUserExists(userId);
-    this.validateEventExists(userId, event);
-    boolean oldOnline = event.getLocation().isOnline();
-    String oldPlace = event.getLocation().getLocation();
-
-    try {
-      event.setLocation(isOnline, location);
-    } catch (IllegalArgumentException e) {
-      event.setLocation(oldOnline, oldPlace);
-      throw e;
-    }
-  }
-
-  @Override
-  public void modifyEvent(String userId, Event event, List<String> invitees) {
-    ValidationUtilities.validateNull(event);
-    this.validateUserExists(userId);
-    this.validateEventExists(userId, event);
-
-    List<String> oldInvitees = event.getInvitees();
-    removeEventFromSchedules(event); // Remove the event
-
-    try {
-      event.setInvitees(invitees); // Modify the event
-
-      this.validateEventTime(event); // Re-validate
-      this.addEventToSchedules(event); // Re-add the modified event
-    } catch (IllegalArgumentException e) {
-      event.setInvitees(oldInvitees);
-      this.addEventToSchedules(event); // Re-add the original event
       throw e;
     }
   }
@@ -222,18 +144,22 @@ public class NUPlannerSystem implements PlannerSystem {
     ValidationUtilities.validateNull(event);
     this.validateUserExists(userId);
     this.validateEventExists(userId, event);
-    if (userId.equals(event.getHost())) {
-      this.removeEventFromSchedules(event);
+    Event originalEvent = this.users.get(userId).getEvent(event);
+    if (userId.equals(originalEvent.getHost())) {
+      this.removeEventFromSchedules(originalEvent);
     } else {
-      this.getSchedule(userId).removeEvent(event);
-      event.removeInvitee(userId);
+      this.getSchedule(userId).removeEvent(originalEvent);
+      List<String> invitees = originalEvent.getInvitees();
+      this.removeEventFromSchedules(originalEvent);
+      invitees.remove(userId);
+      originalEvent.setInvitees(invitees);
+      this.addEventToSchedules(originalEvent);
     }
   }
 
   @Override
   public void automaticScheduling(String userId, String name, boolean isOnline,
                                   String location, List<String> invitees) {
-
   }
 
   @Override
@@ -353,7 +279,8 @@ public class NUPlannerSystem implements PlannerSystem {
    * @param event The event to be added to the invitees' schedules.
    */
   private void addEventToSchedules(Event event) {
-    for (String user : event.getInvitees()) {
+    List<String> invitees = event.getInvitees();
+    for (String user : invitees) {
       Schedule schedule = users.getOrDefault(user, new Schedule(user));
       if (!schedule.hasEvent(event)) {
         schedule.addEvent(event);
@@ -415,35 +342,57 @@ public class NUPlannerSystem implements PlannerSystem {
 
 
   /**
-   * Removes the specified event from the schedules of all its invitees.
-   * If the event is removed from the host's schedule, it is also removed from all invitees'
-   * schedules.
+   * Removes a specified event from the schedules of all its invitees, effectively canceling the
+   * event for those users. After removal, the event's list of invitees is cleared to reflect that
+   * it no longer has any attendees.
    *
-   * @param event The event to be removed.
+   * @param event The event to be removed from all associated schedules.
    */
   private void removeEventFromSchedules(Event event) {
-    for (String user : event.getInvitees()) {
+    List<String> invitees = new ArrayList<>(event.getInvitees());
+    for (String user : invitees) {
       if (users.containsKey(user)) {
         users.get(user).removeEvent(event);
-        event.removeInvitee(user);
       }
     }
+    event.clearInvitees();
   }
 
-  // newly added
+  /**
+   * Adds a collection of schedules to the system. Each schedule is associated with a unique user.
+   * This method is intended for initializing the system with a predefined set of user schedules.
+   *
+   * @param schedules A list of {@link Schedule} objects to be added to the system.
+   */
   private void addSchedules(List<Schedule> schedules) {
     for (Schedule schedule: schedules) {
       users.put(schedule.getUserId(), schedule);
     }
   }
 
+  /**
+   * Creates a backup of the current state of an event. This backup includes all relevant details
+   * of the event such as its name, timing, location, host, and invitees. The backup is used to
+   * restore the event's state in case of a failure during modification.
+   *
+   * @param event The {@link Event} to be backed up.
+   * @return An {@link EventBackup} object containing the backed-up event details.
+   */
   private EventBackup backupEventDetails(Event event) {
     return new EventBackup(event);
   }
 
+  /**
+   * Restores an event's details from a backup. This method is typically called to revert changes
+   * to an event after a failed modification attempt, ensuring the event's state is consistent with
+   * its state prior to the modification.
+   *
+   * @param event  The {@link Event} whose details are to be restored.
+   * @param backup The {@link EventBackup} from which to restore the event's details.
+   */
   private void restoreEventFromBackup(Event event, EventBackup backup) {
-    event.setEventTimes(backup.startDay, backup.startTime, backup.endDay, backup.endTime);
     event.setName(backup.name);
+    event.setEventTimes(backup.startDay, backup.startTime, backup.endDay, backup.endTime);
     event.setHost(backup.host);
     event.setLocation(backup.isOnline, backup.place);
     event.setInvitees(backup.invitees);

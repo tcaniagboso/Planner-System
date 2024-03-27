@@ -85,7 +85,8 @@ public class TimeTest {
    * This test covers various scenarios to ensure accurate detection of time overlaps
    * between different Time objects, including edge cases and multi-day events.
    * It validates the overlap logic against overlapping and non-overlapping events,
-   * ensuring that the method correctly identifies when two events' times conflict.
+   * ensuring that the method correctly identifies when two events' times conflict. It also tests
+   * the wrapAround method.
    */
   @Test
   public void testOverlap() {
@@ -113,9 +114,11 @@ public class TimeTest {
     other.setEndTime("1000");
     time = new Time("monday", "1000", "monday", "0900");
     Assert.assertFalse(time.overlap(other)); // starts before a multi week event
+    Assert.assertTrue(time.wrapsAround());
 
     other = new Time("Monday", "0900", "monday", "1000");
     Assert.assertFalse(time.overlap(other)); // starts right before a multi week event
+    Assert.assertFalse(other.wrapsAround());
 
     other = new Time("Tuesday", "0900", "Tuesday", "0800");
     Assert.assertTrue(time.overlap(other)); // tests if it starts within a multi week event
