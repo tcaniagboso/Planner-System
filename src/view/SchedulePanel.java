@@ -38,7 +38,6 @@ public class SchedulePanel extends JPanel {
     }
     this.schedule = schedule;
     this.setBackground(Color.lightGray);
-    addMouseListener(new EventClickListener(this));
   }
 
   /**

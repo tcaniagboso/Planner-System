@@ -48,10 +48,10 @@ public class Event {
    * @throws IllegalArgumentException If the name is null or empty.
    */
   public void setName(String name) {
-    if (name == null || name.isEmpty()) {
+    if (name == null || name.trim().isEmpty()) {
       throw new IllegalArgumentException("Event name cannot be null or empty");
     }
-    this.name = name;
+    this.name = name.trim();
   }
 
   /**
@@ -151,7 +151,7 @@ public class Event {
   public void setHost(String host) {
     this.validateUser(host);
 
-    this.host = host;
+    this.host = host.trim();
   }
 
   /**

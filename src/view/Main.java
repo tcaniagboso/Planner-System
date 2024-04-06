@@ -3,10 +3,12 @@ package view;
 import java.util.ArrayList;
 import java.util.List;
 
+import controller.PlannerSystemController;
+import controller.ScheduleViewController;
+import plannersystem.PlannerSystem;
 import schedule.Event;
 import schedule.Schedule;
 
-import plannersystem.ReadonlyPlannerSystem;
 import plannersystem.NUPlannerSystem;
 
 /**
@@ -58,10 +60,11 @@ public class Main {
     List<Schedule> schedules = new ArrayList<>(List.of(tobeSchedule, karinaSchedule));
 
     // Creating a read-only planner system with the provided schedules
-    ReadonlyPlannerSystem system = new NUPlannerSystem(schedules);
+    PlannerSystem system = new NUPlannerSystem(schedules);
 
     // Initializing the planner system view
-    PlannerSystemView systemView = new PlannerSystemView(system);
-    systemView.setVisible(true);
+    PlannerSystemViewImpl systemView = new PlannerSystemViewImpl(system);
+    PlannerSystemController controller = new ScheduleViewController(systemView);
+    controller.launch(system);
   }
 }

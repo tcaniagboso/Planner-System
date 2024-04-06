@@ -51,7 +51,7 @@ public class Location {
    * @throws IllegalArgumentException if location is null or is an empty string.
    */
   public void setLocation(String location) {
-    if (location == null || location.isEmpty()) {
+    if (location == null || location.trim().isEmpty()) {
       throw new IllegalArgumentException("Invalid location");
     }
     this.location = location;

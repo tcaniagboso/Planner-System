@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import controller.Observer;
 import schedule.Event;
 import schedule.Schedule;
 import scheduleview.ScheduleView;
@@ -32,6 +33,7 @@ import validationutilities.ValidationUtilities;
  */
 public class NUPlannerSystem implements PlannerSystem {
   private final Map<String, Schedule> users;
+  private final List<Observer> observers = new ArrayList<>();
 
   /**
    * Constructs a new NUPlannerSystem instance with an empty map of users.
@@ -76,14 +78,17 @@ public class NUPlannerSystem implements PlannerSystem {
     } catch (IllegalArgumentException e) {
       throw new IllegalArgumentException(e.getMessage());
     }
+    this.notifyObservers();
   }
 
   @Override
-  public void saveUserSchedule(String userId) {
+  public void saveUserSchedule(String userId, String filePath) {
+    if (filePath == null || filePath.trim().isEmpty()) {
+      throw new IllegalArgumentException("File path cannot be null or empty");
+    }
     this.validateUserExists(userId);
-    String fileName = userId.toLowerCase() + ".xml";
     try {
-      ScheduleXMLWriter.writeScheduleToXML(this.getSchedule(userId), fileName);
+      ScheduleXMLWriter.writeScheduleToXML(this.getSchedule(userId), filePath);
     } catch (Exception e) {
       throw new IllegalStateException(e.getMessage());
     }
@@ -108,6 +113,7 @@ public class NUPlannerSystem implements PlannerSystem {
     newEvent.setInvitees(invitees);
     this.validateEventTime(newEvent);
     this.addEventToSchedules(newEvent);
+    this.notifyObservers();
   }
 
   @Override
@@ -137,6 +143,7 @@ public class NUPlannerSystem implements PlannerSystem {
       this.addEventToSchedules(event);
       throw e;
     }
+    this.notifyObservers();
   }
 
   @Override
@@ -155,12 +162,25 @@ public class NUPlannerSystem implements PlannerSystem {
       originalEvent.setInvitees(invitees);
       this.addEventToSchedules(originalEvent);
     }
+    this.notifyObservers();
   }
 
   @Override
   public void automaticScheduling(String userId, String name, boolean isOnline,
                                   String location, List<String> invitees) {
     // To be implemented later
+  }
+
+  @Override
+  public void addObserver(Observer observer) {
+    ValidationUtilities.validateNull(observer);
+    observers.add(observer);
+  }
+
+  @Override
+  public void removeObserver(Observer observer) {
+    ValidationUtilities.validateNull(observer);
+    observers.remove(observer);
   }
 
   @Override
@@ -187,6 +207,12 @@ public class NUPlannerSystem implements PlannerSystem {
   @Override
   public Set<String> getUsers() {
     return users.keySet();
+  }
+
+  private void notifyObservers() {
+    for (Observer observer : observers) {
+      observer.update();
+    }
   }
 
   /**

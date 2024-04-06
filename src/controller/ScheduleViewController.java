@@ -1,26 +1,99 @@
-package view;
+package controller;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.time.LocalTime;
 
+import command.AddCalendar;
+import command.Command;
+import command.OpenExistingEvent;
+import command.OpenNewEvent;
+import command.OpenScheduleEvent;
+import command.SaveCalendars;
+import command.SelectUser;
+import plannersystem.PlannerSystem;
 import schedule.Event;
 import schedule.Schedule;
+import view.PlannerSystemView;
+import view.SchedulePanel;
 
 /**
- * Listens for mouse click events on the SchedulePanel to handle event selection.
+ * Controller class for managing user actions and mouse events in the Planner System application.
+ * This class listens for actions performed on the GUI and responds to mouse clicks on the schedule
+ * panel.
+ * It bridges the interaction between the view ({@link PlannerSystemView}) and the model
+ * ({@link PlannerSystem}).
  */
-public class EventClickListener extends MouseAdapter {
+public class ScheduleViewController extends MouseAdapter implements PlannerSystemController,
+        ActionListener, Observer {
 
+  private final PlannerSystemView view;
+  private PlannerSystem model;
   private final SchedulePanel schedulePanel;
 
   /**
-   * Constructs an EventClickListener with the specified SchedulePanel.
+   * Constructs a ScheduleViewController with a specified view.
+   * Initializes the controller, sets itself as the listener for action and mouse events.
    *
-   * @param schedulePanel The SchedulePanel to listen for mouse click events.
+   * @param view The {@link PlannerSystemView} for this controller to manage.
+   * @throws IllegalArgumentException if the provided view is null.
    */
-  public EventClickListener(SchedulePanel schedulePanel) {
-    this.schedulePanel = schedulePanel;
+  public ScheduleViewController(PlannerSystemView view) {
+    if (view == null) {
+      throw new IllegalArgumentException("View cannot be null");
+    }
+    this.view = view;
+    this.schedulePanel = this.view.getSchedulePanel();
+    this.view.setActionListener(this);
+    this.view.setMouseListener(this);
+  }
+
+  @Override
+  public void launch(PlannerSystem model) {
+    this.setModel(model);
+    this.view.makeVisible();
+  }
+
+  @Override
+  public void actionPerformed(ActionEvent e) {
+    String currentUser = this.view.getCurrentUser();
+    assert currentUser != null;
+    String action = e.getActionCommand();
+    Command command = null;
+    switch (action) {
+      case "Create event":
+        command = new OpenNewEvent(currentUser, model);
+        break;
+      case "Schedule event":
+        command = new OpenScheduleEvent(currentUser);
+        break;
+      case "Add calendar":
+        command = new AddCalendar(view, model);
+        break;
+      case "Save calendars":
+        command = new SaveCalendars(currentUser, view, model);
+        break;
+      case "Select user":
+        command = new SelectUser(currentUser, view);
+        break;
+    }
+
+    if (command != null) {
+      try {
+        command.execute();
+      } catch (Exception ise) {
+        this.view.displayErrorMessage(ise.getMessage());
+      }
+    }
+    this.view.refresh();
+  }
+
+  @Override
+  public void update() {
+    this.view.updateUsers();
+    this.view.refresh();
   }
 
   /**
@@ -91,30 +164,35 @@ public class EventClickListener extends MouseAdapter {
                                                int cellWidth, int cellHeight, double mouseX,
                                                double mouseY, double startY, double endY) {
     String userId = schedulePanel.getSchedule().getUserId();
+    boolean found = false;
     for (int i = startDayIndex; i <= endDayIndex; i++) {
       int startX = cellWidth * (i + 1);
       int endX = cellWidth * (i + 2);
       if (i == startDayIndex && i == endDayIndex) {
         if (isInRange(startX, endX, startY, endY, mouseX, mouseY)) {
-          new EventView(event, userId);
-          return;
+          found = true;
+          break;
         }
       } else if (i == startDayIndex) {
         if (isInRange(startX, endX, startY, cellHeight * 25, mouseX, mouseY)) {
-          new EventView(event, userId);
-          return;
+          found = true;
+          break;
         }
       } else if (i == endDayIndex) {
         if (isInRange(startX, endX, cellHeight, endY, mouseX, mouseY)) {
-          new EventView(event, userId);
-          return;
+          found = true;
+          break;
         }
       } else {
         if (isInRange(startX, endX, cellHeight, cellHeight * 25, mouseX, mouseY)) {
-          new EventView(event, userId);
-          return;
+          found = true;
+          break;
         }
       }
+    }
+    if (found) {
+      Command command = new OpenExistingEvent(userId, event, model);
+      command.execute();
     }
   }
 
@@ -132,5 +210,13 @@ public class EventClickListener extends MouseAdapter {
   private boolean isInRange(double startX, double endX, double startY, double endY, double clickX,
                             double clickY) {
     return (clickX >= startX && clickX < endX) && (clickY >= startY && clickY < endY);
+  }
+
+  private void setModel(PlannerSystem model) {
+    if (model == null) {
+      throw new IllegalArgumentException("Planner System Model is null");
+    }
+    this.model = model;
+    this.model.addObserver(this);
   }
 }

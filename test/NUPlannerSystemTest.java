@@ -117,12 +117,12 @@ public class NUPlannerSystemTest {
   @Test
   public void testSaveSchedule() {
     Assert.assertThrows(IllegalArgumentException.class,
-        () -> system.saveUserSchedule("Prof. Lucia"));
+        () -> system.saveUserSchedule("Prof. Lucia", "prof2.xml"));
     File xmlFile = new File("prof.xml");
     system.readUserSchedule(xmlFile);
 
-    this.system.saveUserSchedule("Prof. Lucia");
-    File file = new File("prof. lucia.xml");
+    this.system.saveUserSchedule("Prof. Lucia", "prof2.xml");
+    File file = new File("prof2.xml");
 
     PlannerSystem other = new NUPlannerSystem();
     other.readUserSchedule(file);

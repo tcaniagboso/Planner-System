@@ -1,11 +1,11 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <schedule id="Prof. Lucia">
     <event>
         <name>CS3500 Morning Lecture</name>
         <time>
-            <start-day>Monday</start-day>
+            <start-day>Tuesday</start-day>
             <start>0950</start>
-            <end-day>Monday</end-day>
+            <end-day>Tuesday</end-day>
             <end>1130</end>
         </time>
         <location>
@@ -21,9 +21,9 @@
     <event>
         <name>CS3500 Afternoon Lecture</name>
         <time>
-            <start-day>Monday</start-day>
+            <start-day>Tuesday</start-day>
             <start>1335</start>
-            <end-day>Monday</end-day>
+            <end-day>Tuesday</end-day>
             <end>1515</end>
         </time>
         <location>
@@ -40,8 +40,8 @@
         <time>
             <start-day>Friday</start-day>
             <start>1800</start>
-            <end-day>Friday</end-day>
-            <end>2000</end>
+            <end-day>Sunday</end-day>
+            <end>1200</end>
         </time>
         <location>
             <online>true</online>

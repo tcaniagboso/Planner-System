@@ -59,7 +59,7 @@ public class Time {
    * @throws IllegalArgumentException If the input does not correspond to a valid {@link DayOfWeek}.
    */
   public void setStartDay(String startDay) {
-    this.startDay = this.validateDay(startDay);
+    this.startDay = this.validateDay(startDay.trim());
   }
 
   /**
@@ -82,7 +82,7 @@ public class Time {
     if (startDay == null) {
       throw new IllegalStateException("Start day must be set before start time.");
     }
-    this.startTime = this.validateTime(startTime);
+    this.startTime = this.validateTime(startTime.trim());
   }
 
   /**
@@ -105,7 +105,7 @@ public class Time {
     if (startDay == null || startTime == null) {
       throw new IllegalStateException("Start day and start time must be set before end day.");
     }
-    this.endDay = this.validateDay(endDay);
+    this.endDay = this.validateDay(endDay.trim());
   }
 
   /**
@@ -132,7 +132,7 @@ public class Time {
       throw new IllegalStateException("Start day, start time and end day must be "
               + "set before end time.");
     }
-    LocalTime parsedEndTime = this.validateTime(endTime);
+    LocalTime parsedEndTime = this.validateTime(endTime.trim());
     if (startDay.equals(endDay) && startTime.equals(parsedEndTime)) {
       throw new IllegalArgumentException("An event cannot start and end at the same "
               + "time on the same day.");

@@ -3,6 +3,7 @@ package plannersystem;
 import java.io.File;
 import java.util.List;
 
+import controller.Observer;
 import schedule.Event;
 
 /**
@@ -29,10 +30,11 @@ public interface PlannerSystem extends ReadonlyPlannerSystem {
    * Saves the current schedule of a user to an XML file.
    *
    * @param userId The ID of the user whose schedule is being saved.
+   * @param filePath The path of the file to save the schedule to.
    * @throws IllegalStateException if any error occurs during the saving process, encapsulating
    *                               the original exception message.
    */
-  void saveUserSchedule(String userId);
+  void saveUserSchedule(String userId, String filePath);
 
   /**
    * Creates an event and adds it to the schedule of the specified user and all invitees.
@@ -97,4 +99,30 @@ public interface PlannerSystem extends ReadonlyPlannerSystem {
    */
   void automaticScheduling(String userId, String name, boolean isOnline,
                            String location, List<String> invitees);
+
+  /**
+   * Registers an observer to be notified of changes to the planner system. Observers are typically
+   * components interested in being informed about updates to the system's state, such as changes
+   * to schedules or events. This allows for a decoupled architecture where components can react to
+   * changes without having direct dependencies on each other.
+   *
+   * @param observer The {@link Observer} to be added to the list of registered observers. Once
+   *                 added, the observer will receive updates on changes to the planner system.
+   * @throws IllegalArgumentException if the observer is null, ensuring that only valid observers
+   *                                  are registered.
+   */
+  void addObserver(Observer observer);
+
+  /**
+   * Unregisters an observer from the planner system. Once removed, the observer will no longer
+   * receive updates about changes to the system's state. This method is typically called when an
+   * observer is being destroyed or no longer needs to receive updates, helping to prevent memory
+   * leaks and ensure that the system can manage its list of observers efficiently.
+   *
+   * @param observer The {@link Observer} to be removed from the list of registered observers.
+   *                 If the observer is not currently registered, this method has no effect.
+   * @throws IllegalArgumentException if the observer is null, ensuring that the method attempts
+   *                                  to remove only valid observers.
+   */
+  void removeObserver(Observer observer);
 }
