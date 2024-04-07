@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<schedule id="Tobe">
+    <event>
+        <name>CS3500 Lecture Morning</name>
+        <time>
+            <start-day>Tuesday</start-day>
+            <start>0950</start>
+            <end-day>Tuesday</end-day>
+            <end>1130</end>
+        </time>
+        <location>
+            <online>true</online>
+            <place>Churchill Hall Room 109</place>
+        </location>
+        <users>
+            <uid>Tobe</uid>
+            <uid>Karina</uid>
+        </users>
+    </event>
+    <event>
+        <name>Assignments</name>
+        <time>
+            <start-day>Friday</start-day>
+            <start>0950</start>
+            <end-day>Sunday</end-day>
+            <end>1130</end>
+        </time>
+        <location>
+            <online>true</online>
+            <place>Home</place>
+        </location>
+        <users>
+            <uid>Tobe</uid>
+            <uid>Karina</uid>
+        </users>
+    </event>
+    <event>
+        <name>Football</name>
+        <time>
+            <start-day>Wednesday</start-day>
+            <start>0950</start>
+            <end-day>Thursday</end-day>
+            <end>1130</end>
+        </time>
+        <location>
+            <online>false</online>
+            <place>Carter Field</place>
+        </location>
+        <users>
+            <uid>Tobe</uid>
+        </users>
+    </event>
+</schedule>

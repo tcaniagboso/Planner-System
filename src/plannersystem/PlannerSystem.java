@@ -95,10 +95,11 @@ public interface PlannerSystem extends ReadonlyPlannerSystem {
    * @param name     The name of the event to be scheduled.
    * @param isOnline Indicates if the event is to be held online.
    * @param location The physical location of the event, if not online.
+   * @param duration The desired duration of the event.
    * @param invitees A list of IDs for users to be invited to the event.
    */
-  void automaticScheduling(String userId, String name, boolean isOnline,
-                           String location, List<String> invitees);
+  void automaticScheduling(String userId, String name, boolean isOnline, String location,
+                           int duration, List<String> invitees);
 
   /**
    * Registers an observer to be notified of changes to the planner system. Observers are typically

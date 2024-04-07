@@ -166,9 +166,14 @@ public class NUPlannerSystem implements PlannerSystem {
   }
 
   @Override
-  public void automaticScheduling(String userId, String name, boolean isOnline,
-                                  String location, List<String> invitees) {
-    // To be implemented later
+  public void automaticScheduling(String userId, String name, boolean isOnline, String location,
+                                  int duration, List<String> invitees) {
+    Event newEvent = new Event();
+    newEvent.setName(name);
+    newEvent.setLocation(isOnline, location);
+    newEvent.setHost(userId);
+    newEvent.setInvitees(invitees);
+    // TODO: Command Line Bullshit
   }
 
   @Override
@@ -331,7 +336,8 @@ public class NUPlannerSystem implements PlannerSystem {
     for (String user : event.getInvitees()) {
       if (users.containsKey(user)) {
         if (this.getSchedule(user).overlap(event)) {
-          throw new IllegalArgumentException("There is a time conflict in " + user + " schedule.");
+          throw new IllegalArgumentException("There is a time conflict in " + user + "'s "
+                  + "schedule.");
         }
       }
     }
@@ -363,7 +369,7 @@ public class NUPlannerSystem implements PlannerSystem {
     ValidationUtilities.validateNull(event);
     this.validateUserExists(userId);
     if (!this.getSchedule(userId).hasEvent(event)) {
-      throw new IllegalArgumentException("Event doesn't exist in user " + userId + " schedule.");
+      throw new IllegalArgumentException("Event doesn't exist in user " + userId + "'s schedule.");
     }
   }
 
@@ -392,7 +398,7 @@ public class NUPlannerSystem implements PlannerSystem {
    * @param schedules A list of {@link Schedule} objects to be added to the system.
    */
   private void addSchedules(List<Schedule> schedules) {
-    for (Schedule schedule: schedules) {
+    for (Schedule schedule : schedules) {
       users.put(schedule.getUserId(), schedule);
     }
   }
