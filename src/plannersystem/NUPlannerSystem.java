@@ -430,4 +430,24 @@ public class NUPlannerSystem implements PlannerSystem {
     event.setLocation(backup.isOnline, backup.place);
     event.setInvitees(backup.invitees);
   }
+
+  /**
+   * Retrieves a list of schedules for all invitees of a given event. If an invitee does not have an
+   * existing schedule, a new schedule is created and returned for that user. This method ensures
+   * that every invitee of the event is accounted for, with their respective schedule
+   * (existing or new) included in the returned list.
+   *
+   * @param event The event for which to retrieve the invitees' schedules. Assumes the event is not
+   *              null and contains a valid list of invitees.
+   * @return A list of {@link Schedule} objects corresponding to each invitee of the event. The list
+   *         contains either existing schedules from the 'users' map or newly created schedules for
+   *         invitees without an existing schedule.
+   */
+  private List<Schedule> getSchedules(Event event) {
+    List<Schedule> result = new ArrayList<>();
+    for (String user : event.getInvitees()) {
+      result.add(users.getOrDefault(user, new Schedule(user)));
+    }
+    return result;
+  }
 }
