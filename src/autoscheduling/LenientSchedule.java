@@ -33,6 +33,10 @@ public class LenientSchedule extends WorkHourSchedule {
     }
     // Ensure both the host is available and at least one other user
     boolean isHostAvailable = availableUsers.contains(event.getHost());
-    return isHostAvailable && availableUsers.size() > 1;
+    if (isHostAvailable && availableUsers.size() > 1) {
+      event.setInvitees(availableUsers);
+      return true;
+    }
+    return false;
   }
 }
