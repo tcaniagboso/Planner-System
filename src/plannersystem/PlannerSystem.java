@@ -3,6 +3,7 @@ package plannersystem;
 import java.io.File;
 import java.util.List;
 
+import autoscheduling.AutoSchedule;
 import controller.Observer;
 import schedule.Event;
 
@@ -29,7 +30,7 @@ public interface PlannerSystem extends ReadonlyPlannerSystem {
   /**
    * Saves the current schedule of a user to an XML file.
    *
-   * @param userId The ID of the user whose schedule is being saved.
+   * @param userId   The ID of the user whose schedule is being saved.
    * @param filePath The path of the file to save the schedule to.
    * @throws IllegalStateException if any error occurs during the saving process, encapsulating
    *                               the original exception message.
@@ -88,15 +89,22 @@ public interface PlannerSystem extends ReadonlyPlannerSystem {
   void removeEvent(String userId, Event event);
 
   /**
-   * Automatically schedules an event, attempting to find a suitable time slot that accommodates
-   * all participants. This method is a placeholder and not yet implemented.
+   * Attempts to automatically schedule a new event using the current scheduling strategy. This
+   * method constructs a new event based on the provided parameters and uses the assigned scheduling
+   * strategy to find an appropriate time slot. If a suitable time slot is found, the event is added
+   * to the schedules of all its invitees. If no suitable time slot can be found, an exception is
+   * thrown.
    *
-   * @param userId   The ID of the user requesting the automatic scheduling.
+   * @param userId   The user ID of the event's host.
    * @param name     The name of the event to be scheduled.
-   * @param isOnline Indicates if the event is to be held online.
-   * @param location The physical location of the event, if not online.
-   * @param duration The desired duration of the event.
-   * @param invitees A list of IDs for users to be invited to the event.
+   * @param isOnline Indicates whether the event is to be held online. True for online events; false
+   *                 otherwise.
+   * @param location The location of the event if it is not online.
+   * @param duration The duration of the event in minutes.
+   * @param invitees A list of user IDs representing the invitees to the event.
+   * @throws IllegalArgumentException if no suitable time slot can be found for the event,
+   *                                  indicating it is not possible to schedule the event as per the
+   *                                  current scheduling constraints and availability.
    */
   void automaticScheduling(String userId, String name, boolean isOnline, String location,
                            int duration, List<String> invitees);
@@ -126,4 +134,17 @@ public interface PlannerSystem extends ReadonlyPlannerSystem {
    *                                  to remove only valid observers.
    */
   void removeObserver(Observer observer);
+
+  /**
+   * Sets the scheduling strategy for the planner system. This strategy determines how events are
+   * scheduled within the system, according to the specific rules and constraints of the strategy.
+   * The strategy must implement the AutoSchedule interface.
+   *
+   * @param scheduleStrategy An instance of a class that implements the AutoSchedule interface,
+   *                         representing the new scheduling strategy to be used by the planner
+   *                         system.
+   * @throws IllegalArgumentException if the provided scheduleStrategy is null, ensuring that the
+   *                                  planner system always has a valid scheduling strategy.
+   */
+  void setScheduleStrategy(AutoSchedule scheduleStrategy);
 }

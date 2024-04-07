@@ -3,6 +3,8 @@ package view;
 import java.util.ArrayList;
 import java.util.List;
 
+import autoscheduling.AutoSchedule;
+import autoscheduling.ScheduleStrategyCreator;
 import controller.PlannerSystemController;
 import controller.ScheduleViewController;
 import plannersystem.PlannerSystem;
@@ -14,15 +16,21 @@ import plannersystem.NUPlannerSystem;
 /**
  * The Main class serves as the entry point for the Planner System application.
  * It demonstrates the functionality of the system by creating events, schedules,
- * and initializing the planner system view.
+ * and initializing the planner system view. Additionally, it supports selecting
+ * a scheduling strategy based on command-line arguments to demonstrate different
+ * scheduling behaviors.
  */
 public class Main {
 
   /**
-   * The main method initializes the Planner System application by creating events,
-   * schedules, and initializing the planner system view.
+   * Initializes the Planner System application by creating sample events and schedules,
+   * and setting up the user interface. Based on the command-line arguments, it selects a
+   * scheduling strategy to be used within the application. Demonstrates the creation of events,
+   * assignment of events to schedules, and the use of different scheduling strategies.
    *
-   * @param args The command-line arguments (not used).
+   * @param args The command-line arguments to select a scheduling strategy.
+   *             Supports "Any time", "Work hours", and "Lenient" as inputs to select the respective
+   *             scheduling strategy. If no argument is provided, defaults to "Any time".
    */
   public static void main(String[] args) {
     // Creating events
@@ -61,10 +69,41 @@ public class Main {
 
     // Creating a read-only planner system with the provided schedules
     PlannerSystem system = new NUPlannerSystem(schedules);
+    assignStrategy(args, system);
 
     // Initializing the planner system view
     PlannerSystemViewImpl systemView = new PlannerSystemViewImpl(system);
     PlannerSystemController controller = new ScheduleViewController(systemView);
     controller.launch(system);
+  }
+
+  /**
+   * Assigns a scheduling strategy to the planner system based on the provided command-line argument.
+   * Supports "Any time", "Work hours", and "Lenient" as scheduling strategies.
+   *
+   * @param args   The command-line arguments specifying the desired scheduling strategy.
+   * @param system The planner system to which the strategy will be applied.
+   * @throws IllegalArgumentException if an unsupported scheduling strategy is specified.
+   */
+  public static void assignStrategy(String[] args, PlannerSystem system) {
+    String strategy = (args.length > 0) ? args[0].strip() : "Any time";
+    AutoSchedule scheduleStrategy;
+    switch (strategy) {
+      case "Any time":
+        scheduleStrategy = ScheduleStrategyCreator
+                .createScheduleStrategy(ScheduleStrategyCreator.ScheduleStrategy.ANYTIME);
+        break;
+      case "Work hours":
+        scheduleStrategy = ScheduleStrategyCreator
+                .createScheduleStrategy(ScheduleStrategyCreator.ScheduleStrategy.WORKHOURS);
+        break;
+      case "Lenient":
+        scheduleStrategy = ScheduleStrategyCreator
+                .createScheduleStrategy(ScheduleStrategyCreator.ScheduleStrategy.LENIENT);
+        break;
+      default:
+        throw new IllegalArgumentException("Unknown Schedule Strategy: " + strategy);
+    }
+    system.setScheduleStrategy(scheduleStrategy);
   }
 }

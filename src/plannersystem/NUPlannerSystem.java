@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import autoscheduling.AutoSchedule;
 import controller.Observer;
 import schedule.Event;
 import schedule.Schedule;
@@ -34,6 +35,7 @@ import validationutilities.ValidationUtilities;
 public class NUPlannerSystem implements PlannerSystem {
   private final Map<String, Schedule> users;
   private final List<Observer> observers = new ArrayList<>();
+  private AutoSchedule scheduleStrategy;
 
   /**
    * Constructs a new NUPlannerSystem instance with an empty map of users.
@@ -173,7 +175,20 @@ public class NUPlannerSystem implements PlannerSystem {
     newEvent.setLocation(isOnline, location);
     newEvent.setHost(userId);
     newEvent.setInvitees(invitees);
-    // TODO: Command Line Bullshit
+
+    // Retrieve schedules for all invitees to check for availability
+    List<Schedule> scheduleList = this.getSchedules(newEvent);
+
+    // Attempt to schedule the event using the current scheduling strategy
+    Event scheduled = this.scheduleStrategy.scheduleEvent(newEvent, duration, scheduleList);
+
+    // If a suitable time slot is found, add the event to schedules; otherwise, throw an exception
+    if (scheduled != null) {
+      this.addEventToSchedules(scheduled);
+    } else {
+      throw new IllegalArgumentException("No available time to schedule this event");
+    }
+    this.notifyObservers();
   }
 
   @Override
@@ -186,6 +201,12 @@ public class NUPlannerSystem implements PlannerSystem {
   public void removeObserver(Observer observer) {
     ValidationUtilities.validateNull(observer);
     observers.remove(observer);
+  }
+
+  @Override
+  public void setScheduleStrategy(AutoSchedule scheduleStrategy) {
+    ValidationUtilities.validateNull(scheduleStrategy);
+    this.scheduleStrategy = scheduleStrategy;
   }
 
   @Override
