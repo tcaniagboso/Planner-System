@@ -29,7 +29,7 @@ import schedule.Schedule;
  * and displaying user schedules.
  */
 public class PlannerSystemViewImpl extends JFrame implements PlannerSystemView {
-  private static final int FRAME_SIZE = 1200;
+  private static final int FRAME_SIZE = 700;
   private JButton createEventButton;
   private JButton scheduleEventButton;
   private JComboBox<String> userOptions;
@@ -54,7 +54,7 @@ public class PlannerSystemViewImpl extends JFrame implements PlannerSystemView {
     this.system = system;
     this.setTitle("Weekly Schedule");
     this.setSize(FRAME_SIZE, FRAME_SIZE + 50);
-    this.setResizable(false);
+    this.setResizable(true);
     this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     setLayout(new BorderLayout());
 
@@ -163,7 +163,7 @@ public class PlannerSystemViewImpl extends JFrame implements PlannerSystemView {
   private void displayButtons() {
     // Panel for buttons
     JPanel buttonPanel = new JPanel(new BorderLayout());
-    buttonPanel.setPreferredSize(new Dimension(FRAME_SIZE, 50));
+    buttonPanel.setPreferredSize(new Dimension(FRAME_SIZE, this.getHeight() / 16));
 
     createEventButton = this.createButton("Create event");
     scheduleEventButton = this.createButton("Schedule event");
@@ -197,9 +197,9 @@ public class PlannerSystemViewImpl extends JFrame implements PlannerSystemView {
    */
   private JButton createButton(String text) {
     JButton button = new JButton(text);
-    button.setFont(new Font("Aptos", Font.BOLD, 15));
+    button.setFont(new Font("Aptos", Font.BOLD, this.getWidth() / 50));
     button.setBackground(Color.white);
-    button.setPreferredSize(new Dimension(200, 40));
+    button.setPreferredSize(new Dimension(this.getWidth() / 4, this.getHeight() / 20));
     button.setActionCommand(text);
     return button;
   }
@@ -212,9 +212,10 @@ public class PlannerSystemViewImpl extends JFrame implements PlannerSystemView {
    */
   private JComboBox<String> createComboBox(String[] options) {
     JComboBox<String> comboBox = new JComboBox<>(options);
-    comboBox.setFont(new Font("Aptos", Font.BOLD, 15));
+    comboBox.setFont(new Font("Aptos", Font.BOLD, this.getWidth() / 50));
     comboBox.setBackground(Color.white);
-    comboBox.setPreferredSize(new Dimension(200, 40));
+    comboBox.setPreferredSize(new Dimension(this.getWidth() / 4,
+            this.getHeight() / 20));
     comboBox.setActionCommand("Select user");
     return comboBox;
   }

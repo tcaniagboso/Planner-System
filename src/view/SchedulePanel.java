@@ -80,7 +80,7 @@ public class SchedulePanel extends JPanel {
     int height = this.getHeight();
     int cellHeight = height / (NUM_HOURS + 1); // +1 for the days of the week
     int cellWidth = width / (NUM_DAYS + 1); // +1 for the time column
-    int columnWidth = (getWidth() - cellWidth) / NUM_DAYS;
+    int columnWidth = (width - cellWidth) / NUM_DAYS;
 
 
     this.drawTimes(g, cellHeight);
@@ -111,7 +111,7 @@ public class SchedulePanel extends JPanel {
    */
   private void drawTimes(Graphics g, int cellHeight) {
     // Draw the times on the leftmost column
-    g.setFont(new Font("Aptos", Font.BOLD, 15));
+    g.setFont(new Font("Aptos", Font.BOLD, cellHeight / 2));
     for (int i = 1; i <= NUM_HOURS; i++) {
       String time = String.format("%02d:00", i - 1);
       g.drawString(time, 5, cellHeight * i + g.getFontMetrics().getAscent() / 2 - 2);
@@ -128,7 +128,7 @@ public class SchedulePanel extends JPanel {
    */
   private void drawDaysOfWeek(Graphics g, int cellWidth, int columnWidth, int cellHeight) {
     // Draw the days of the week
-    g.setFont(new Font("Aptos", Font.BOLD, 20));
+    g.setFont(new Font("Aptos", Font.BOLD, cellWidth / 9));
     for (int i = 0; i < NUM_DAYS; i++) {
       g.drawString(daysOfWeek[i], cellWidth * (i + 1)
                       + (columnWidth - g.getFontMetrics().stringWidth(daysOfWeek[i])) / 2,
@@ -213,7 +213,7 @@ public class SchedulePanel extends JPanel {
 
     // Redraw grid lines over the filled cells
     g.setColor(defaultColor);
-    drawGridLines(g, cellWidth, columnWidth, cellHeight);
+    drawGridLines(g, cellWidth, cellHeight);
   }
 
   /**
@@ -221,10 +221,9 @@ public class SchedulePanel extends JPanel {
    *
    * @param g           The Graphics object to draw on.
    * @param cellWidth   The width of a single cell.
-   * @param columnWidth The width of a column.
    * @param cellHeight  The height of a single cell.
    */
-  private void drawGridLines(Graphics g, int cellWidth, int columnWidth, int cellHeight) {
+  private void drawGridLines(Graphics g, int cellWidth, int cellHeight) {
     for (int i = 0; i <= NUM_DAYS; i++) { // 7 days + 1 time column
       int x = i * cellWidth;
       g.drawLine(x, 0, x, this.getHeight());
