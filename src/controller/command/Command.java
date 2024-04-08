@@ -1,4 +1,4 @@
-package command;
+package controller.command;
 
 /**
  * The Command interface is part of the Command design pattern, which encapsulates a request as

@@ -1,4 +1,4 @@
-package command;
+package controller.command;
 
 import java.util.List;
 
@@ -52,23 +52,22 @@ public class RemoveEvent extends CreateEvent {
     if (isNewEvent()) {
       throw new IllegalStateException("Cannot remove a new event.");
     }
-
-    String name = this.eventView.getEventName();
-    String startDay = this.eventView.getStartDay();
-    String startTime = this.eventView.getStartTime();
-    String endDay = this.eventView.getEndDay();
-    String endTime = this.eventView.getEndTime();
-    String location = this.eventView.getEventLocation();
-    boolean isOnline = this.eventView.getOnline();
-    List<String> invitees = this.eventView.getInvitees();
-
-    Event curEvent = new Event();
-    curEvent.setName(name);
-    curEvent.setEventTimes(startDay, startTime, endDay, endTime);
-    curEvent.setLocation(isOnline, location);
-    curEvent.setHost(invitees.get(0));
-    curEvent.setInvitees(invitees);
     try {
+      String name = this.eventView.getEventName();
+      String startDay = this.eventView.getStartDay();
+      String startTime = this.eventView.getStartTime();
+      String endDay = this.eventView.getEndDay();
+      String endTime = this.eventView.getEndTime();
+      String location = this.eventView.getEventLocation();
+      boolean isOnline = this.eventView.getOnline();
+      List<String> invitees = this.eventView.getInvitees();
+
+      Event curEvent = new Event();
+      curEvent.setName(name);
+      curEvent.setEventTimes(startDay, startTime, endDay, endTime);
+      curEvent.setLocation(isOnline, location);
+      curEvent.setHost(invitees.get(0));
+      curEvent.setInvitees(invitees);
       this.model.removeEvent(userId, curEvent);
     } catch (Exception e) {
       throw new IllegalStateException("Cannot remove event: " + e.getMessage());

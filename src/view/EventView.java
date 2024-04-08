@@ -98,6 +98,19 @@ public interface EventView {
   List<String> getInvitees();
 
   /**
+   * Retrieves the duration entered by the user in the designated text field.
+   * The method attempts to parse the input string into an integer representing
+   * the duration. If the parsing fails or the input is not a valid number,
+   * it throws an IllegalArgumentException.
+   *
+   * @return The duration as an integer, extracted from the text field.
+   * @throws IllegalArgumentException If the text entered is not a valid integer
+   *                                  or if the text field does not contain a numeric value
+   *                                  representing the duration.
+   */
+  int getDuration();
+
+  /**
    * Checks if all text fields and text areas within the view are not empty.
    *
    * @throws IllegalStateException if any field or text area is empty.

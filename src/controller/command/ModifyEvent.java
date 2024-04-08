@@ -1,4 +1,4 @@
-package command;
+package controller.command;
 
 import java.util.List;
 
@@ -51,16 +51,15 @@ public class ModifyEvent extends CreateEvent {
       throw new IllegalStateException("Cannot modify a new event.");
     }
 
-    String name = this.eventView.getEventName();
-    String startDay = this.eventView.getStartDay();
-    String startTime = this.eventView.getStartTime();
-    String endDay = this.eventView.getEndDay();
-    String endTime = this.eventView.getEndTime();
-    String location = this.eventView.getEventLocation();
-    boolean isOnline = this.eventView.getOnline();
-    List<String> invitees = this.eventView.getInvitees();
-
     try {
+      String name = this.eventView.getEventName();
+      String startDay = this.eventView.getStartDay();
+      String startTime = this.eventView.getStartTime();
+      String endDay = this.eventView.getEndDay();
+      String endTime = this.eventView.getEndTime();
+      String location = this.eventView.getEventLocation();
+      boolean isOnline = this.eventView.getOnline();
+      List<String> invitees = this.eventView.getInvitees();
       this.model.modifyEvent(userId, event, name, startDay, startTime, endDay, endTime, isOnline,
               location, invitees);
     } catch (Exception e) {

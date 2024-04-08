@@ -86,14 +86,14 @@ public class Main {
    * @throws IllegalArgumentException if an unsupported scheduling strategy is specified.
    */
   public static void assignStrategy(String[] args, PlannerSystem system) {
-    String strategy = (args.length > 0) ? args[0].strip() : "Any time";
+    String strategy = (args.length > 0) ? args[0].strip() : "Anytime";
     AutoSchedule scheduleStrategy;
     switch (strategy) {
-      case "Any time":
+      case "Anytime":
         scheduleStrategy = ScheduleStrategyCreator
                 .createScheduleStrategy(ScheduleStrategyCreator.ScheduleStrategy.ANYTIME);
         break;
-      case "Work hours":
+      case "Work-hours":
         scheduleStrategy = ScheduleStrategyCreator
                 .createScheduleStrategy(ScheduleStrategyCreator.ScheduleStrategy.WORKHOURS);
         break;

@@ -1,4 +1,4 @@
-package command;
+package controller.command;
 
 import java.util.List;
 
@@ -61,16 +61,16 @@ public class CreateEvent implements Command {
     if (!isNewEvent()) {
       throw new IllegalStateException("Cannot create an event that already exists.");
     }
-    String name = this.eventView.getEventName();
-    String startDay = this.eventView.getStartDay();
-    String startTime = this.eventView.getStartTime();
-    String endDay = this.eventView.getEndDay();
-    String endTime = this.eventView.getEndTime();
-    String location = this.eventView.getEventLocation();
-    boolean isOnline = this.eventView.getOnline();
-    List<String> invitees = this.eventView.getInvitees();
 
     try {
+      String name = this.eventView.getEventName();
+      String startDay = this.eventView.getStartDay();
+      String startTime = this.eventView.getStartTime();
+      String endDay = this.eventView.getEndDay();
+      String endTime = this.eventView.getEndTime();
+      String location = this.eventView.getEventLocation();
+      boolean isOnline = this.eventView.getOnline();
+      List<String> invitees = this.eventView.getInvitees();
       this.model.createEvent(userId, name, startDay, startTime, endDay, endTime, isOnline, location,
               invitees);
     } catch (Exception e) {

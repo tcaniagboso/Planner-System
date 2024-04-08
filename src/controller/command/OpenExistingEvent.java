@@ -1,4 +1,4 @@
-package command;
+package controller.command;
 
 import controller.EventViewController;
 import controller.EventViewControllerImpl;

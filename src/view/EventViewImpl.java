@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 import java.awt.Component;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -49,11 +48,14 @@ public class EventViewImpl extends JFrame implements EventView {
    *
    * @param event  The event to be displayed and interacted with.
    * @param userId The ID of the user associated with the event.
-   * @throws IllegalArgumentException if the event or userId is null.
+   * @throws IllegalArgumentException if the event is null or userId is null or empty.
    */
   public EventViewImpl(Event event, String userId) {
-    if (event == null || userId == null) {
-      throw new IllegalArgumentException("Event is null.");
+    if (userId == null || userId.isBlank()) {
+      throw new IllegalStateException("UserID is null or empty");
+    }
+    if (event == null) {
+      throw new IllegalArgumentException("Event is null");
     }
     this.event = event;
     this.user = userId;
@@ -143,6 +145,11 @@ public class EventViewImpl extends JFrame implements EventView {
   }
 
   @Override
+  public int getDuration() {
+    return 0;
+  }
+
+  @Override
   public void refresh() {
     this.repaint();
   }
@@ -176,7 +183,7 @@ public class EventViewImpl extends JFrame implements EventView {
   /**
    * Displays the labels for various event details.
    */
-  private void displayLabels() {
+  protected void displayLabels() {
     this.createLabel("Event name:", 0, 5, 200, 30);
     this.createTextField("", 5, 45, WIDTH - 50, 50);
 
@@ -198,14 +205,14 @@ public class EventViewImpl extends JFrame implements EventView {
     this.createTextField("", 125, 475, 425, 50);
 
     this.createLabel("Available Users", 0, 550, 200, 30);
-    this.createScrollableTextArea();
+    this.createScrollableTextArea(590);
     this.populateTextFields();
   }
 
   /**
    * Displays the buttons for creating, modifying, and removing events.
    */
-  private void displayButtons() {
+  protected void displayButtons() {
     // Panel for buttons
     JPanel buttonPanel = new JPanel(null); // Use null layout
     buttonPanel.setPreferredSize(new Dimension(WIDTH, 50));
@@ -239,7 +246,7 @@ public class EventViewImpl extends JFrame implements EventView {
    * @param width  The width of the label.
    * @param height The height of the label.
    */
-  private void createLabel(String text, int x, int y, int width, int height) {
+  protected void createLabel(String text, int x, int y, int width, int height) {
     JLabel label = new JLabel(text);
     label.setForeground(Color.black);
     label.setFont(new Font("Aptos", Font.PLAIN, 20));
@@ -256,7 +263,7 @@ public class EventViewImpl extends JFrame implements EventView {
    * @param width  The width of the text field.
    * @param height The height of the text field.
    */
-  private void createTextField(String text, int x, int y, int width, int height) {
+  protected void createTextField(String text, int x, int y, int width, int height) {
     JTextField textField = new JTextField(text);
     textField.setPreferredSize(new Dimension(width, 30));
     textField.setFont(new Font("Aptos", Font.PLAIN, 20));
@@ -288,7 +295,7 @@ public class EventViewImpl extends JFrame implements EventView {
    * @param x       The x-coordinate of the combo box.
    * @param y       The y-coordinate of the combo box.
    */
-  private void createComboBox(String[] options, int x, int y) {
+  protected void createComboBox(String[] options, int x, int y) {
     JComboBox<String> comboBox = new JComboBox<>(options);
     comboBox.setFont(new Font("Aptos", Font.PLAIN, 20));
     comboBox.setForeground(Color.black);
@@ -299,8 +306,9 @@ public class EventViewImpl extends JFrame implements EventView {
 
   /**
    * Creates a scrollable JTextArea and adds it to the frame within a JScrollPane.
+   * @param y starting y position
    */
-  private void createScrollableTextArea() {
+  protected void createScrollableTextArea(int y) {
     JTextArea textArea = new JTextArea("");
     textArea.setLineWrap(true);
     textArea.setWrapStyleWord(true);
@@ -310,7 +318,7 @@ public class EventViewImpl extends JFrame implements EventView {
 
     JScrollPane scrollPane = new JScrollPane(textArea);
     scrollPane.setPreferredSize(new Dimension(550, 150));
-    scrollPane.setBounds(5, 590, 550, 150); // Adjust bounds if necessary
+    scrollPane.setBounds(5, y, 550, 150); // Adjust bounds if necessary
 
     getContentPane().add(scrollPane); // Ad
   }
@@ -318,7 +326,7 @@ public class EventViewImpl extends JFrame implements EventView {
   /**
    * Populates the text fields, combo boxes, and text areas with event data.
    */
-  private void populateTextFields() {
+  protected void populateTextFields() {
     setEventName();
     setOnlineComboBox();
     setLocationTextField();

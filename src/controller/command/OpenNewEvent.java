@@ -1,4 +1,4 @@
-package command;
+package controller.command;
 
 import controller.EventViewController;
 import controller.EventViewControllerImpl;
@@ -14,8 +14,8 @@ import view.EventViewImpl;
  */
 public class OpenNewEvent implements Command {
 
-  private final String userId;
-  private final PlannerSystem model;
+  protected final String userId;
+  protected final PlannerSystem model;
 
   /**
    * Constructs an {@code OpenNewEvent} command with the specified user ID and planner system model.
@@ -30,7 +30,7 @@ public class OpenNewEvent implements Command {
    *                                  arguments are required for the operation.
    */
   public OpenNewEvent(String userId, PlannerSystem model) {
-    if (userId == null || userId.trim().isEmpty() || model == null) {
+    if (userId == null || userId.isBlank() || model == null) {
       throw new IllegalArgumentException("invalid argument");
     }
     this.userId = userId;

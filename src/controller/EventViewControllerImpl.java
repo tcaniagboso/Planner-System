@@ -3,10 +3,11 @@ package controller;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import command.Command;
-import command.CreateEvent;
-import command.ModifyEvent;
-import command.RemoveEvent;
+import controller.command.Command;
+import controller.command.CreateEvent;
+import controller.command.ModifyEvent;
+import controller.command.RemoveEvent;
+import controller.command.ScheduleEvent;
 import plannersystem.PlannerSystem;
 import schedule.Event;
 import view.EventView;
@@ -59,6 +60,9 @@ public class EventViewControllerImpl implements EventViewController, ActionListe
         break;
       case "Remove event":
         command = new RemoveEvent(currentUser, model, eventView, event);
+        break;
+      case "Schedule event":
+        command = new ScheduleEvent(currentUser, model, eventView, event);
         break;
     }
 

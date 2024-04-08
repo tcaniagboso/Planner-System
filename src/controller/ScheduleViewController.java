@@ -6,13 +6,13 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.time.LocalTime;
 
-import command.AddCalendar;
-import command.Command;
-import command.OpenExistingEvent;
-import command.OpenNewEvent;
-import command.OpenScheduleEvent;
-import command.SaveCalendars;
-import command.SelectUser;
+import controller.command.AddCalendar;
+import controller.command.Command;
+import controller.command.OpenExistingEvent;
+import controller.command.OpenNewEvent;
+import controller.command.OpenScheduleEvent;
+import controller.command.SaveCalendars;
+import controller.command.SelectUser;
 import plannersystem.PlannerSystem;
 import schedule.Event;
 import schedule.Schedule;
@@ -67,7 +67,7 @@ public class ScheduleViewController extends MouseAdapter implements PlannerSyste
         command = new OpenNewEvent(currentUser, model);
         break;
       case "Schedule event":
-        command = new OpenScheduleEvent(currentUser);
+        command = new OpenScheduleEvent(currentUser, model);
         break;
       case "Add calendar":
         command = new AddCalendar(view, model);

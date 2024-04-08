@@ -1,4 +1,4 @@
-package command;
+package controller.command;
 
 import plannersystem.PlannerSystem;
 import view.PlannerSystemView;
