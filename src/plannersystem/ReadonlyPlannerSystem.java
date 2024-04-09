@@ -69,6 +69,7 @@ public interface ReadonlyPlannerSystem {
    * @param event The event to check for potential scheduling conflicts.
    * @return {@code true} if the event does not conflict with the schedules of invited users and
    *         can be successfully scheduled; {@code false} if there is a scheduling conflict.
+   * @throws IllegalArgumentException if event is null.
    */
   boolean checkEventConflict(Event event);
 }

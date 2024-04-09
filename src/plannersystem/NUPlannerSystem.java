@@ -237,6 +237,7 @@ public class NUPlannerSystem implements PlannerSystem {
 
   @Override
   public boolean checkEventConflict(Event event) {
+    ValidationUtilities.validateNull(event);
     try {
       this.validateEventTime(event);
       return true;
