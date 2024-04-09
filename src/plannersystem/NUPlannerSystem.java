@@ -445,11 +445,12 @@ public class NUPlannerSystem implements PlannerSystem {
    * @param backup The {@link EventBackup} from which to restore the event's details.
    */
   private void restoreEventFromBackup(Event event, EventBackup backup) {
-    event.setName(backup.name);
-    event.setEventTimes(backup.startDay, backup.startTime, backup.endDay, backup.endTime);
-    event.setHost(backup.host);
-    event.setLocation(backup.isOnline, backup.place);
-    event.setInvitees(backup.invitees);
+    event.setName(backup.getName());
+    event.setEventTimes(backup.getStartDay(), backup.getStartTime(), backup.getEndDay(),
+            backup.getEndTime());
+    event.setHost(backup.getHost());
+    event.setLocation(backup.isOnline(), backup.getPlace());
+    event.setInvitees(backup.getInvitees());
   }
 
   /**

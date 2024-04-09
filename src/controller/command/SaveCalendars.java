@@ -27,7 +27,7 @@ public class SaveCalendars implements Command {
    *                                  required for the operation.
    */
   public SaveCalendars(String userId, PlannerSystemView view, PlannerSystem model) {
-    if (userId == null || userId.trim().isEmpty()) {
+    if (userId == null || userId.isBlank()) {
       throw new IllegalArgumentException("User ID is null or empty");
     }
     if (view == null || model == null) {
@@ -52,11 +52,10 @@ public class SaveCalendars implements Command {
    */
   @Override
   public void execute() {
-    String filePath = this.view.saveFile();
-
     if (userId.equals("<none>")) {
       throw new IllegalStateException("No user selected");
     }
+    String filePath = this.view.saveFile();
     try {
       this.model.saveUserSchedule(userId, filePath);
     } catch (Exception e) {

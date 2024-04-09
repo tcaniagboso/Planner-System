@@ -19,15 +19,15 @@ import schedule.TimeUtilities;
  * {@code Event} object after the backup is made.</p>
  */
 class EventBackup {
-  String startDay;
-  String startTime;
-  String endDay;
-  String endTime;
-  String name;
-  String host;
-  String place;
-  boolean isOnline;
-  List<String> invitees;
+  private final String startDay;
+  private final String startTime;
+  private final String endDay;
+  private final String endTime;
+  private final String name;
+  private final String host;
+  private final String place;
+  private final boolean isOnline;
+  private final List<String> invitees;
 
   /**
    * Constructs an {@code EventBackup} object capturing the current state of the specified
@@ -52,5 +52,81 @@ class EventBackup {
     this.place = event.getLocation().getLocation();
     this.isOnline = event.getLocation().isOnline();
     this.invitees = new ArrayList<>(event.getInvitees());
+  }
+
+  /**
+   * Gets the backup start day of the event.
+   * @return The start day of the event.
+   */
+  public String getStartDay() {
+    return startDay;
+  }
+
+  /**
+   * Gets the backup start time of the event.
+   * @return The start time of the event.
+   */
+  public String getStartTime() {
+    return startTime;
+  }
+
+  /**
+   * Gets the backup end day of the event.
+   * @return The end day of the event.
+   */
+  public String getEndDay() {
+    return endDay;
+  }
+
+  /**
+   * Gets the backup end time of the event.
+   * @return The end time of the event.
+   */
+  public String getEndTime() {
+    return endTime;
+  }
+
+  /**
+   * Gets the backup name of the event.
+   * @return The name of the event.
+   */
+  public String getName() {
+    return name;
+  }
+
+  /**
+   * Checks if the event was online.
+   * @return {@code true} if the event was online, {@code false} otherwise.
+   */
+  public boolean isOnline() {
+    return isOnline;
+  }
+
+  /**
+   * Gets the backup location of the event.
+   * @return The location of the event.
+   */
+  public String getPlace() {
+    return place;
+  }
+
+  /**
+   * Gets the backup host of the event.
+   * @return The host of the event.
+   */
+  public String getHost() {
+    return host;
+  }
+
+  /**
+   * Gets a copy of the invitees list from the backup.
+   * @return A list of invitees.
+   */
+  public List<String> getInvitees() {
+    List<String> invitedList = new ArrayList<>();
+    for (String user: this.invitees) {
+      invitedList.add(user);
+    }
+    return invitedList;
   }
 }

@@ -8,8 +8,7 @@ import java.time.LocalTime;
 
 import controller.command.AddCalendar;
 import controller.command.Command;
-import controller.command.OpenExistingEvent;
-import controller.command.OpenNewEvent;
+import controller.command.OpenEventFrame;
 import controller.command.OpenScheduleEvent;
 import controller.command.SaveCalendars;
 import controller.command.SelectUser;
@@ -64,10 +63,10 @@ public class ScheduleViewController extends MouseAdapter implements PlannerSyste
     Command command = null;
     switch (action) {
       case "Create event":
-        command = new OpenNewEvent(currentUser, model);
+        command = new OpenEventFrame(currentUser, new Event(), model);
         break;
       case "Schedule event":
-        command = new OpenScheduleEvent(currentUser, model);
+        command = new OpenScheduleEvent(currentUser, new Event(), model);
         break;
       case "Add calendar":
         command = new AddCalendar(view, model);
@@ -191,7 +190,7 @@ public class ScheduleViewController extends MouseAdapter implements PlannerSyste
       }
     }
     if (found) {
-      Command command = new OpenExistingEvent(userId, event, model);
+      Command command = new OpenEventFrame(userId, event, model);
       command.execute();
     }
   }

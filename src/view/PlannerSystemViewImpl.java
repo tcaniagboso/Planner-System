@@ -30,8 +30,6 @@ import schedule.Schedule;
  */
 public class PlannerSystemViewImpl extends JFrame implements PlannerSystemView {
   private static final int FRAME_SIZE = 700;
-  private static final int MIN_WIDTH = 700;
-  private static final int MIN_HEIGHT = 700;
   private JButton createEventButton;
   private JButton scheduleEventButton;
   private JComboBox<String> userOptions;

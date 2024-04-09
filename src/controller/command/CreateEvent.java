@@ -18,7 +18,6 @@ public class CreateEvent implements Command {
   protected final EventView eventView;
   protected final Event event;
 
-  protected final boolean newEvent;
 
   /**
    * Constructs a CreateEvent command with the necessary information to add a new event.
@@ -28,19 +27,21 @@ public class CreateEvent implements Command {
    * @param eventView The view capturing user input for the event details.
    * @param event     The event to be added to the planner system. This object may initially
    *                  be partially filled or empty, and is populated based on user input.
-   * @throws IllegalArgumentException If any of the required parameters (model, eventView, event)
-   *                                  are null, indicating invalid or incomplete command
-   *                                  initialization.
+   * @throws IllegalArgumentException If any of the required parameters
+   *                                  (userId, model, eventView, event) are null or userId is blank,
+   *                                  indicating invalid or incomplete command initialization.
    */
   public CreateEvent(String userId, PlannerSystem model, EventView eventView, Event event) {
     if (model == null || eventView == null || event == null) {
       throw new IllegalArgumentException("Invalid Argument(s)");
     }
+    if (userId == null || userId.isBlank()) {
+      throw new IllegalArgumentException("User ID is null or blank");
+    }
     this.userId = userId;
     this.model = model;
     this.eventView = eventView;
     this.event = event;
-    this.newEvent = this.isNewEvent();
   }
 
   /**
@@ -58,9 +59,6 @@ public class CreateEvent implements Command {
     } catch (IllegalStateException e) {
       throw new IllegalStateException(e.getMessage());
     }
-    if (!isNewEvent()) {
-      throw new IllegalStateException("Cannot create an event that already exists.");
-    }
 
     try {
       String name = this.eventView.getEventName();
@@ -75,24 +73,6 @@ public class CreateEvent implements Command {
               invitees);
     } catch (Exception e) {
       throw new IllegalStateException("Cannot create event: " + e.getMessage());
-    }
-  }
-
-  /**
-   * Determines if the current event represents a new event that does not yet exist in the
-   * planner system. This method may rely on specific attributes of the event to assess its
-   * uniqueness or existence.
-   *
-   * @return {@code true} if the event is considered new and does not exist in the system;
-   * {@code false} otherwise.
-   */
-  protected boolean isNewEvent() {
-    try {
-      event.getName();
-      event.getHost();
-      return false;
-    } catch (IllegalStateException e) {
-      return true;
     }
   }
 }

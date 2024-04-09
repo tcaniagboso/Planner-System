@@ -47,9 +47,6 @@ public class ModifyEvent extends CreateEvent {
     } catch (IllegalStateException e) {
       throw new IllegalStateException(e.getMessage());
     }
-    if (isNewEvent()) {
-      throw new IllegalStateException("Cannot modify a new event.");
-    }
 
     try {
       String name = this.eventView.getEventName();

@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<schedule id="Tobe">
+    <event>
+        <name>CS3500 Lecture Morning</name>
+        <time>
+            <start-day>Tuesday</start-day>
+            <start>0950</start>
+            <end-day>Tuesday</end-day>
+            <end>1130</end>
+        </time>
+        <location>
+            <online>true</online>
+            <place>Churchill Hall Room 109</place>
+        </location>
+        <users>
+            <uid>Tobe</uid>
+            <uid>Karina</uid>
+        </users>
+    </event>
+    <event>
+        <name>Assignments</name>
+        <time>
+            <start-day>Friday</start-day>
+            <start>0950</start>
+            <end-day>Sunday</end-day>
+            <end>1130</end>
+        </time>
+        <location>
+            <online>true</online>
+            <place>Home</place>
+        </location>
+        <users>
+            <uid>Tobe</uid>
+            <uid>Karina</uid>
+        </users>
+    </event>
+    <event>
+        <name>Football</name>
+        <time>
+            <start-day>Wednesday</start-day>
+            <start>0950</start>
+            <end-day>Thursday</end-day>
+            <end>1130</end>
+        </time>
+        <location>
+            <online>false</online>
+            <place>Carter Field</place>
+        </location>
+        <users>
+            <uid>Tobe</uid>
+        </users>
+    </event>
+    <event>
+        <name>Something</name>
+        <time>
+            <start-day>Monday</start-day>
+            <start>0900</start>
+            <end-day>Monday</end-day>
+            <end>1040</end>
+        </time>
+        <location>
+            <online>true</online>
+            <place>Class</place>
+        </location>
+        <users>
+            <uid>Karina</uid>
+            <uid>Tobe</uid>
+            <uid>Prof. Lucia</uid>
+        </users>
+    </event>
+    <event>
+        <name>Drake concert</name>
+        <time>
+            <start-day>Monday</start-day>
+            <start>1040</start>
+            <end-day>Monday</end-day>
+            <end>1540</end>
+        </time>
+        <location>
+            <online>false</online>
+            <place>Stadium</place>
+        </location>
+        <users>
+            <uid>Prof. Lucia</uid>
+            <uid>Tobe</uid>
+            <uid>Student Anon</uid>
+            <uid>Karina</uid>
+        </users>
+    </event>
+    <event>
+        <name>Class</name>
+        <time>
+            <start-day>Thursday</start-day>
+            <start>1130</start>
+            <end-day>Thursday</end-day>
+            <end>1700</end>
+        </time>
+        <location>
+            <online>false</online>
+            <place>Churchill</place>
+        </location>
+        <users>
+            <uid>Tobe</uid>
+            <uid>Karina</uid>
+            <uid>Student Anon</uid>
+            <uid>Prof. Lucia</uid>
+        </users>
+    </event>
+    <event>
+        <name>Something</name>
+        <time>
+            <start-day>Tuesday</start-day>
+            <start>1130</start>
+            <end-day>Tuesday</end-day>
+            <end>1330</end>
+        </time>
+        <location>
+            <online>true</online>
+            <place>Somewhere</place>
+        </location>
+        <users>
+            <uid>Tobe</uid>
+            <uid>John</uid>
+            <uid>Jake</uid>
+        </users>
+    </event>
+</schedule>

@@ -38,8 +38,7 @@ public class RemoveEvent extends CreateEvent {
    * If the event does not exist (i.e., it is considered as a new event) or if any validation
    * fails, an exception is thrown to prevent the removal of a non-existing event.
    *
-   * @throws IllegalStateException If the event is considered new (does not exist in the system)
-   *                               or if required fields are empty, indicating that removal cannot
+   * @throws IllegalStateException if required fields are empty, indicating that removal cannot
    *                               proceed.
    */
   @Override
@@ -49,9 +48,7 @@ public class RemoveEvent extends CreateEvent {
     } catch (IllegalStateException e) {
       throw new IllegalStateException(e.getMessage());
     }
-    if (isNewEvent()) {
-      throw new IllegalStateException("Cannot remove a new event.");
-    }
+
     try {
       String name = this.eventView.getEventName();
       String startDay = this.eventView.getStartDay();
