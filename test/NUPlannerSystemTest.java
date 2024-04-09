@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import autoscheduling.AutoSchedule;
 import plannersystem.NUPlannerSystem;
 import plannersystem.PlannerSystem;
 import schedule.Event;

@@ -235,6 +235,16 @@ public class NUPlannerSystem implements PlannerSystem {
     return users.keySet();
   }
 
+  @Override
+  public boolean checkEventConflict(Event event) {
+    try {
+      this.validateEventTime(event);
+      return true;
+    } catch (IllegalArgumentException e) {
+      return false;
+    }
+  }
+
   private void notifyObservers() {
     for (Observer observer : observers) {
       observer.update();

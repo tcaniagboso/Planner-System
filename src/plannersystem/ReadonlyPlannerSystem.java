@@ -2,6 +2,7 @@ package plannersystem;
 
 import java.util.Set;
 
+import schedule.Event;
 import schedule.Schedule;
 
 /**
@@ -31,7 +32,7 @@ public interface ReadonlyPlannerSystem {
    * @param day    The day of the event.
    * @param time   The time of the event.
    * @return A string indicating whether an event exists at the specified time and its details,
-   *         or a message stating no event exists at that time.
+   * or a message stating no event exists at that time.
    * @throws IllegalArgumentException if the specified user does not exist or if day/time
    *                                  parameters are null.
    */
@@ -58,4 +59,16 @@ public interface ReadonlyPlannerSystem {
    *         system.
    */
   Set<String> getUsers();
+
+  /**
+   * Checks if the given event conflicts with existing schedules for all invited users.
+   * This method attempts to validate the timing of the event against the schedules of all users
+   * invited to the event. If the event's timing conflicts with an existing schedule of any invited
+   * user, it is considered a conflict.
+   *
+   * @param event The event to check for potential scheduling conflicts.
+   * @return {@code true} if the event does not conflict with the schedules of invited users and
+   *         can be successfully scheduled; {@code false} if there is a scheduling conflict.
+   */
+  boolean checkEventConflict(Event event);
 }
