@@ -32,7 +32,7 @@ public interface ReadonlyPlannerSystem {
    * @param day    The day of the event.
    * @param time   The time of the event.
    * @return A string indicating whether an event exists at the specified time and its details,
-   * or a message stating no event exists at that time.
+   *         or a message stating no event exists at that time.
    * @throws IllegalArgumentException if the specified user does not exist or if day/time
    *                                  parameters are null.
    */

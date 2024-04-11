@@ -64,9 +64,9 @@ public class CommandTest {
   @Test
   public void testAddCalendar() {
     Assert.assertThrows(IllegalArgumentException.class,
-            () -> new AddCalendar(null, model));
+        () -> new AddCalendar(null, model));
     Assert.assertThrows(IllegalArgumentException.class,
-            () -> new AddCalendar(view, null));
+        () -> new AddCalendar(view, null));
 
     command = new AddCalendar(view, model);
     String result = "This method loads a file into the view." + System.lineSeparator()
@@ -85,15 +85,15 @@ public class CommandTest {
   @Test
   public void testCreateEvent() {
     Assert.assertThrows(IllegalArgumentException.class,
-            () -> new CreateEvent(userId, null, eventView, empty));
+        () -> new CreateEvent(userId, null, eventView, empty));
     Assert.assertThrows(IllegalArgumentException.class,
-            () -> new CreateEvent(userId, model, null, empty));
+        () -> new CreateEvent(userId, model, null, empty));
     Assert.assertThrows(IllegalArgumentException.class,
-            () -> new CreateEvent(userId, model, eventView, null));
+        () -> new CreateEvent(userId, model, eventView, null));
     Assert.assertThrows(IllegalArgumentException.class,
-            () -> new CreateEvent(null, model, eventView, empty));
+        () -> new CreateEvent(null, model, eventView, empty));
     Assert.assertThrows(IllegalArgumentException.class,
-            () -> new CreateEvent(" ", null, eventView, empty));
+        () -> new CreateEvent(" ", null, eventView, empty));
     command = new CreateEvent(userId, model, eventView, empty);
     String result = "This method checks if all the event view fields have been filled."
             + System.lineSeparator() + "This method gets the name of the event from the event view."
@@ -147,13 +147,13 @@ public class CommandTest {
   @Test
   public void testSaveCalendars() {
     Assert.assertThrows(IllegalArgumentException.class,
-            () -> new SaveCalendars(null, view, model));
+        () -> new SaveCalendars(null, view, model));
     Assert.assertThrows(IllegalArgumentException.class,
-            () -> new SaveCalendars(" ", view, model));
+        () -> new SaveCalendars(" ", view, model));
     Assert.assertThrows(IllegalArgumentException.class,
-            () -> new SaveCalendars(userId, null, model));
+        () -> new SaveCalendars(userId, null, model));
     Assert.assertThrows(IllegalArgumentException.class,
-            () -> new SaveCalendars(userId, view, null));
+        () -> new SaveCalendars(userId, view, null));
 
     command = new SaveCalendars(userId, view, model);
     String result = "This method returns a desired file path for saving a file."
@@ -244,13 +244,13 @@ public class CommandTest {
   public void testOpenEventFrame() {
     // OpenEVentFrame and OpenScheduleEvent use the same logic so test applies to both.
     Assert.assertThrows(IllegalArgumentException.class,
-            () -> new OpenEventFrame(null, filled, model));
+        () -> new OpenEventFrame(null, filled, model));
     Assert.assertThrows(IllegalArgumentException.class,
-            () -> new OpenEventFrame(" ", filled, model));
+        () -> new OpenEventFrame(" ", filled, model));
     Assert.assertThrows(IllegalArgumentException.class,
-            () -> new OpenEventFrame(userId, null, model));
+        () -> new OpenEventFrame(userId, null, model));
     Assert.assertThrows(IllegalArgumentException.class,
-            () -> new OpenEventFrame(userId, filled, null));
+        () -> new OpenEventFrame(userId, filled, null));
 
     OpenEventFrame openCommand = new OpenEventFrame(userId, filled, model);
     openCommand.setEventView(eventView);
@@ -261,11 +261,10 @@ public class CommandTest {
     boolean passed = testCommand(openCommand, result, log);
     Assert.assertTrue(passed);
 
-    openCommand = new OpenEventFrame("<none>", filled, model);
-    openCommand.setEventView(eventView);
-    openCommand.setController(new MockEventViewController(log));
+    OpenEventFrame finalOpenCommand = new OpenEventFrame("<none>", filled, model);
+    finalOpenCommand.setEventView(eventView);
+    finalOpenCommand.setController(new MockEventViewController(log));
 
-    OpenEventFrame finalOpenCommand = openCommand;
     Assert.assertThrows(IllegalStateException.class, () -> finalOpenCommand.execute());
 
   }

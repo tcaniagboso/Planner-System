@@ -75,8 +75,9 @@ public class MockPlannerSystemView implements PlannerSystemView {
 
   @Override
   public String getCurrentUser() {
-    this.log.append("This method gets the current selected user of the view.");
-    return null;
+    this.log.append("This method gets the current selected user of the view.")
+            .append(System.lineSeparator());
+    return "Tobe";
   }
 
   @Override
@@ -95,6 +96,6 @@ public class MockPlannerSystemView implements PlannerSystemView {
   public SchedulePanel getSchedulePanel() {
     this.log.append("This method gets the schedule panel of the view.")
             .append(System.lineSeparator());
-    return null;
+    return new MockSchedulePanel(log);
   }
 }

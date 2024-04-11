@@ -29,10 +29,10 @@ public class EventViewControllerImpl implements EventViewController, ActionListe
    * @param eventView The view associated with this controller, providing the user interface.
    * @param model The model with which the controller interacts to manipulate event data.
    * @throws IllegalArgumentException if either argument is null, indicating a failure to properly
-   * initialize the controller.
+   *                                  initialize the controller.
    */
   public EventViewControllerImpl(EventView eventView, PlannerSystem model) {
-    if(eventView == null && model == null) {
+    if (eventView == null || model == null) {
       throw new IllegalArgumentException("Arguments are null");
     }
     this.eventView = eventView;
@@ -50,7 +50,7 @@ public class EventViewControllerImpl implements EventViewController, ActionListe
   public void actionPerformed(ActionEvent e) {
     String currentUser = this.eventView.getUserId();
     String action = e.getActionCommand();
-    Command command = null;
+    Command command;
     switch (action) {
       case "Create event":
         command = new CreateEvent(currentUser, model, eventView, event);
@@ -64,6 +64,8 @@ public class EventViewControllerImpl implements EventViewController, ActionListe
       case "Schedule event":
         command = new ScheduleEvent(currentUser, model, eventView, event);
         break;
+      default:
+        command = null;
     }
 
     if (command != null) {

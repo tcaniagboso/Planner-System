@@ -26,7 +26,7 @@ import view.SchedulePanel;
  * ({@link PlannerSystem}).
  */
 public class ScheduleViewController extends MouseAdapter implements PlannerSystemController,
-        ActionListener, Observer {
+        ActionListener {
 
   private final PlannerSystemView view;
   private PlannerSystem model;
@@ -60,7 +60,7 @@ public class ScheduleViewController extends MouseAdapter implements PlannerSyste
     String currentUser = this.view.getCurrentUser();
     assert currentUser != null;
     String action = e.getActionCommand();
-    Command command = null;
+    Command command;
     switch (action) {
       case "Create event":
         command = new OpenEventFrame(currentUser, new Event(), model);
@@ -77,6 +77,8 @@ public class ScheduleViewController extends MouseAdapter implements PlannerSyste
       case "Select user":
         command = new SelectUser(currentUser, view);
         break;
+      default:
+        command = null;
     }
 
     if (command != null) {

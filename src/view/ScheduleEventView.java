@@ -16,13 +16,26 @@ import javax.swing.JScrollPane;
 
 import schedule.Event;
 
+/**
+ * ScheduleEventView class extends EventViewImpl to provide a user interface
+ * for scheduling events within the Planner System. This specialized view includes
+ * functionality for specifying the duration of events and selecting invitees,
+ * in addition to the standard event details.
+ */
 public class ScheduleEventView extends EventViewImpl {
 
   private static final int WIDTH = 600;
   private static final int HEIGHT = 650;
   private JButton scheduleEventButton;
 
-
+  /**
+   * Constructs a ScheduleEventView for a given event and user ID.
+   * Initializes the view with specified dimensions and sets up UI components
+   * for event scheduling.
+   *
+   * @param event  The event to be scheduled or viewed.
+   * @param userId The user ID associated with this event scheduling session.
+   */
   public ScheduleEventView(Event event, String userId) {
     super(event, userId);
     this.setSize(WIDTH, HEIGHT);
@@ -124,6 +137,4 @@ public class ScheduleEventView extends EventViewImpl {
   protected void populateTextFields() {
     // ignored
   }
-
-
 }

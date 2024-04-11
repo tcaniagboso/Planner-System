@@ -22,7 +22,7 @@ public class WorkHourSchedule extends AnyTimeSchedule {
    * @param scheduleList A list of existing schedules against which the event will be checked
    *                     for overlaps.
    * @return The scheduled event with updated start and end times if a suitable slot is found;
-   * otherwise, null.
+   *         otherwise, null.
    * @throws IllegalArgumentException If the event is null, duration is non-positive, or scheduling
    *                                  is not possible within specified work hours.
    */
@@ -30,6 +30,7 @@ public class WorkHourSchedule extends AnyTimeSchedule {
   public Event scheduleEvent(Event event, int duration, List<Schedule> scheduleList) {
     ValidationUtilities.validateNull(event);
     this.validateDuration(duration);
+    this.validateSchedules(scheduleList);
     int minutesInDay = 1440;
     int maxDuration = 8 * 60;
     final int workStart = 9 * 60;

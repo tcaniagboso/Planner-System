@@ -170,6 +170,10 @@ public class NUPlannerSystem implements PlannerSystem {
   @Override
   public void automaticScheduling(String userId, String name, boolean isOnline, String location,
                                   int duration, List<String> invitees) {
+    if (scheduleStrategy == null) {
+      throw new IllegalStateException("Schedule strategy is not set");
+    }
+
     Event newEvent = new Event();
     newEvent.setName(name);
     newEvent.setLocation(isOnline, location);
@@ -246,6 +250,9 @@ public class NUPlannerSystem implements PlannerSystem {
     }
   }
 
+  /**
+   * Notifies all the model observers when the model has been mutated.
+   */
   private void notifyObservers() {
     for (Observer observer : observers) {
       observer.update();

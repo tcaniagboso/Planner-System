@@ -7,7 +7,7 @@ import plannersystem.PlannerSystem;
  * The controller acts as an intermediary between the view and the model,
  * handling user actions and updating the model or view accordingly.
  */
-public interface PlannerSystemController {
+public interface PlannerSystemController extends Observer {
 
   /**
    * Initializes and launches the application with the provided model. This method

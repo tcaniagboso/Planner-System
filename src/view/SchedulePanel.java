@@ -28,15 +28,8 @@ public class SchedulePanel extends JPanel {
 
   /**
    * Constructs a SchedulePanel with the specified schedule.
-   *
-   * @param schedule The schedule to be displayed on the panel.
-   * @throws IllegalArgumentException if the provided schedule is null.
    */
-  public SchedulePanel(Schedule schedule) {
-    if (schedule == null) {
-      throw new IllegalArgumentException("Schedule is null");
-    }
-    this.schedule = schedule;
+  public SchedulePanel() {
     this.setBackground(Color.lightGray);
   }
 
@@ -98,8 +91,12 @@ public class SchedulePanel extends JPanel {
    * Sets the schedule to be displayed on this panel.
    *
    * @param schedule The schedule to be displayed.
+   * @throws IllegalArgumentException if schedule is null.
    */
   public void setSchedule(Schedule schedule) {
+    if (schedule == null) {
+      throw new IllegalArgumentException("Schedule is null.");
+    }
     this.schedule = schedule;
   }
 

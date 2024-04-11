@@ -123,6 +123,308 @@ interactive visualization of users' schedules.
 These GUI enhancements not only improve the aesthetics and user experience of the NUPlannerSystem
 but also provide intuitive and efficient ways for users to manage their schedules and events.
 
+Changes for Part 3:
+Interface and GUI Enhancements
+PlannerSystemView Interface
+The PlannerSystemView interface defines essential operations for the planner system's graphical user
+interface (GUI). It includes methods for setting action and mouse listeners, displaying error
+messages, loading and saving files, refreshing the view, and updating user and schedule information.
+This interface serves as a contract for implementing various GUI components that interact with the
+user, facilitating a dynamic and responsive user experience.
+
+Implementation and GUI Components
+PlannerSystemViewImpl Class: Implements the PlannerSystemView interface, representing the main
+window of the Planner System application. It offers functionalities for event creation, scheduling,
+loading/saving calendars, and displaying schedules, integrating these operations into a cohesive
+user interface.
+
+EventView Interface: Defines operations for an event-specific view within the GUI, supporting
+actions such as refreshing the view, displaying errors, and managing event details. It ensures that
+GUI components handling event data provide a consistent set of functionalities.
+
+EventViewImpl and ScheduleEventView Classes: Provide concrete implementations of the EventView
+interface for different contexts—EventViewImpl for general event management and ScheduleEventView
+for scheduling specific events. These classes enable detailed interactions with individual events,
+including creating, modifying, and scheduling operations.
+
+SchedulePanel Class: A specialized JPanel subclass designed to graphically display a user's
+schedule within the Planner System. It draws a schedule grid, represents events, and allows for
+interactive schedule visualization, enhancing the overall user interaction with the system's
+scheduling functionalities.
+
+Observer Pattern Integration
+Observer Interface: Introduced as part of implementing the Observer design pattern, the Observer
+interface allows for a subscription mechanism where multiple objects can listen and react to events
+or changes in another object, known as the subject. This integration facilitates communication
+between the model (or controller) and the views or other components that need to react to changes
+within the system.
+
+Controller Enhancements
+PlannerSystemController Interface: Defines the essential operations that a planner system controller
+should support, acting as an intermediary between the view and the model. It handles user actions,
+updates the model, or view accordingly, and integrates with the Observer pattern to respond to model
+updates.
+
+ScheduleViewController Class: Manages user actions and mouse events within the Planner System
+application, serving as a bridge between the view (PlannerSystemView) and the model (PlannerSystem).
+It listens for GUI actions, processes mouse clicks on the schedule panel, and updates the model or
+view based on user interactions.
+
+EventViewController Interface and Implementation: Focuses on event-specific user interactions
+within an EventView. It supports initializing and displaying event details for editing or creating
+new events, encapsulating the logic for event-related user commands and interactions.
+
+Command Pattern Utilization
+Command Interface: Part of the Command design pattern, encapsulating a request as an object.
+This allows for dynamic operation execution, including creating, modifying, and scheduling events,
+as well as saving calendars and selecting users.
+
+Concrete Commands: Including AddCalendar, CreateEvent, ModifyEvent, RemoveEvent, ScheduleEvent,
+OpenEventFrame, OpenScheduleEvent, SaveCalendars, and SelectUser. These commands encapsulate
+specific actions related to event and schedule management within the planner system, offering
+flexibility in operation execution.
+
+AutoSchedule Interface
+The AutoSchedule interface defines a contract for auto-scheduling events. Implementations of this
+interface are responsible for scheduling an event at an appropriate time slot, considering the
+duration and avoiding conflicts with existing schedules.
+
+Method:
+
+scheduleEvent(Event event, int duration, List<Schedule> scheduleList): Schedules an event based on
+its duration and a list of existing schedules, returning the event with updated scheduling details
+if successful.
+
+AnyTimeSchedule Class
+Implements the AutoSchedule interface to provide a scheduling strategy that attempts to find the
+earliest possible time for an event within a week, ensuring there is no overlap with existing
+events.
+
+Key Features:
+
+Schedules events at the earliest possible time within the week.
+Ensures the scheduled event does not conflict with existing scheduled events.
+
+WorkHourSchedule Class
+Extends AnyTimeSchedule to specifically target standard work hours
+(09:00 to 17:00, Monday to Friday) for scheduling events. This class represents a more restrictive
+scheduling strategy, focusing on business hours.
+
+Key Features:
+
+Schedules events within standard work hours and workdays.
+Adheres to a more structured scheduling framework suitable for professional settings.
+
+LenientSchedule Class
+Extends WorkHourSchedule to introduce a lenient approach to scheduling. This strategy aims
+to schedule events even if not all invitees are available, requiring only the host and at least one
+other invitee to be present.
+
+Key Features:
+
+Adopts a flexible scheduling strategy, prioritizing the host and at least one other invitee's
+availability.Useful in scenarios where full attendance is not critical, allowing for greater
+flexibility in scheduling.
+
+ScheduleStrategyCreator Class
+A factory class designed to generate instances of scheduling strategies based on specified types.
+This class supports the creation of different scheduling strategies, facilitating dynamic strategy
+selection based on application needs.
+
+Functionality:
+
+Provides a method to create instances of AutoSchedule according to the specified strategy type.
+Supports various scheduling strategies, including 'Anytime', 'WorkHours', and 'Lenient',
+accommodating a wide range of scheduling requirements and preferences.
+
+Through these additions, the scheduling component now boasts enhanced flexibility,
+offering multiple strategies to cater to diverse scheduling needs. Whether the requirement is for
+strict adherence to work hours, a lenient approach to invitee availability, or any other
+scheduling constraint, these new classes and interfaces provide the necessary tools to implement
+efficient and effective scheduling solutions within your application.
+
+NUPLANNERSYSTEM CLASS:
+Observer Pattern Implementation
+Fields Added: private final List<Observer> observers = new ArrayList<>();
+Purpose: This field supports the Observer design pattern, allowing the system to maintain a list of
+observers that should be notified upon certain changes, such as updates to schedules or events.
+Implications: The inclusion of this pattern facilitates a more modular and decoupled design.
+Components of the system can now "listen" to changes without being directly linked to the source of
+these changes, enhancing the system's maintainability and scalability.
+
+Scheduling Strategy Flexibility
+Field Added: private AutoSchedule scheduleStrategy;
+Purpose: This field allows the system to utilize different strategies for scheduling events
+dynamically. It represents a shift towards a strategy pattern, enabling the selection and
+application of various scheduling algorithms at runtime.
+Implications: This change introduces greater flexibility in how events are scheduled within
+the system. By abstracting the scheduling logic into separate strategy implementations,
+the system can easily adapt to different scheduling requirements and constraints without
+modifying the core logic.
+
+New Methods Overview
+automaticScheduling: Implements automatic scheduling of events based on the current scheduling
+strategy. It demonstrates the system's ability to dynamically schedule events, considering the
+availability of invitees and the specifics of the scheduling strategy in use.
+addObserver and removeObserver: Facilitate the dynamic management of observers. These methods
+allow the system to add or remove components interested in being notified about changes, supporting
+a dynamic and responsive architecture.
+setScheduleStrategy: Enables the dynamic selection of a scheduling strategy. This method allows the
+system to change its scheduling behavior at runtime, adapting to different needs or preferences.
+checkEventConflict: Offers a utility method to check for potential conflicts when scheduling an
+event, enhancing the system's robustness and reliability in managing event schedules.
+notifyObservers: Encapsulates the logic for notifying all registered observers about changes,
+ensuring that all interested parties are informed about updates in a consistent manner.
+
+Conclusion
+These enhancements significantly improve the NUPlannerSystem's architecture by incorporating
+design patterns that promote flexibility, modularity, and decoupling. The Observer pattern
+allows for efficient notification mechanisms, while the strategy pattern enables flexible
+scheduling algorithms. Together, these changes make the system more adaptable, maintainable,
+and capable of meeting diverse scheduling needs.
+
+The Main class in the Planner System application serves a crucial role as the entry point where the
+application's core functionalities are demonstrated and initiated. This class showcases how the
+Planner System can be utilized, from creating events and schedules to initializing the view and
+selecting scheduling strategies based on input arguments. Here’s a detailed look into its
+functionalities and the design decisions it illustrates:
+
+Core Functionalities
+Event and Schedule Creation: The class starts by creating sample events and assigning them to user
+schedules. This demonstrates the fundamental operations of the Planner System - managing events and
+their allocation to different users.
+Scheduling Strategy Assignment: It further allows for the dynamic selection of scheduling strategies
+through command-line arguments. This flexibility shows the application's adaptability to different
+scheduling needs, such as "Any time," "Work hours," and "Lenient" scheduling strategies.
+Initialization of the View and Controller: It initializes the user interface (PlannerSystemViewImpl)
+and links it with the model (NUPlannerSystem) through a controller (ScheduleViewController),
+demonstrating the application's adherence to the Model-View-Controller (MVC) architectural pattern.
+Design Decisions
+Strategy Pattern for Scheduling: The dynamic selection of scheduling strategies showcases the
+Strategy pattern, where the scheduleStrategy can be switched at runtime depending on the user's
+needs. This design choice enhances the system's flexibility and extensibility.
+Model-View-Controller (MVC) Architecture: By separating concerns among the model (planner system),
+view (system view), and controller (schedule view controller), the application promotes modularity,
+scalability, and maintainability. This architectural pattern facilitates easier updates and
+modifications to the system.
+Command-line Interface for Strategy Selection: Utilizing command-line arguments for the selection of
+scheduling strategies illustrates a simple yet effective way to interact with the system.
+This choice underscores the application's potential for customization and adaptability to user
+preferences or operational requirements.
+Implications
+The Main class not only kick-starts the Planner System application but also encapsulates several key
+software design principles and patterns, making the system more robust, adaptable, and
+user-friendly. By demonstrating the system's core functionalities and its architectural choices,
+the Main class serves as an essential component that ties together the different aspects of the
+Planner System, providing a comprehensive overview of how the system operates and interacts with
+its users.
+
+EXTRA CREDIT:
+
+Resizable View:
+In the latest update to the Planner System, significant enhancements were made to the user
+interface's adaptability and user experience. A key improvement is the transition from hardcoded
+values for component sizes and positions within the PlannerSystemView and SchedulePanel to dynamic
+calculations based on the frame or panel's current dimensions. This change makes the Planner System
+view resizable, offering a more flexible and user-friendly interface. Here's an overview of the
+implications of these adjustments:
+
+Dynamic Sizing and Positioning
+Adaptive Layout: By calculating component sizes and positions using getWidth() and getHeight(),
+the layout now adapts seamlessly to changes in the window size. This adaptability ensures that the
+user interface remains coherent and visually appealing across a wide range of window sizes and
+screen resolutions.
+Enhanced User Experience: Users can now resize the application window according to their preference
+or the needs of their display setup, making the Planner System more versatile and accessible.
+This responsiveness contributes to a more personalized and comfortable user experience.
+Scalability: The dynamic approach to layout management lays a solid foundation for future
+enhancements and features. As new components are added or existing ones are modified, the
+application can easily accommodate these changes without the need for extensive redesigns or
+adjustments to hardcoded values.
+
+LenientSchedule Class
+Extends WorkHourSchedule to introduce a lenient approach to scheduling. This strategy aims
+to schedule events even if not all invitees are available, requiring only the host and at least one
+other invitee to be present.
+
+Key Features:
+
+Adopts a flexible scheduling strategy, prioritizing the host and at least one other invitee's
+availability.Useful in scenarios where full attendance is not critical, allowing for greater
+flexibility in scheduling.
+
+TUTORIAL:
+Command Line Arguments: Enter "Anytime" anytime scheduling, "Work-hours" for scheduling work hours,
+and "Lenient" for lenient scheduling. The default scheduling strategy is set to anytime scheduling.
+
+Entering Event Details:
+Event name: Enter the name of the event as a non-empty and non-blank string.
+Location:
+    isOnline: Select "Yes", if it is online or "No", if it isn't online.
+    Place: Enter the physical location of the event as a non-empty and non-blank string.
+Start Day: Choose any of the days in the combo box.
+Start-Time: Start time must be entered exactly in the format "HH:mm".
+End-Day: Choose any of the days in the combo box.
+End-Time: End time must be entered exactly in the format "HH:mm".
+Available users: Every user must be a non-empty and non-blank string. Every user should be written
+on a new line.
+Duration(Schedule event only): Enter a whole number that is greater than 0.
+
+Features:
+Select user: You can select a user's schedule to display by expanding the user options box, at the
+bottom left of the planner system schedule, and selecting a user. NOTE: Every feature, barring
+"Add Calendar" requires a user to be selected.
+
+Save Calendar: Click on "File" in the menu bar then Click on "Save calendars" and enter the name of
+the file or file path then press "Save" to save the current user's schedule as an xml file with that
+file name or path. NOTE: An available user must be selected. If successful the new xml file will
+exist in it's desired directory, otherwise the system would display an error message.
+
+Add Calendar: Click on "File" in the menu bar then Click on the "Add calendar" and select the file
+you want to load into the planner system and click on "Open". If successful, the change would be
+reflected on the planner, otherwise the system would display an error message.
+
+Modify Event: To modify an event, you have to select an available user and click on an existing
+event in their schedule and the event frame would pop up. Enter the new details of the event and
+click on the "Modify event" button. If successful, the change would be reflected on the planner,
+otherwise the system would display an error message.
+
+Create Event: To create an event, you have to select an available user and click on the
+"Create event" button and a new event frame would pop up. Enter the details of the event and click
+on the "Create event" button and the system would attempt to create the event. If successful, the
+change would be reflected on the planner, otherwise the system would display an error message.
+
+Schedule Event: To schedule an event, you have to select an available user and click on the
+"Schedule event" button and a new schedule event frame would pop up. Enter the details of the event
+and click on the "Schedule event" button and the system would attempt to schedule an event.
+If successful, the change would be reflected on the planner, otherwise the system would display an
+error message.
+
+Remove Event: To remove an event, you have to select an available user and click on an existing
+event in their schedule and the existing event frame would pop up. Click on the "Remove event"
+button and the system would attempt to remove the event using its defined logic. If successful, the
+change would be reflected on the planner, otherwise the system would display an error message.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

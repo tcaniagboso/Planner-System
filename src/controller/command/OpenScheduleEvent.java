@@ -1,6 +1,5 @@
 package controller.command;
 
-import controller.EventViewController;
 import controller.EventViewControllerImpl;
 import plannersystem.PlannerSystem;
 import schedule.Event;
@@ -11,8 +10,8 @@ import view.ScheduleEventView;
  * A command for opening an event scheduling view for a specific user. This command initializes
  * an {@link EventView} specifically {@link ScheduleEventView} with a new {@link Event} object
  * and sets it up for the specified user, allowing the user to schedule a new event.
- * It extends the {@link OpenEventFrame} command to leverage the initial setup for opening a new event
- * but specifically targets scheduling by opening a {@link ScheduleEventView}.
+ * It extends the {@link OpenEventFrame} command to leverage the initial setup for opening a
+ * new event but specifically targets scheduling by opening a {@link ScheduleEventView}.
  */
 public class OpenScheduleEvent extends OpenEventFrame {
 

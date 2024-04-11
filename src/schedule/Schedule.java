@@ -21,10 +21,10 @@ public class Schedule {
    * @throws IllegalArgumentException If the user ID is null or empty.
    */
   public Schedule(String userId) {
-    if (userId == null || userId.trim().isEmpty()) {
+    if (userId == null || userId.isBlank()) {
       throw new IllegalArgumentException("User ID cannot be null ot empty");
     }
-    this.userId = userId;
+    this.userId = userId.trim();
     this.events = new ArrayList<>();
   }
 

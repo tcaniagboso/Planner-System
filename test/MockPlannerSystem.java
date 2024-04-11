@@ -130,4 +130,11 @@ public class MockPlannerSystem implements PlannerSystem {
             .append(System.lineSeparator());
     return null;
   }
+
+  @Override
+  public boolean checkEventConflict(Event event) {
+    this.log.append("This method checks if the given event conflicts with the schedule of ")
+            .append("any of its invitees").append(System.lineSeparator());
+    return false;
+  }
 }

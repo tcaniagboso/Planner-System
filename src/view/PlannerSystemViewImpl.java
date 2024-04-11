@@ -58,7 +58,8 @@ public class PlannerSystemViewImpl extends JFrame implements PlannerSystemView {
     this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     setLayout(new BorderLayout());
 
-    schedulePanel = new SchedulePanel(new Schedule("none"));
+    schedulePanel = new SchedulePanel();
+    schedulePanel.setSchedule(new Schedule("none"));
     // Custom panel for drawing the schedule
     this.add(schedulePanel, BorderLayout.CENTER);
     this.displayButtons();

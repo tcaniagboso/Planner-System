@@ -48,7 +48,7 @@ public class Event {
    * @throws IllegalArgumentException If the name is null or empty.
    */
   public void setName(String name) {
-    if (name == null || name.trim().isEmpty()) {
+    if (name == null || name.isBlank()) {
       throw new IllegalArgumentException("Event name cannot be null or empty");
     }
     this.name = name.trim();
@@ -128,6 +128,7 @@ public class Event {
     if (!invitees.contains(this.host)) {
       throw new IllegalArgumentException("The list of invitees must contain the host of the event");
     }
+    this.clearInvitees();
     this.invitees.addAll(invitees);
   }
 
@@ -259,7 +260,7 @@ public class Event {
    * @throws IllegalArgumentException if the user string is null or empty.
    */
   private void validateUser(String user) {
-    if (user == null || user.isEmpty()) {
+    if (user == null || user.isBlank()) {
       throw new IllegalArgumentException("User cannot be null or empty.");
     }
   }

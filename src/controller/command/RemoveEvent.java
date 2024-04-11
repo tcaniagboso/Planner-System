@@ -34,8 +34,8 @@ public class RemoveEvent extends CreateEvent {
    * Executes the operation to remove an existing event. This method validates that the event
    * fields are not empty and checks if the event is indeed an existing event within the system
    * before proceeding with its removal.
-   * <p>
-   * If the event does not exist (i.e., it is considered as a new event) or if any validation
+   *
+   * <p>If the event does not exist (i.e., it is considered as a new event) or if any validation
    * fails, an exception is thrown to prevent the removal of a non-existing event.
    *
    * @throws IllegalStateException if required fields are empty, indicating that removal cannot

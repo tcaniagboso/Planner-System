@@ -59,7 +59,7 @@ public class Time {
    * @throws IllegalArgumentException If the input does not correspond to a valid {@link DayOfWeek}.
    */
   public void setStartDay(String startDay) {
-    this.startDay = this.validateDay(startDay.trim());
+    this.startDay = this.validateDay(startDay);
   }
 
   /**
@@ -82,7 +82,7 @@ public class Time {
     if (startDay == null) {
       throw new IllegalStateException("Start day must be set before start time.");
     }
-    this.startTime = this.validateTime(startTime.trim());
+    this.startTime = this.validateTime(startTime);
   }
 
   /**
@@ -105,7 +105,7 @@ public class Time {
     if (startDay == null || startTime == null) {
       throw new IllegalStateException("Start day and start time must be set before end day.");
     }
-    this.endDay = this.validateDay(endDay.trim());
+    this.endDay = this.validateDay(endDay);
   }
 
   /**
@@ -132,7 +132,7 @@ public class Time {
       throw new IllegalStateException("Start day, start time and end day must be "
               + "set before end time.");
     }
-    LocalTime parsedEndTime = this.validateTime(endTime.trim());
+    LocalTime parsedEndTime = this.validateTime(endTime);
     if (startDay.equals(endDay) && startTime.equals(parsedEndTime)) {
       throw new IllegalArgumentException("An event cannot start and end at the same "
               + "time on the same day.");
@@ -239,12 +239,12 @@ public class Time {
    *                                  format.
    */
   private LocalTime validateTime(String timeString) {
-    if (timeString == null || timeString.length() != 4) {
+    if (timeString == null || timeString.trim().length() != 4) {
       throw new IllegalArgumentException("The chosen time is invalid");
     }
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HHmm");
     try {
-      return LocalTime.parse(timeString, formatter);
+      return LocalTime.parse(timeString.trim(), formatter);
     } catch (DateTimeParseException e) {
       throw new IllegalArgumentException(e.getMessage());
     }
@@ -259,7 +259,7 @@ public class Time {
    *                                  {@link DayOfWeek}.
    */
   private DayOfWeek validateDay(String dayString) {
-    if (dayString == null || dayString.isEmpty()) {
+    if (dayString == null || dayString.isBlank()) {
       throw new IllegalArgumentException("The chosen day is invalid");
     }
     try {

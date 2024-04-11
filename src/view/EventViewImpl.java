@@ -34,7 +34,7 @@ public class EventViewImpl extends JFrame implements EventView {
   private static final int HEIGHT = 850;
 
   private static final String[] daysOfWeek = {"Sunday", "Monday", "Tuesday", "Wednesday",
-          "Thursday", "Friday", "Saturday"};
+      "Thursday", "Friday", "Saturday"};
 
   private JButton createEventButton;
   private JButton modifyEventButton;

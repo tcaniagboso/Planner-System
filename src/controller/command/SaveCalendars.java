@@ -42,8 +42,8 @@ public class SaveCalendars implements Command {
    * Executes the save operation. This method prompts the user, through the system view,
    * to select a file path where the calendar will be saved. It then invokes the model's
    * saving file functionality to persist the calendar data to the selected location.
-   * <p>
-   * If no user is selected or if the saving process encounters any issues, appropriate
+   *
+   * <p>If no user is selected or if the saving process encounters any issues, appropriate
    * exceptions are thrown to indicate failure.
    *
    * @throws IllegalStateException if no user is selected or if any problem occurs during

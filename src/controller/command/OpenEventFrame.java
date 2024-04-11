@@ -50,11 +50,11 @@ public class OpenEventFrame implements Command {
    * {@link EventView} with an empty or existing {@link Event} and launches it via an
    * {@link EventViewController}. The view allows the user to enter details for the event,
    * which can then be saved to the planner system.
-   * If no user is selected (userId is "<none>"), an exception is thrown to indicate that
+   * If no user is selected (userId is "none"), an exception is thrown to indicate that
    * a user must be selected before creating a new event.
    *
    * @throws IllegalStateException if no user is selected for creating the new event, indicated
-   *                               by the userId being "<none>".
+   *                               by the userId being "none".
    */
   @Override
   public void execute() {

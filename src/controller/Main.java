@@ -1,17 +1,16 @@
-package view;
+package controller;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import autoscheduling.AutoSchedule;
 import autoscheduling.ScheduleStrategyCreator;
-import controller.PlannerSystemController;
-import controller.ScheduleViewController;
 import plannersystem.PlannerSystem;
 import schedule.Event;
 import schedule.Schedule;
 
 import plannersystem.NUPlannerSystem;
+import view.PlannerSystemViewImpl;
 
 /**
  * The Main class serves as the entry point for the Planner System application.
@@ -78,7 +77,8 @@ public class Main {
   }
 
   /**
-   * Assigns a scheduling strategy to the planner system based on the provided command-line argument.
+   * Assigns a scheduling strategy to the planner system based on the provided command-line
+   * argument.
    * Supports "Any time", "Work hours", and "Lenient" as scheduling strategies.
    *
    * @param args   The command-line arguments specifying the desired scheduling strategy.

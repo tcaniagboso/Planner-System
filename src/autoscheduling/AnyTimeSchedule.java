@@ -14,7 +14,7 @@ import validationutilities.ValidationUtilities;
 public class AnyTimeSchedule implements AutoSchedule {
 
   protected static final String[] daysOfWeek = {"Sunday", "Monday", "Tuesday", "Wednesday",
-          "Thursday", "Friday", "Saturday"};
+      "Thursday", "Friday", "Saturday"};
 
   /**
    * Schedules an event at the earliest possible time within a week,
@@ -26,7 +26,7 @@ public class AnyTimeSchedule implements AutoSchedule {
    * @param scheduleList A list of existing schedules against which the event will be checked for
    *                     overlaps.
    * @return The scheduled event with updated start and end times if a suitable slot is found;
-   * otherwise, null.
+   *         otherwise, null.
    * @throws IllegalArgumentException If the event is null, duration is non-positive,
    *                                  or duration exceeds the maximum allowed length.
    */
@@ -34,6 +34,7 @@ public class AnyTimeSchedule implements AutoSchedule {
   public Event scheduleEvent(Event event, int duration, List<Schedule> scheduleList) {
     ValidationUtilities.validateNull(event);
     this.validateDuration(duration);
+    this.validateSchedules(scheduleList);
     int startMinute = 0;
     int endMinuteOfWeek = (6 * 1440) + (23 * 60) + 59;
     boolean foundTime = false;
@@ -121,5 +122,11 @@ public class AnyTimeSchedule implements AutoSchedule {
   protected String durationToMinutes(int duration) {
     int minutes = duration % 60;
     return String.format("%02d", minutes);
+  }
+
+  protected void validateSchedules(List<Schedule> scheduleList) {
+    if (scheduleList == null || scheduleList.isEmpty() || scheduleList.contains(null)) {
+      throw new IllegalArgumentException("Invalid list of schedule.");
+    }
   }
 }

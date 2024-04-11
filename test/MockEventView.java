@@ -55,7 +55,7 @@ public class MockEventView implements EventView {
   public String getUserId() {
     this.log.append("This method gets the userId of the event view.")
             .append(System.lineSeparator());
-    return null;
+    return "Tobe";
   }
 
   @Override
