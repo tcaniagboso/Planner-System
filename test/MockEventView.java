@@ -1,7 +1,8 @@
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import controller.PlannerSystemController;
+import schedule.Event;
 import view.EventView;
 
 /**
@@ -37,16 +38,6 @@ public class MockEventView implements EventView {
   }
 
   @Override
-  public void refresh() {
-    this.log.append("This method refreshes the event view.").append(System.lineSeparator());
-  }
-
-  @Override
-  public void displayError(String message) {
-    this.log.append("This method displays an error message.").append(System.lineSeparator());
-  }
-
-  @Override
   public void makeVisible() {
     this.log.append("This method makes the event view visible.").append(System.lineSeparator());
   }
@@ -59,9 +50,9 @@ public class MockEventView implements EventView {
   }
 
   @Override
-  public void setActionListener(ActionListener listener) {
-    this.log.append("This method sets the action listener of the event view to the given listener.")
-            .append(System.lineSeparator());
+  public void setActionListener(PlannerSystemController listener) {
+    this.log.append("This method sets the given event view controller as a listener for the event ")
+            .append("view.").append(System.lineSeparator());
   }
 
   @Override
@@ -131,5 +122,18 @@ public class MockEventView implements EventView {
   public void checkFieldsNotEmpty() {
     this.log.append("This method checks if all the event view fields have been filled.")
             .append(System.lineSeparator());
+  }
+
+  @Override
+  public Event getEvent() {
+    this.log.append("This gets the event assigned to the view.").append(System.lineSeparator());
+    return new Event();
+  }
+
+  @Override
+  public boolean isViewVisible() {
+    this.log.append("returns true if event view is visible, otherwise false.")
+            .append(System.lineSeparator());
+    return false;
   }
 }

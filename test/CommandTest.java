@@ -9,13 +9,13 @@ import controller.command.AddCalendar;
 import controller.command.Command;
 import controller.command.CreateEvent;
 import controller.command.ModifyEvent;
-import controller.command.OpenEventFrame;
 import controller.command.RemoveEvent;
 import controller.command.SaveCalendars;
 import controller.command.ScheduleEvent;
 import controller.command.SelectUser;
 import plannersystem.PlannerSystem;
 import schedule.Event;
+import schedule.IEvent;
 import view.EventView;
 import view.PlannerSystemView;
 
@@ -26,8 +26,8 @@ import view.PlannerSystemView;
 public class CommandTest {
 
   private Command command;
-  private Event filled;
-  private Event empty;
+  private IEvent filled;
+  private IEvent empty;
   private PlannerSystem model;
   private PlannerSystemView view;
   private StringBuilder log;
@@ -233,40 +233,6 @@ public class CommandTest {
 
     boolean passed = testCommand(command, result, log);
     Assert.assertTrue(passed);
-  }
-
-  /**
-   * Tests the OpenEventFrame command to verify the correct instantiation and display
-   * of an event frame. Ensures that an EventView is correctly initialized and launched
-   * for creating or editing an event.
-   */
-  @Test
-  public void testOpenEventFrame() {
-    // OpenEVentFrame and OpenScheduleEvent use the same logic so test applies to both.
-    Assert.assertThrows(IllegalArgumentException.class,
-        () -> new OpenEventFrame(null, filled, model));
-    Assert.assertThrows(IllegalArgumentException.class,
-        () -> new OpenEventFrame(" ", filled, model));
-    Assert.assertThrows(IllegalArgumentException.class,
-        () -> new OpenEventFrame(userId, null, model));
-    Assert.assertThrows(IllegalArgumentException.class,
-        () -> new OpenEventFrame(userId, filled, null));
-
-    OpenEventFrame openCommand = new OpenEventFrame(userId, filled, model);
-    openCommand.setEventView(eventView);
-    openCommand.setController(new MockEventViewController(log));
-
-    String result = "This method launches the controller by setting the event of the controller "
-            + "and making the eventView visible." + System.lineSeparator();
-    boolean passed = testCommand(openCommand, result, log);
-    Assert.assertTrue(passed);
-
-    OpenEventFrame finalOpenCommand = new OpenEventFrame("<none>", filled, model);
-    finalOpenCommand.setEventView(eventView);
-    finalOpenCommand.setController(new MockEventViewController(log));
-
-    Assert.assertThrows(IllegalStateException.class, () -> finalOpenCommand.execute());
-
   }
 
   /**

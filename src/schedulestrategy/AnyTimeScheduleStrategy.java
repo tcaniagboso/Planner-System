@@ -1,9 +1,11 @@
-package autoscheduling;
+package schedulestrategy;
 
+import java.time.DayOfWeek;
 import java.util.List;
 
-import schedule.Event;
-import schedule.Schedule;
+import schedule.IEvent;
+import schedule.ISchedule;
+import schedule.ReadOnlyEvent;
 import validationutilities.ValidationUtilities;
 
 /**
@@ -11,10 +13,12 @@ import validationutilities.ValidationUtilities;
  * This scheduler attempts to find the earliest possible start time for an event
  * within the week that does not conflict with existing scheduled events.
  */
-public class AnyTimeSchedule implements AutoSchedule {
+public class AnyTimeScheduleStrategy implements ScheduleStrategy {
 
   protected static final String[] daysOfWeek = {"Sunday", "Monday", "Tuesday", "Wednesday",
       "Thursday", "Friday", "Saturday"};
+
+  protected String firstDayOfWeek;
 
   /**
    * Schedules an event at the earliest possible time within a week,
@@ -31,7 +35,7 @@ public class AnyTimeSchedule implements AutoSchedule {
    *                                  or duration exceeds the maximum allowed length.
    */
   @Override
-  public Event scheduleEvent(Event event, int duration, List<Schedule> scheduleList) {
+  public ReadOnlyEvent scheduleEvent(IEvent event, int duration, List<ISchedule> scheduleList) {
     ValidationUtilities.validateNull(event);
     this.validateDuration(duration);
     this.validateSchedules(scheduleList);
@@ -60,6 +64,14 @@ public class AnyTimeSchedule implements AutoSchedule {
     return null;
   }
 
+  @Override
+  public void setFirstDayOfWeek(String firstDayOfWeek) {
+    if (this.firstDayOfWeek == null) {
+      this.firstDayOfWeek = firstDayOfWeek.toUpperCase();
+    }
+  }
+
+
   /**
    * Validates if the proposed event times overlap with any event in the provided schedules.
    *
@@ -67,9 +79,9 @@ public class AnyTimeSchedule implements AutoSchedule {
    * @param scheduleList The list of schedules to check against.
    * @return true if an overlap exists; false otherwise.
    */
-  protected boolean validateTime(Event event, List<Schedule> scheduleList) {
-    for (Schedule schedule : scheduleList) {
-      if (schedule.overlap(event)) {
+  protected boolean validateTime(IEvent event, List<ISchedule> scheduleList) {
+    for (ISchedule schedule : scheduleList) {
+      if (schedule.overlap(event, firstDayOfWeek)) {
         return false;
       }
     }
@@ -97,7 +109,8 @@ public class AnyTimeSchedule implements AutoSchedule {
    */
   private String durationToDay(int duration) {
     int index = (duration / 1440) % 7;
-    return daysOfWeek[index];
+    int difference = DayOfWeek.valueOf(firstDayOfWeek).getValue();
+    return daysOfWeek[(index + difference) % 7];
   }
 
   /**
@@ -124,7 +137,7 @@ public class AnyTimeSchedule implements AutoSchedule {
     return String.format("%02d", minutes);
   }
 
-  protected void validateSchedules(List<Schedule> scheduleList) {
+  protected void validateSchedules(List<ISchedule> scheduleList) {
     if (scheduleList == null || scheduleList.isEmpty() || scheduleList.contains(null)) {
       throw new IllegalArgumentException("Invalid list of schedule.");
     }

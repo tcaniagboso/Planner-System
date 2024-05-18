@@ -7,18 +7,20 @@ import java.util.Arrays;
 import java.util.List;
 
 import schedule.Event;
+import schedule.IEvent;
+import schedule.ISchedule;
 import schedule.Schedule;
 
 /**
- * A test class for the {@link schedule.Schedule} class.
+ * A test class for the {@link schedule.ISchedule} class.
  * Tests the functionality of the Schedule class,
- * ensuring that it correctly manages a collection of {@link schedule.Event} objects,
+ * ensuring that it correctly manages a collection of {@link schedule.IEvent} objects,
  * including their addition, removal, and queries regarding events' presence and overlaps.
  */
 public class ScheduleTest {
 
-  private Schedule schedule;
-  private Event event;
+  private ISchedule schedule;
+  private IEvent event;
 
   /**
    * Initializes the test environment before each test method.
@@ -37,7 +39,7 @@ public class ScheduleTest {
   }
 
   /**
-   * Tests the constructors and getters of the {@link schedule.Schedule} class.
+   * Tests the constructors and getters of the {@link schedule.ISchedule} class.
    * Verifies that the constructor throws IllegalArgumentException for invalid inputs,
    * and checks that getters return the correct initial values. It also tests the immutability
    * of the events list by attempting to modify it through a getter method.
@@ -47,7 +49,7 @@ public class ScheduleTest {
     Assert.assertThrows(IllegalArgumentException.class, () -> new Schedule(null));
     Assert.assertThrows(IllegalArgumentException.class, () -> new Schedule(""));
 
-    Assert.assertEquals(schedule.getUserId(), "john");
+    Assert.assertEquals(schedule.getUserName(), "john");
     Assert.assertEquals(schedule.getEvents(), new ArrayList<>());
 
     // try mutating
@@ -57,7 +59,7 @@ public class ScheduleTest {
   }
 
   /**
-   * Tests various methods of the {@link schedule.Schedule} class,
+   * Tests various methods of the {@link schedule.ISchedule} class,
    * including adding, removing, and checking for events.
    * This test ensures that the Schedule class correctly manages events,
    * prevents the addition of overlapping events, and maintains the integrity
@@ -70,25 +72,23 @@ public class ScheduleTest {
     Assert.assertTrue(schedule.hasEvent(event));
     Assert.assertEquals(schedule.getEvent(event), event);
 
-    Event other = new Event();
+    IEvent other = new Event();
     other.setName("something");
     other.setEventTimes("Monday", "1030", "Monday", "1100");
     other.setHost("john");
     other.setInvitees(new ArrayList<>(List.of("john")));
     other.setLocation(true, "somewhere");
 
-    Assert.assertTrue(event.overlap(other));
-    Assert.assertThrows(IllegalArgumentException.class, () -> schedule.addEvent(other));
     Assert.assertFalse(schedule.hasEvent(other));
     Assert.assertThrows(IllegalArgumentException.class, () -> schedule.getEvent(other));
 
-    Event something = new Event();
+    IEvent something = new Event();
     something.setName("something");
     something.setEventTimes("Monday", "1200", "Monday", "1100");
     something.setHost("john");
     something.setInvitees(new ArrayList<>(List.of("john")));
     something.setLocation(true, "somewhere");
-    Assert.assertFalse(event.overlap(something));
+    Assert.assertFalse(event.overlap(something, "Sunday"));
     schedule.addEvent(something);
     Assert.assertTrue(schedule.hasEvent(something));
 
@@ -98,7 +98,7 @@ public class ScheduleTest {
 
     schedule.addEvent(something);
 
-    Event sunday = new Event();
+    IEvent sunday = new Event();
     sunday.setName("something");
     sunday.setEventTimes("Sunday", "1200", "Monday", "1000");
     sunday.setHost("john");

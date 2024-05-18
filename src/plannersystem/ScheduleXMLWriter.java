@@ -14,26 +14,26 @@ import java.io.File;
 
 import javax.xml.transform.OutputKeys;
 
-import schedule.Event;
-import schedule.Location;
-import schedule.Schedule;
-import schedule.Time;
+import schedule.ILocation;
+import schedule.ISchedule;
+import schedule.ITime;
+import schedule.ReadOnlyEvent;
 import schedule.TimeUtilities;
 
 /**
  * Provides functionality to write schedule information into an XML file.
- * This class enables the serialization of a {@link Schedule} object to XML, preserving
+ * This class enables the serialization of a {@link ISchedule} object to XML, preserving
  * event details, including names, times, locations, hosts, and invitees.
  */
 public class ScheduleXMLWriter {
 
 
   /**
-   * Writes the provided {@link Schedule} object to an XML file at the specified file path.
+   * Writes the provided {@link ISchedule} object to an XML file at the specified file path.
    * This method serializes the entire schedule, including all events and their details,
    * into an XML structure and saves it to a file.
    *
-   * @param schedule The {@link Schedule} object to be serialized to XML.
+   * @param schedule The {@link ISchedule} object to be serialized to XML.
    * @param filePath The file path where the XML file will be saved.
    * @throws Exception if an error occurs during document building, XML serialization,
    *                   or file writing. Specific exceptions might include
@@ -42,15 +42,15 @@ public class ScheduleXMLWriter {
    *                   {@link javax.xml.transform.TransformerException},
    *                   and others related to IO operations.
    */
-  public static void writeScheduleToXML(Schedule schedule, String filePath) throws Exception {
+  public static void writeScheduleToXML(ISchedule schedule, String filePath) throws Exception {
     DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();
     DocumentBuilder documentBuilder = documentFactory.newDocumentBuilder();
     Document document = documentBuilder.newDocument();
     Element root = document.createElement("schedule");
-    root.setAttribute("id", schedule.getUserId());
+    root.setAttribute("id", schedule.getUserName());
     document.appendChild(root);
 
-    for (Event event : schedule.getEvents()) {
+    for (ReadOnlyEvent event : schedule.getEvents()) {
       Element eventElement = document.createElement("event");
       root.appendChild(eventElement);
 
@@ -63,7 +63,7 @@ public class ScheduleXMLWriter {
       eventElement.appendChild(timeElement);
 
       Element locationElement = document.createElement("location");
-      appendLocationDetails(document, locationElement, event.getLocation());
+      appendLocationDetails(document, locationElement, event.getEventLocation());
       eventElement.appendChild(locationElement);
 
       Element usersElement = document.createElement("users");
@@ -98,9 +98,9 @@ public class ScheduleXMLWriter {
    *
    * @param doc         The XML {@link Document} being constructed.
    * @param timeElement The parent XML {@link Element} to which time details are appended.
-   * @param time        The {@link Time} object containing the event's time details.
+   * @param time        The {@link ITime} object containing the event's time details.
    */
-  private static void appendTimeDetails(Document doc, Element timeElement, Time time) {
+  private static void appendTimeDetails(Document doc, Element timeElement, ITime time) {
     Element startDayElement = doc.createElement("start-day");
     startDayElement.setTextContent(TimeUtilities.formatDay(time.getStartDay()));
     timeElement.appendChild(startDayElement);
@@ -125,10 +125,10 @@ public class ScheduleXMLWriter {
    *
    * @param doc             The XML {@link Document} being constructed.
    * @param locationElement The parent XML {@link Element} to which location details are appended.
-   * @param location        The {@link Location} object containing the event's location details.
+   * @param location        The {@link ILocation} object containing the event's location details.
    */
   private static void appendLocationDetails(Document doc, Element locationElement,
-                                            Location location) {
+                                            ILocation location) {
     Element onlineElement = doc.createElement("online");
     onlineElement.setTextContent(String.valueOf(location.isOnline()));
     locationElement.appendChild(onlineElement);

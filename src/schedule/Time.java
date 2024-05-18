@@ -13,7 +13,7 @@ import validationutilities.ValidationUtilities;
  * their respective days. This class is responsible for managing time-related data for events,
  * ensuring time validity, and providing methods for time comparison.
  */
-public class Time {
+public class Time implements ITime {
 
   private DayOfWeek startDay;
   private LocalTime startTime;
@@ -42,42 +42,24 @@ public class Time {
     // to represent an empty time constructor since there is a non-empty one, I had to declare this
   }
 
-  /**
-   * Gets the start day of the event.
-   *
-   * @return The {@link DayOfWeek} indicating the start day of the event.
-   */
+  @Override
   public DayOfWeek getStartDay() {
     ValidationUtilities.validateGetNull(this.startDay);
     return startDay;
   }
 
-  /**
-   * Sets the start day of the event. Validates the input to ensure it is a valid day of the week.
-   *
-   * @param startDay The day of the week as a String that the event starts on.
-   * @throws IllegalArgumentException If the input does not correspond to a valid {@link DayOfWeek}.
-   */
+  @Override
   public void setStartDay(String startDay) {
     this.startDay = this.validateDay(startDay);
   }
 
-  /**
-   * Gets the start time of the event.
-   *
-   * @return The start time of the event as {@link LocalTime}.
-   */
+  @Override
   public LocalTime getStartTime() {
     ValidationUtilities.validateGetNull(this.startTime);
     return startTime;
   }
 
-  /**
-   * Sets the start time of the event. Validates the input to ensure it follows the HHmm format.
-   *
-   * @param startTime The start time of the event in HHmm format.
-   * @throws IllegalArgumentException If the input does not represent a valid time in HHmm format.
-   */
+  @Override
   public void setStartTime(String startTime) {
     if (startDay == null) {
       throw new IllegalStateException("Start day must be set before start time.");
@@ -85,22 +67,13 @@ public class Time {
     this.startTime = this.validateTime(startTime);
   }
 
-  /**
-   * Gets the end day of the event.
-   *
-   * @return The {@link DayOfWeek} indicating the end day of the event.
-   */
+  @Override
   public DayOfWeek getEndDay() {
     ValidationUtilities.validateGetNull(this.endDay);
     return endDay;
   }
 
-  /**
-   * Sets the end day of the event. Validates the input to ensure it is a valid day of the week.
-   *
-   * @param endDay The day of the week that the event ends on, as a String.
-   * @throws IllegalArgumentException If the input does not correspond to a valid {@link DayOfWeek}.
-   */
+  @Override
   public void setEndDay(String endDay) {
     if (startDay == null || startTime == null) {
       throw new IllegalStateException("Start day and start time must be set before end day.");
@@ -108,25 +81,13 @@ public class Time {
     this.endDay = this.validateDay(endDay);
   }
 
-  /**
-   * Gets the end time of the event.
-   *
-   * @return The end time of the event as {@link LocalTime}.
-   */
+  @Override
   public LocalTime getEndTime() {
     ValidationUtilities.validateGetNull(this.endTime);
     return endTime;
   }
 
-  /**
-   * Sets the end time of the event. Validates the input to ensure it follows the HHmm format and
-   * does not result in a duration exceeding the maximum allowed (6 days, 23 hours, 59 minutes).
-   *
-   * @param endTime The end time of the event in HHmm format.
-   * @throws IllegalArgumentException If the input does not represent a valid time in HHmm format
-   *                                  or if setting this end time would exceed the maximum event
-   *                                  duration.
-   */
+  @Override
   public void setEndTime(String endTime) {
     if (startDay == null || startTime == null || endDay == null) {
       throw new IllegalStateException("Start day, start time and end day must be "
@@ -140,13 +101,8 @@ public class Time {
     this.endTime = parsedEndTime;
   }
 
-  /**
-   * Checks if the time period of this Time object overlaps with that of another.
-   *
-   * @param other The other Time object to compare with.
-   * @return true if there is an overlap, false otherwise.
-   */
-  public boolean overlap(Time other) {
+  @Override
+  public boolean overlap(ITime other, String firstDayOfWeek) {
     if (this.equals(other)) {
       return true;
     }
@@ -154,14 +110,15 @@ public class Time {
     int minutesInDay = 1440;
 
     // Convert start and end times to minutes since the start of the week, considering Sunday as 0
-    long thisStartMinutes = this.getMinutes(this.startDay, this.startTime);
-    long thisEndMinutes = this.getMinutes(this.endDay, this.endTime);
+    long thisStartMinutes = this.getMinutes(this.startDay, this.startTime, firstDayOfWeek);
+    long thisEndMinutes = this.getMinutes(this.endDay, this.endTime, firstDayOfWeek);
     if (thisEndMinutes < thisStartMinutes) {
       thisEndMinutes += daysInWeek * minutesInDay; // Adjust for wrap-around
     }
 
-    long otherStartMinutes = this.getMinutes(other.startDay, other.startTime);
-    long otherEndMinutes = this.getMinutes(other.endDay, other.endTime);
+    long otherStartMinutes = this.getMinutes(other.getStartDay(), other.getStartTime(),
+            firstDayOfWeek);
+    long otherEndMinutes = this.getMinutes(other.getEndDay(), other.getEndTime(), firstDayOfWeek);
     if (otherEndMinutes < otherStartMinutes) {
       otherEndMinutes += daysInWeek * minutesInDay; // Adjust for wrap-around
     }
@@ -170,14 +127,8 @@ public class Time {
     return !(otherEndMinutes <= thisStartMinutes || otherStartMinutes >= thisEndMinutes);
   }
 
-  /**
-   * Determines whether this Time instance occurs on a specific day and time.
-   *
-   * @param day  The day to check, as a string.
-   * @param time The time to check, in HHmm format.
-   * @return true if this Time occurs at the specified day and time, false otherwise.
-   */
-  public boolean occurs(String day, String time) {
+  @Override
+  public boolean occurs(String day, String time, String firstDayOfWeek) {
     DayOfWeek givenDay = DayOfWeek.valueOf(day.toUpperCase());
     LocalTime givenTime = LocalTime.parse(time, DateTimeFormatter.ofPattern("HHmm"));
 
@@ -185,15 +136,15 @@ public class Time {
     int minutesInDay = 1440; // 24 hours * 60 minutes
 
     // Convert the event's start and end times to minutes since the start of the week
-    long eventStartMinutes = this.getMinutes(this.startDay, this.startTime);
-    long eventEndMinutes = this.getMinutes(this.endDay, this.endTime);
+    long eventStartMinutes = this.getMinutes(this.startDay, this.startTime, firstDayOfWeek);
+    long eventEndMinutes = this.getMinutes(this.endDay, this.endTime, firstDayOfWeek);
 
     if (eventEndMinutes < eventStartMinutes) {
       eventEndMinutes += daysInWeek * minutesInDay; // Adjust for wrap-around
     }
 
     // Convert the given day and time to minutes since the start of the week
-    long givenMinutes = (givenDay.getValue() % 7) * minutesInDay
+    long givenMinutes = ((givenDay.getValue() + this.difference(firstDayOfWeek)) % 7) * minutesInDay
             + givenTime.getHour() * 60 + givenTime.getMinute();
 
     // Check if the given day and time occur during the event
@@ -201,13 +152,12 @@ public class Time {
     return givenMinutes >= eventStartMinutes && givenMinutes < eventEndMinutes;
   }
 
-  /**
-   * Checks if an event time continues into a new week.
-   *
-   * @return true if an event time continues into a new week otherwise return false.
-   */
-  public boolean wrapsAround() {
-    return ((this.endDay.getValue() % 7) < (this.startDay.getValue() % 7))
+  @Override
+  public boolean wrapsAround(String firstDayOfWeek) {
+    int difference = this.difference(firstDayOfWeek);
+    int endDayValue = (this.endDay.getValue() + difference) % 7;
+    int startDayValue = (this.startDay.getValue() + difference) % 7;
+    return (endDayValue < startDayValue)
             || (this.startDay.equals(this.endDay) && this.endTime.isBefore(this.startTime));
   }
 
@@ -275,10 +225,22 @@ public class Time {
    *
    * @param day  The day of the week.
    * @param time The time of day.
+   * @param firstDayOfWeek The first day of the week.
    * @return The total number of minutes from the start of the week to the specified day and time.
    */
-  private long getMinutes(DayOfWeek day, LocalTime time) {
-    return (day.getValue() % 7) * 1440
+  private long getMinutes(DayOfWeek day, LocalTime time, String firstDayOfWeek) {
+    int difference = this.difference(firstDayOfWeek);
+    return ((day.getValue() + difference) % 7) * 1440
             + time.getHour() * 60 + time.getMinute();
+  }
+
+  /**
+   * Calculates the difference between the value of the current day and 7.
+   *
+   * @param day The day we are concerned with.
+   * @return the difference from the original start day Sunday.
+   */
+  private int difference(String day) {
+    return 7 - (DayOfWeek.valueOf(day.toUpperCase()).getValue());
   }
 }

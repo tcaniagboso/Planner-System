@@ -2,8 +2,8 @@ package plannersystem;
 
 import java.util.Set;
 
-import schedule.Event;
-import schedule.Schedule;
+import schedule.ISchedule;
+import schedule.ReadOnlyEvent;
 
 /**
  * The ReadonlyPlannerSystem interface defines a read-only view of the PlannerSystem.
@@ -12,6 +12,16 @@ import schedule.Schedule;
  * ensuring that the underlying model cannot be altered.
  */
 public interface ReadonlyPlannerSystem {
+
+  /**
+   * Saves the current schedule of a user to an XML file.
+   *
+   * @param userId   The ID of the user whose schedule is being saved.
+   * @param filePath The path of the file to save the schedule to.
+   * @throws IllegalStateException if any error occurs during the saving process, encapsulating
+   *                               the original exception message.
+   */
+  void saveUserSchedule(String userId, String filePath);
 
   /**
    * Generates and returns a string representation of a user's schedule, formatted for display.
@@ -44,10 +54,10 @@ public interface ReadonlyPlannerSystem {
    * to modify them.
    *
    * @param userId The ID of the user whose schedule is requested.
-   * @return The {@link Schedule} associated with the given user ID.
+   * @return The {@link ISchedule} associated with the given user ID.
    * @throws IllegalArgumentException if no schedule exists for the specified user.
    */
-  Schedule getSchedule(String userId);
+  ISchedule getSchedule(String userId);
 
   /**
    * Retrieves a set of user IDs that have schedules within the planner system. This method provides
@@ -71,5 +81,12 @@ public interface ReadonlyPlannerSystem {
    *         can be successfully scheduled; {@code false} if there is a scheduling conflict.
    * @throws IllegalArgumentException if event is null.
    */
-  boolean checkEventConflict(Event event);
+  boolean checkEventConflict(ReadOnlyEvent event);
+
+  /**
+   * Gets the first day of the week for the planner.
+   *
+   * @return the first day of the week.
+   */
+  String getFirstDayOfWeek();
 }

@@ -15,11 +15,13 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Color;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
 import java.io.File;
 
+import controller.PlannerSystemController;
 import plannersystem.ReadonlyPlannerSystem;
+import schedule.ISchedule;
 import schedule.Schedule;
 
 /**
@@ -28,17 +30,15 @@ import schedule.Schedule;
  * It provides functionalities for creating events, scheduling events, loading and saving calendars,
  * and displaying user schedules.
  */
-public class PlannerSystemViewImpl extends JFrame implements PlannerSystemView {
+public class PlannerSystemViewImpl extends JFrame implements PlannerSystemView, ActionListener {
   private static final int FRAME_SIZE = 700;
-  private JButton createEventButton;
-  private JButton scheduleEventButton;
   private JComboBox<String> userOptions;
   private final SchedulePanel schedulePanel;
-  private JMenuItem addCalendar;
-  private JMenuItem saveCalendar;
   private final JFileChooser fileChooser;
 
   private final ReadonlyPlannerSystem system;
+
+  private PlannerSystemController controller;
 
   /**
    * Constructs a PlannerSystemView with the specified ReadonlyPlannerSystem.
@@ -60,6 +60,7 @@ public class PlannerSystemViewImpl extends JFrame implements PlannerSystemView {
 
     schedulePanel = new SchedulePanel();
     schedulePanel.setSchedule(new Schedule("none"));
+    schedulePanel.setFirstDayOfWeek(system.getFirstDayOfWeek());
     // Custom panel for drawing the schedule
     this.add(schedulePanel, BorderLayout.CENTER);
     this.displayButtons();
@@ -68,21 +69,12 @@ public class PlannerSystemViewImpl extends JFrame implements PlannerSystemView {
     menuBar.add(fileMenu);
     this.setJMenuBar(menuBar);
     this.fileChooser = new JFileChooser();
-    fileChooser.setCurrentDirectory(new File("."));
   }
 
   @Override
-  public void setActionListener(ActionListener listener) {
-    this.createEventButton.addActionListener(listener);
-    this.scheduleEventButton.addActionListener(listener);
-    this.userOptions.addActionListener(listener);
-    this.addCalendar.addActionListener(listener);
-    this.saveCalendar.addActionListener(listener);
-  }
-
-  @Override
-  public void setMouseListener(MouseAdapter listener) {
-    this.schedulePanel.addMouseListener(listener);
+  public void setActionListener(PlannerSystemController listener) {
+    this.controller = listener;
+    this.schedulePanel.setActionListener(listener);
   }
 
   @Override
@@ -128,7 +120,7 @@ public class PlannerSystemViewImpl extends JFrame implements PlannerSystemView {
   public void updateSchedulePanel(String currentUser) {
     if (currentUser != null && !currentUser.equals("<none>")) {
       // Retrieve the schedule for the selected user
-      Schedule userSchedule = system.getSchedule(currentUser);
+      ISchedule userSchedule = system.getSchedule(currentUser);
       // Update the schedule panel with the user's schedule
       schedulePanel.setSchedule(userSchedule);
     } else {
@@ -154,8 +146,14 @@ public class PlannerSystemViewImpl extends JFrame implements PlannerSystemView {
   }
 
   @Override
-  public SchedulePanel getSchedulePanel() {
-    return this.schedulePanel;
+  public void toggleColor() {
+    this.schedulePanel.setColorEvent();
+  }
+
+  @Override
+  public void actionPerformed(ActionEvent e) {
+    String command = e.getActionCommand();
+    this.controller.processButtonPress(command);
   }
 
   /**
@@ -166,17 +164,23 @@ public class PlannerSystemViewImpl extends JFrame implements PlannerSystemView {
     JPanel buttonPanel = new JPanel(new BorderLayout());
     buttonPanel.setPreferredSize(new Dimension(FRAME_SIZE, this.getHeight() / 16));
 
-    createEventButton = this.createButton("Create event");
-    scheduleEventButton = this.createButton("Schedule event");
+    JButton createEventButton = this.createButton("Create event");
+    JButton scheduleEventButton = this.createButton("Schedule event");
+    JButton toggleColorButton = this.createButton("Toggle color");
     userOptions = this.createComboBox(this.userOptions());
+
+    createEventButton.setActionCommand("Open Event Frame");
+    scheduleEventButton.setActionCommand("Open Schedule Event Frame");
+    toggleColorButton.setActionCommand("Toggle Color");
 
     // Panel to hold the createEventButton and keep it at the center
     JPanel centerButtonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
     centerButtonPanel.add(createEventButton);
+    centerButtonPanel.add(scheduleEventButton);
 
     // Panel to hold the scheduleEventButton and keep it at the right
     JPanel rightButtonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-    rightButtonPanel.add(scheduleEventButton);
+    rightButtonPanel.add(toggleColorButton);
 
     JPanel leftButtonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
     leftButtonPanel.add(userOptions);
@@ -198,10 +202,10 @@ public class PlannerSystemViewImpl extends JFrame implements PlannerSystemView {
    */
   private JButton createButton(String text) {
     JButton button = new JButton(text);
-    button.setFont(new Font("Aptos", Font.BOLD, this.getWidth() / 50));
+    button.setFont(new Font("Aptos", Font.BOLD, this.getWidth() / 55));
     button.setBackground(Color.white);
-    button.setPreferredSize(new Dimension(this.getWidth() / 4, this.getHeight() / 20));
-    button.setActionCommand(text);
+    button.setPreferredSize(new Dimension(this.getWidth() / 5, this.getHeight() / 20));
+    button.addActionListener(this);
     return button;
   }
 
@@ -213,10 +217,11 @@ public class PlannerSystemViewImpl extends JFrame implements PlannerSystemView {
    */
   private JComboBox<String> createComboBox(String[] options) {
     JComboBox<String> comboBox = new JComboBox<>(options);
-    comboBox.setFont(new Font("Aptos", Font.BOLD, this.getWidth() / 50));
+    comboBox.setFont(new Font("Aptos", Font.BOLD, this.getWidth() / 55));
     comboBox.setBackground(Color.white);
-    comboBox.setPreferredSize(new Dimension(this.getWidth() / 4,
+    comboBox.setPreferredSize(new Dimension(this.getWidth() / 5,
             this.getHeight() / 20));
+    comboBox.addActionListener(this);
     comboBox.setActionCommand("Select user");
     return comboBox;
   }
@@ -244,8 +249,10 @@ public class PlannerSystemViewImpl extends JFrame implements PlannerSystemView {
    */
   private JMenu createFileMenu() {
     JMenu menu = new JMenu("File");
-    addCalendar = new JMenuItem("Add calendar");
-    saveCalendar = new JMenuItem("Save calendars");
+    JMenuItem addCalendar = new JMenuItem("Add calendar");
+    JMenuItem saveCalendar = new JMenuItem("Save calendars");
+    addCalendar.addActionListener(this);
+    saveCalendar.addActionListener(this);
     addCalendar.setActionCommand("Add calendar");
     saveCalendar.setActionCommand("Save calendars");
     menu.add(addCalendar);

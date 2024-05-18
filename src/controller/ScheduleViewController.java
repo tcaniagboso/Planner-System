@@ -1,22 +1,20 @@
 package controller;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.time.LocalTime;
-
 import controller.command.AddCalendar;
 import controller.command.Command;
-import controller.command.OpenEventFrame;
-import controller.command.OpenScheduleEvent;
+import controller.command.CreateEvent;
+import controller.command.ModifyEvent;
+import controller.command.RemoveEvent;
 import controller.command.SaveCalendars;
+import controller.command.ScheduleEvent;
 import controller.command.SelectUser;
 import plannersystem.PlannerSystem;
 import schedule.Event;
-import schedule.Schedule;
+import schedule.ReadOnlyEvent;
+import view.EventView;
+import view.EventViewImpl;
 import view.PlannerSystemView;
-import view.SchedulePanel;
+import view.ScheduleEventView;
 
 /**
  * Controller class for managing user actions and mouse events in the Planner System application.
@@ -25,12 +23,12 @@ import view.SchedulePanel;
  * It bridges the interaction between the view ({@link PlannerSystemView}) and the model
  * ({@link PlannerSystem}).
  */
-public class ScheduleViewController extends MouseAdapter implements PlannerSystemController,
-        ActionListener {
+public class ScheduleViewController implements PlannerSystemController {
 
   private final PlannerSystemView view;
   private PlannerSystem model;
-  private final SchedulePanel schedulePanel;
+
+  private EventView eventView;
 
   /**
    * Constructs a ScheduleViewController with a specified view.
@@ -44,9 +42,7 @@ public class ScheduleViewController extends MouseAdapter implements PlannerSyste
       throw new IllegalArgumentException("View cannot be null");
     }
     this.view = view;
-    this.schedulePanel = this.view.getSchedulePanel();
     this.view.setActionListener(this);
-    this.view.setMouseListener(this);
   }
 
   @Override
@@ -56,31 +52,10 @@ public class ScheduleViewController extends MouseAdapter implements PlannerSyste
   }
 
   @Override
-  public void actionPerformed(ActionEvent e) {
+  public void processButtonPress(String action) {
     String currentUser = this.view.getCurrentUser();
     assert currentUser != null;
-    String action = e.getActionCommand();
-    Command command;
-    switch (action) {
-      case "Create event":
-        command = new OpenEventFrame(currentUser, new Event(), model);
-        break;
-      case "Schedule event":
-        command = new OpenScheduleEvent(currentUser, new Event(), model);
-        break;
-      case "Add calendar":
-        command = new AddCalendar(view, model);
-        break;
-      case "Save calendars":
-        command = new SaveCalendars(currentUser, view, model);
-        break;
-      case "Select user":
-        command = new SelectUser(currentUser, view);
-        break;
-      default:
-        command = null;
-    }
-
+    Command command = this.handleCommands(action, currentUser);
     if (command != null) {
       try {
         command.execute();
@@ -91,6 +66,73 @@ public class ScheduleViewController extends MouseAdapter implements PlannerSyste
     this.view.refresh();
   }
 
+  /**
+   * Handles various command actions based on the input action string and current user context.
+   * This method routes the action to specific command implementations or UI actions,
+   * creating and executing appropriate Command objects or triggering UI changes directly.
+   *
+   * @param action      The string representing the action command triggered by the user. This
+   *                    should match one of the predefined actions such as "Open Event Frame",
+   *                    "Save calendars", etc.
+   * @param currentUser The username of the currently active user, used to customize command
+   *                    behavior based on user context.
+   * @return A Command object appropriate to the action, or null if the action does not directly
+   *         correlate to a command pattern (e.g., actions that directly manipulate the UI or
+   *         initiate other procedures).
+   */
+  private Command handleCommands(String action, String currentUser) {
+    Command command;
+    switch (action) {
+      case "Open Event Frame":
+        command = null;
+        this.launchEventView(currentUser, new Event(), "Standard");
+        break;
+      case "Open Schedule Event Frame":
+        command = null;
+        this.launchEventView(currentUser, new Event(), "Schedule");
+        break;
+      case "Add calendar":
+        command = new AddCalendar(view, model);
+        break;
+      case "Save calendars":
+        command = new SaveCalendars(currentUser, view, model);
+        break;
+      case "Select user":
+        command = new SelectUser(currentUser, view);
+        break;
+      case "Create event":
+        command = new CreateEvent(currentUser, model, eventView, eventView.getEvent());
+        break;
+      case "Modify event":
+        command = new ModifyEvent(currentUser, model, eventView, eventView.getEvent());
+        break;
+      case "Remove event":
+        command = new RemoveEvent(currentUser, model, eventView, eventView.getEvent());
+        break;
+      case "Schedule event":
+        command = new ScheduleEvent(currentUser, model, eventView, eventView.getEvent());
+        break;
+      case "Toggle Color":
+        command = null;
+        this.handleToggleColor(currentUser);
+        break;
+      default:
+        command = null;
+    }
+    return command;
+  }
+
+  @Override
+  public void processMouseClick(ReadOnlyEvent event) {
+    String userId = this.view.getCurrentUser();
+    this.launchEventView(userId, event, "Standard");
+  }
+
+  @Override
+  public void setEventView(EventView view) {
+    this.eventView = view;
+  }
+
   @Override
   public void update() {
     this.view.updateUsers();
@@ -98,121 +140,11 @@ public class ScheduleViewController extends MouseAdapter implements PlannerSyste
   }
 
   /**
-   * Handles mouseClicked event by processing the mouse event.
+   * Sets the model for this controller.
    *
-   * @param e The MouseEvent that triggered the event.
+   * @param model The {@link PlannerSystem} model to be set.
+   * @throws IllegalArgumentException if the provided model is null.
    */
-  @Override
-  public void mouseClicked(MouseEvent e) {
-    super.mouseClicked(e);
-    processMouseEvent(e);
-  }
-
-  /**
-   * Processes the mouse event to determine if an event is clicked.
-   *
-   * @param e The MouseEvent to process.
-   */
-  private void processMouseEvent(MouseEvent e) {
-    int cellWidth = schedulePanel.getCellWidth();
-    int cellHeight = schedulePanel.getCellHeight();
-    Schedule schedule = schedulePanel.getSchedule();
-    double mouseX = e.getX();
-    double mouseY = e.getY();
-
-    for (Event event : schedule.getEvents()) {
-      int startDayIndex = (event.getTime().getStartDay().getValue() % 7);
-      int endDayIndex = (event.getTime().getEndDay().getValue() % 7);
-      LocalTime startTime = event.getTime().getStartTime();
-      LocalTime endTime = event.getTime().getEndTime();
-      double startY = calculateYPosition(startTime, cellHeight);
-      double endY = calculateYPosition(endTime, cellHeight);
-
-      if (event.wrapsAround()) {
-        endDayIndex = 6;
-        endY = calculateYPosition(LocalTime.of(23, 59), cellHeight);
-      }
-      checkAndHandleEventIntersection(event, startDayIndex, endDayIndex, cellWidth, cellHeight,
-              mouseX, mouseY, startY, endY);
-    }
-  }
-
-  /**
-   * Calculates the Y position of an event based on its start time and cell height.
-   *
-   * @param time       The start time of the event.
-   * @param cellHeight The height of a single cell.
-   * @return The Y position of the event.
-   */
-  private double calculateYPosition(LocalTime time, int cellHeight) {
-    return (cellHeight * (time.getHour() + 1)) + (cellHeight * ((double) time.getMinute() / 60));
-  }
-
-  /**
-   * Checks if the mouse click intersects with an event and handles it accordingly.
-   *
-   * @param event         The event to check intersection with.
-   * @param startDayIndex The start day index of the event.
-   * @param endDayIndex   The end day index of the event.
-   * @param cellWidth     The width of a single cell.
-   * @param cellHeight    The height of a single cell.
-   * @param mouseX        The X coordinate of the mouse click.
-   * @param mouseY        The Y coordinate of the mouse click.
-   * @param startY        The Y position of the event start.
-   * @param endY          The Y position of the event end.
-   */
-  private void checkAndHandleEventIntersection(Event event, int startDayIndex, int endDayIndex,
-                                               int cellWidth, int cellHeight, double mouseX,
-                                               double mouseY, double startY, double endY) {
-    String userId = schedulePanel.getSchedule().getUserId();
-    boolean found = false;
-    for (int i = startDayIndex; i <= endDayIndex; i++) {
-      int startX = cellWidth * (i + 1);
-      int endX = cellWidth * (i + 2);
-      if (i == startDayIndex && i == endDayIndex) {
-        if (isInRange(startX, endX, startY, endY, mouseX, mouseY)) {
-          found = true;
-          break;
-        }
-      } else if (i == startDayIndex) {
-        if (isInRange(startX, endX, startY, cellHeight * 25, mouseX, mouseY)) {
-          found = true;
-          break;
-        }
-      } else if (i == endDayIndex) {
-        if (isInRange(startX, endX, cellHeight, endY, mouseX, mouseY)) {
-          found = true;
-          break;
-        }
-      } else {
-        if (isInRange(startX, endX, cellHeight, cellHeight * 25, mouseX, mouseY)) {
-          found = true;
-          break;
-        }
-      }
-    }
-    if (found) {
-      Command command = new OpenEventFrame(userId, event, model);
-      command.execute();
-    }
-  }
-
-  /**
-   * Checks if the mouse click is within the range of an event.
-   *
-   * @param startX The starting X coordinate of the event.
-   * @param endX   The ending X coordinate of the event.
-   * @param startY The starting Y coordinate of the event.
-   * @param endY   The ending Y coordinate of the event.
-   * @param clickX The X coordinate of the mouse click.
-   * @param clickY The Y coordinate of the mouse click.
-   * @return True if the mouse click is within the range of the event, false otherwise.
-   */
-  private boolean isInRange(double startX, double endX, double startY, double endY, double clickX,
-                            double clickY) {
-    return (clickX >= startX && clickX < endX) && (clickY >= startY && clickY < endY);
-  }
-
   private void setModel(PlannerSystem model) {
     if (model == null) {
       throw new IllegalArgumentException("Planner System Model is null");
@@ -220,4 +152,47 @@ public class ScheduleViewController extends MouseAdapter implements PlannerSyste
     this.model = model;
     this.model.addObserver(this);
   }
+
+  /**
+   * Launches an event view based on the specified user ID, event, and frame type. Displays an error
+   * message if an event frame is already open or if the user selected is "none".
+   *
+   * @param userId    The ID of the user associated with the event view.
+   * @param event     The event to be displayed in the event view.
+   * @param frameType The type of frame to be launched ("Schedule" or any other value).
+   */
+  private void launchEventView(String userId, ReadOnlyEvent event, String frameType) {
+    if (eventView != null && eventView.isViewVisible()) {
+      view.displayErrorMessage("An event frame is already open.");
+      return;
+    }
+    if (userId.equals("<none>")) {
+      view.displayErrorMessage("No user is selected.");
+      return;
+    }
+    if (frameType.equals("Schedule")) {
+      this.eventView = new ScheduleEventView(event, userId);
+    } else {
+      this.eventView = new EventViewImpl(event, userId);
+    }
+    this.eventView.setActionListener(this);
+    this.eventView.makeVisible();
+  }
+
+  /**
+   * Toggles the color theme or color settings in the user interface based on the specified user's
+   * action. This method checks if a valid user (not "none") is provided before toggling the color
+   * settings to ensure that the operation is meaningful in a user-specific context.
+   *
+   * @param userId The identifier for the current user, used to determine if the toggle operation
+   *               should proceed. The method performs the toggle only if the userId is not
+   *               "none", which typically represents a lack of user selection or a default non-user
+   *               state.
+   */
+  private void handleToggleColor(String userId) {
+    if (!userId.equals("<none>")) {
+      this.view.toggleColor();
+    }
+  }
+
 }

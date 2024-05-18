@@ -3,12 +3,13 @@ package view;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.Component;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -18,17 +19,15 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JTextArea;
 import javax.swing.JScrollPane;
-import javax.swing.JOptionPane;
 
-
-import schedule.Event;
-import schedule.TimeUtilities;
+import controller.PlannerSystemController;
+import schedule.ReadOnlyEvent;
 
 /**
  * EventView class represents a graphical user interface for viewing and interacting with events.
  * It extends the JFrame class and implements the ActionListener interface.
  */
-public class EventViewImpl extends JFrame implements EventView {
+public class EventViewImpl extends JFrame implements EventView, ActionListener {
 
   private static final int WIDTH = 600;
   private static final int HEIGHT = 850;
@@ -36,12 +35,10 @@ public class EventViewImpl extends JFrame implements EventView {
   private static final String[] daysOfWeek = {"Sunday", "Monday", "Tuesday", "Wednesday",
       "Thursday", "Friday", "Saturday"};
 
-  private JButton createEventButton;
-  private JButton modifyEventButton;
-  private JButton removeEventButton;
-
-  private final Event event;
+  private final ReadOnlyEvent event;
   private final String user;
+
+  protected PlannerSystemController controller;
 
   /**
    * Constructs an EventView object with the specified event and user ID.
@@ -50,7 +47,7 @@ public class EventViewImpl extends JFrame implements EventView {
    * @param userId The ID of the user associated with the event.
    * @throws IllegalArgumentException if the event is null or userId is null or empty.
    */
-  public EventViewImpl(Event event, String userId) {
+  public EventViewImpl(ReadOnlyEvent event, String userId) {
     if (userId == null || userId.isBlank()) {
       throw new IllegalStateException("UserID is null or empty");
     }
@@ -80,10 +77,14 @@ public class EventViewImpl extends JFrame implements EventView {
   }
 
   @Override
-  public void setActionListener(ActionListener listener) {
-    this.createEventButton.addActionListener(listener);
-    this.removeEventButton.addActionListener(listener);
-    this.modifyEventButton.addActionListener(listener);
+  public void setActionListener(PlannerSystemController listener) {
+    this.controller = listener;
+  }
+
+  @Override
+  public void actionPerformed(ActionEvent e) {
+    String command = e.getActionCommand();
+    this.controller.processButtonPress(command);
   }
 
   @Override
@@ -101,7 +102,7 @@ public class EventViewImpl extends JFrame implements EventView {
   @Override
   public String getStartTime() {
     JTextField startingTimeTextField = (JTextField) getContentPane().getComponent(9);
-    return TimeUtilities.formatTime(LocalTime.parse(startingTimeTextField.getText()));
+    return this.formatTime(LocalTime.parse(startingTimeTextField.getText()));
   }
 
   @Override
@@ -113,7 +114,7 @@ public class EventViewImpl extends JFrame implements EventView {
   @Override
   public String getEndTime() {
     JTextField endingTimeTextField = (JTextField) getContentPane().getComponent(13);
-    return TimeUtilities.formatTime(LocalTime.parse(endingTimeTextField.getText()));
+    return this.formatTime(LocalTime.parse(endingTimeTextField.getText()));
   }
 
   @Override
@@ -138,7 +139,7 @@ public class EventViewImpl extends JFrame implements EventView {
     String[] unfiltered = inviteesText.split("\n");
     for (String names : unfiltered) {
       if (!names.trim().isEmpty()) {
-        invitees.add(names);
+        invitees.add(names.strip());
       }
     }
     return invitees;
@@ -150,34 +151,33 @@ public class EventViewImpl extends JFrame implements EventView {
   }
 
   @Override
-  public void refresh() {
-    this.repaint();
-  }
-
-  @Override
-  public void displayError(String message) {
-    JOptionPane.showMessageDialog(null, message, "Error",
-            JOptionPane.ERROR_MESSAGE);
-  }
-
-  @Override
   public void checkFieldsNotEmpty() {
     Component[] components = getContentPane().getComponents();
     for (Component component : components) {
       if (component instanceof JTextField) {
         JTextField textField = (JTextField) component;
         String text = textField.getText().trim();
-        if (text.isEmpty()) {
+        if (text.isBlank()) {
           throw new IllegalStateException("All event fields must be filled.");
         }
-      } else if (component instanceof JTextArea) {
+      } else if (component instanceof JScrollPane) {
         JTextArea textArea = (JTextArea) ((JScrollPane) component).getViewport().getView();
         String text = textArea.getText().trim();
-        if (text.isEmpty()) {
+        if (text.isBlank()) {
           throw new IllegalStateException("All event fields must be filled.");
         }
       }
     }
+  }
+
+  @Override
+  public ReadOnlyEvent getEvent() {
+    return event;
+  }
+
+  @Override
+  public boolean isViewVisible() {
+    return this.isVisible();
   }
 
   /**
@@ -195,14 +195,14 @@ public class EventViewImpl extends JFrame implements EventView {
     this.createLabel("Starting Day:", 0, 250, 200, 30);
     this.createComboBox(daysOfWeek, 125, 250);
 
-    this.createLabel("Starting Time:", 0, 325, 200, 30);
-    this.createTextField("", 125, 325, 425, 50);
+    this.createLabel("Starting Time (HH:mm):", 0, 325, 225, 30);
+    this.createTextField("", 220, 325, 330, 50);
 
     this.createLabel("Ending Day:", 0, 400, 200, 30);
     this.createComboBox(daysOfWeek, 125, 400);
 
-    this.createLabel("Ending Time:", 0, 475, 200, 30);
-    this.createTextField("", 125, 475, 425, 50);
+    this.createLabel("Ending Time (HH:mm):", 0, 475, 225, 30);
+    this.createTextField("", 220, 475, 330, 50);
 
     this.createLabel("Available Users", 0, 550, 200, 30);
     this.createScrollableTextArea(590);
@@ -219,9 +219,9 @@ public class EventViewImpl extends JFrame implements EventView {
     buttonPanel.setBounds(0, 750, WIDTH, 50); // Adjusted y-coordinate
     buttonPanel.setBackground(Color.lightGray);
 
-    createEventButton = this.createButton("Create event");
-    modifyEventButton = this.createButton("Modify event");
-    removeEventButton = this.createButton("Remove event");
+    JButton createEventButton = this.createButton("Create event");
+    JButton modifyEventButton = this.createButton("Modify event");
+    JButton removeEventButton = this.createButton("Remove event");
 
     // Set bounds for buttons
     createEventButton.setBounds(5, 5, 150, 40);
@@ -284,6 +284,7 @@ public class EventViewImpl extends JFrame implements EventView {
     button.setFont(new Font("Aptos", Font.BOLD, 15));
     button.setBackground(Color.white);
     button.setPreferredSize(new Dimension(150, 40));
+    button.addActionListener(this);
     button.setActionCommand(text);
     return button;
   }
@@ -354,7 +355,7 @@ public class EventViewImpl extends JFrame implements EventView {
   private void setOnlineComboBox() {
     JComboBox<String> onlineComboBox = (JComboBox<String>) getContentPane().getComponent(4);
     try {
-      onlineComboBox.setSelectedItem(event.getLocation().isOnline() ? "Yes" : "No");
+      onlineComboBox.setSelectedItem(event.isOnline() ? "Yes" : "No");
     } catch (IllegalStateException ignored) {
     }
   }
@@ -365,7 +366,7 @@ public class EventViewImpl extends JFrame implements EventView {
   private void setLocationTextField() {
     JTextField locationTextField = (JTextField) getContentPane().getComponent(5);
     try {
-      locationTextField.setText(event.getLocation().getLocation());
+      locationTextField.setText(event.getLocation());
     } catch (IllegalStateException ignored) {
     }
   }
@@ -376,7 +377,7 @@ public class EventViewImpl extends JFrame implements EventView {
   private void setStartingDayComboBox() {
     JComboBox<String> startingDayComboBox = (JComboBox<String>) getContentPane().getComponent(7);
     try {
-      startingDayComboBox.setSelectedItem(daysOfWeek[event.getTime().getStartDay().getValue() % 7]);
+      startingDayComboBox.setSelectedItem(daysOfWeek[event.getStartDay().getValue() % 7]);
     } catch (IllegalStateException ignored) {
     }
   }
@@ -387,7 +388,7 @@ public class EventViewImpl extends JFrame implements EventView {
   private void setStartingTimeTextField() {
     JTextField startingTimeTextField = (JTextField) getContentPane().getComponent(9);
     try {
-      startingTimeTextField.setText(event.getTime().getStartTime().toString());
+      startingTimeTextField.setText(convertIntToLocalTime(event.getStartTime()).toString());
     } catch (IllegalStateException ignored) {
     }
   }
@@ -398,7 +399,7 @@ public class EventViewImpl extends JFrame implements EventView {
   private void setEndingDayComboBox() {
     JComboBox<String> endingDayComboBox = (JComboBox<String>) getContentPane().getComponent(11);
     try {
-      endingDayComboBox.setSelectedItem(daysOfWeek[event.getTime().getEndDay().getValue() % 7]);
+      endingDayComboBox.setSelectedItem(daysOfWeek[event.getEndDay().getValue() % 7]);
     } catch (IllegalStateException ignored) {
     }
   }
@@ -409,7 +410,7 @@ public class EventViewImpl extends JFrame implements EventView {
   private void setEndingTimeTextField() {
     JTextField endingTimeTextField = (JTextField) getContentPane().getComponent(13);
     try {
-      endingTimeTextField.setText(event.getTime().getEndTime().toString());
+      endingTimeTextField.setText(convertIntToLocalTime(event.getEndTime()).toString());
     } catch (IllegalStateException ignored) {
     }
   }
@@ -421,5 +422,34 @@ public class EventViewImpl extends JFrame implements EventView {
     JTextArea textArea = (JTextArea) ((JScrollPane) getContentPane().getComponent(15))
             .getViewport().getView();
     textArea.setText(String.join("\n", event.getInvitees()));
+  }
+
+  /**
+   * Converts an integer representing a time in HHMM format into a {@link LocalTime} object.
+   * For example, an input of 930 will be converted to LocalTime representing 9:30 AM.
+   *
+   * @param timeInt The integer representing the time in HHMM format.
+   * @return A {@link LocalTime} object corresponding to the given integer time.
+   */
+  private LocalTime convertIntToLocalTime(int timeInt) {
+    int hours = timeInt / 100;
+    int minutes = timeInt % 100;
+    return LocalTime.of(hours, minutes);
+  }
+
+  /**
+   * Formats a {@link LocalTime} object into a string without a colon separator.
+   * The time is formatted into a HHmm pattern. For example, a LocalTime of 9:30
+   * will be formatted as "0930".
+   *
+   * @param time The {@link LocalTime} object to be formatted.
+   * @return A string representation of the {@link LocalTime} formatted as HHmm.
+   */
+  private String formatTime(LocalTime time) {
+    // Formatter to remove the colon
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HHmm");
+
+    // Format the time
+    return time.format(formatter);
   }
 }

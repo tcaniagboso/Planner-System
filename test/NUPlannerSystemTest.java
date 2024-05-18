@@ -8,10 +8,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import autoscheduling.AnyTimeSchedule;
-import autoscheduling.AutoSchedule;
-import autoscheduling.LenientSchedule;
-import autoscheduling.WorkHourSchedule;
+import schedule.IEvent;
+import schedule.ISchedule;
+import schedule.ReadOnlyEvent;
+import schedulestrategy.AnyTimeScheduleStrategy;
+import schedulestrategy.ScheduleStrategy;
+import schedulestrategy.LenientScheduleStrategy;
+import schedulestrategy.WorkHourScheduleStrategy;
 import plannersystem.NUPlannerSystem;
 import plannersystem.PlannerSystem;
 import schedule.Event;
@@ -26,7 +29,7 @@ import schedule.Time;
  */
 public class NUPlannerSystemTest {
 
-  private PlannerSystem system;
+  protected PlannerSystem system;
 
   /**
    * Initializes testing environment before each test case. This method sets up a new instance
@@ -35,6 +38,7 @@ public class NUPlannerSystemTest {
   @Before
   public void init() {
     system = new NUPlannerSystem();
+    system.setFirstDayOfWeek("Sunday");
   }
 
   /**
@@ -48,34 +52,34 @@ public class NUPlannerSystemTest {
   public void testReadUserSchedule() {
     File xmlFile = new File("prof.xml");
     system.readUserSchedule(xmlFile);
-    Schedule schedule = system.getSchedule("Prof. Lucia");
-    Schedule anonSchedule = system.getSchedule("Student Anon");
-    Schedule chatSchedule = system.getSchedule("Chat");
+    ISchedule schedule = system.getSchedule("Prof. Lucia");
+    ISchedule anonSchedule = system.getSchedule("Student Anon");
+    ISchedule chatSchedule = system.getSchedule("Chat");
 
-    Assert.assertEquals("Prof. Lucia", schedule.getUserId());
+    Assert.assertEquals("Prof. Lucia", schedule.getUserName());
 
-    Event event = new Event();
+    IEvent event = new Event();
     event.setName("CS3500 Morning Lecture");
     event.setEventTimes("Tuesday", "0950", "Tuesday", "1130");
     event.setLocation(false, "Churchill Hall 101");
     event.setHost("Prof. Lucia");
     event.setInvitees(new ArrayList<>(Arrays.asList("Prof. Lucia", "Student Anon", "Chat")));
 
-    Event event2 = new Event();
+    IEvent event2 = new Event();
     event2.setName("CS3500 Afternoon Lecture");
     event2.setEventTimes("Tuesday", "1335", "Tuesday", "1515");
     event2.setLocation(false, "Churchill Hall 101");
     event2.setHost("Prof. Lucia");
     event2.setInvitees(new ArrayList<>(Arrays.asList("Prof. Lucia", "Chat")));
 
-    Event event3 = new Event();
+    IEvent event3 = new Event();
     event3.setName("Sleep");
     event3.setEventTimes("Friday", "1800", "Sunday", "1200");
     event3.setLocation(true, "Home");
     event3.setHost("Prof. Lucia");
     event3.setInvitees(new ArrayList<>(List.of("Prof. Lucia")));
 
-    List<Event> events = new ArrayList<>(Arrays.asList(event, event2, event3));
+    List<ReadOnlyEvent> events = new ArrayList<>(Arrays.asList(event, event2, event3));
     Assert.assertEquals(schedule.getEvents(), events);
     Assert.assertTrue(anonSchedule.hasEvent(event));
     Assert.assertFalse(anonSchedule.hasEvent(event2));
@@ -92,14 +96,14 @@ public class NUPlannerSystemTest {
     File xmlFile3 = new File("chat.xml");
     system.readUserSchedule(xmlFile3);
 
-    Event event4 = new Event();
+    IEvent event4 = new Event();
     event4.setName("CS3500 Morning Lecture");
     event4.setEventTimes("Monday", "0950", "Monday", "1130");
     event4.setLocation(false, "Churchill Hall 101");
     event4.setHost("Prof. Lucia");
     event4.setInvitees(new ArrayList<>(Arrays.asList("Prof. Lucia", "Student Anon", "Chat")));
 
-    Event event5 = new Event();
+    IEvent event5 = new Event();
     event5.setName("CS3500 Afternoon Lecture");
     event5.setEventTimes("Monday", "1335", "Monday", "1515");
     event5.setLocation(false, "Churchill Hall 101");
@@ -131,33 +135,33 @@ public class NUPlannerSystemTest {
 
     PlannerSystem other = new NUPlannerSystem();
     other.readUserSchedule(file);
-    Schedule schedule = other.getSchedule("Prof. Lucia");
-    Schedule anonSchedule = other.getSchedule("Student Anon");
+    ISchedule schedule = other.getSchedule("Prof. Lucia");
+    ISchedule anonSchedule = other.getSchedule("Student Anon");
 
-    Assert.assertEquals("Prof. Lucia", schedule.getUserId());
+    Assert.assertEquals("Prof. Lucia", schedule.getUserName());
 
-    Event event = new Event();
+    IEvent event = new Event();
     event.setName("CS3500 Morning Lecture");
     event.setEventTimes("Tuesday", "0950", "Tuesday", "1130");
     event.setLocation(false, "Churchill Hall 101");
     event.setHost("Prof. Lucia");
     event.setInvitees(new ArrayList<>(Arrays.asList("Prof. Lucia", "Student Anon", "Chat")));
 
-    Event event2 = new Event();
+    IEvent event2 = new Event();
     event2.setName("CS3500 Afternoon Lecture");
     event2.setEventTimes("Tuesday", "1335", "Tuesday", "1515");
     event2.setLocation(false, "Churchill Hall 101");
     event2.setHost("Prof. Lucia");
     event2.setInvitees(new ArrayList<>(Arrays.asList("Prof. Lucia", "Chat")));
 
-    Event event3 = new Event();
+    IEvent event3 = new Event();
     event3.setName("Sleep");
     event3.setEventTimes("Friday", "1800", "Sunday", "1200");
     event3.setLocation(true, "Home");
     event3.setHost("Prof. Lucia");
     event3.setInvitees(new ArrayList<>(List.of("Prof. Lucia")));
 
-    List<Event> events = new ArrayList<>(Arrays.asList(event, event2, event3));
+    List<ReadOnlyEvent> events = new ArrayList<>(Arrays.asList(event, event2, event3));
     Assert.assertEquals(schedule.getEvents(), events);
     Assert.assertTrue(anonSchedule.hasEvent(event));
   }
@@ -216,14 +220,14 @@ public class NUPlannerSystemTest {
             "Sunday", "1030", false, "ChurchHill Hall 101",
             new ArrayList<>(Arrays.asList("Student Anon", "Prof. Lucia", "Chat")));
 
-    Event event1 = new Event();
+    IEvent event1 = new Event();
     event1.setName("OH");
     event1.setEventTimes("Sunday", "0950", "Sunday", "1030");
     event1.setLocation(false, "ChurchHill Hall 101");
     event1.setHost("Student Anon");
     event1.setInvitees(new ArrayList<>(Arrays.asList("Student Anon", "Prof. Lucia", "Chat")));
 
-    Schedule anonSchedule = system.getSchedule("Student Anon");
+    ISchedule anonSchedule = system.getSchedule("Student Anon");
     Assert.assertTrue(anonSchedule.hasEvent(event1));
 
     File xmlFile = new File("prof.xml");
@@ -246,7 +250,7 @@ public class NUPlannerSystemTest {
     system.createEvent("Student Anon", "OH", "Monday", "0950",
             "Monday", "1030", false, "ChurchHill Hall 101",
             new ArrayList<>(Arrays.asList("Student Anon", "Prof. Lucia", "Chat")));
-    Event event = new Event();
+    IEvent event = new Event();
     event.setName("OH");
     event.setEventTimes("Monday", "0950", "Monday", "1030");
     event.setLocation(false, "ChurchHill Hall 101");
@@ -264,7 +268,7 @@ public class NUPlannerSystemTest {
    */
   @Test
   public void testModifyEvent() {
-    Event event = new Event();
+    IEvent event = new Event();
     event.setName("CS3500 Morning Lecture");
     event.setEventTimes("Tuesday", "0950", "Tuesday", "1130");
     event.setLocation(false, "Churchill Hall 101");
@@ -301,7 +305,7 @@ public class NUPlannerSystemTest {
     File xmlFile = new File("prof.xml");
     system.readUserSchedule(xmlFile);
 
-    Schedule anonSchedule = system.getSchedule("Student Anon");
+    ISchedule anonSchedule = system.getSchedule("Student Anon");
     Assert.assertNotNull(anonSchedule);
     Assert.assertTrue(anonSchedule.hasEvent(event));
 
@@ -349,7 +353,7 @@ public class NUPlannerSystemTest {
             "Tuesday", "1200", "Tuesday", "1315", true,
             "Ryder Hall",
             new ArrayList<>(Arrays.asList("Prof. Lucia", "Student Anon", "Chat")));
-    Assert.assertEquals("Ryder Hall", event.getLocation().getLocation());
+    Assert.assertEquals("Ryder Hall", event.getEventLocation().getLocation());
 
     // bad invitees modification
     Assert.assertThrows(IllegalArgumentException.class,
@@ -374,7 +378,7 @@ public class NUPlannerSystemTest {
    */
   @Test
   public void testRemoveEvent() {
-    Event event = new Event();
+    IEvent event = new Event();
     event.setName("CS3500 Morning Lecture");
     event.setEventTimes("Tuesday", "0950", "Tuesday", "1130");
     event.setLocation(false, "Churchill Hall 101");
@@ -397,16 +401,16 @@ public class NUPlannerSystemTest {
     File xmlFile = new File("prof.xml");
     system.readUserSchedule(xmlFile);
 
-    Event event2 = new Event();
+    IEvent event2 = new Event();
     event2.setName("CS3500 Afternoon Lecture");
     event2.setEventTimes("Tuesday", "1335", "Tuesday", "1515");
     event2.setLocation(false, "Churchill Hall 101");
     event2.setHost("Prof. Lucia");
     event2.setInvitees(new ArrayList<>(Arrays.asList("Prof. Lucia", "Chat")));
 
-    Schedule chatSchedule = system.getSchedule("Chat");
-    Schedule profSchedule = system.getSchedule("Prof. Lucia");
-    Schedule anonSchedule = system.getSchedule("Student Anon");
+    ISchedule chatSchedule = system.getSchedule("Chat");
+    ISchedule profSchedule = system.getSchedule("Prof. Lucia");
+    ISchedule anonSchedule = system.getSchedule("Student Anon");
     system.removeEvent("Chat", event2);
 
     Assert.assertEquals(new ArrayList<>(List.of("Prof. Lucia")), event2.getInvitees());
@@ -456,23 +460,23 @@ public class NUPlannerSystemTest {
     Assert.assertThrows(IllegalArgumentException.class,
         () -> system.getSchedule("Prof. Lucia"));
     system.readUserSchedule(new File("prof.xml"));
-    Schedule schedule = system.getSchedule("Prof. Lucia");
+    ISchedule schedule = system.getSchedule("Prof. Lucia");
     Assert.assertNotNull(schedule);
-    Event event = new Event();
+    IEvent event = new Event();
     event.setName("CS3500 Morning Lecture");
     event.setEventTimes("Tuesday", "0950", "Tuesday", "1130");
     event.setLocation(false, "Churchill Hall 101");
     event.setHost("Prof. Lucia");
     event.setInvitees(new ArrayList<>(Arrays.asList("Prof. Lucia", "Student Anon", "Chat")));
 
-    Event event2 = new Event();
+    IEvent event2 = new Event();
     event2.setName("CS3500 Afternoon Lecture");
     event2.setEventTimes("Tuesday", "1335", "Tuesday", "1515");
     event2.setLocation(false, "Churchill Hall 101");
     event2.setHost("Prof. Lucia");
     event2.setInvitees(new ArrayList<>(Arrays.asList("Prof. Lucia", "Chat")));
 
-    Event event3 = new Event();
+    IEvent event3 = new Event();
     event3.setName("Sleep");
     event3.setEventTimes("Friday", "1800", "Sunday", "1200");
     event3.setLocation(true, "Home");
@@ -514,7 +518,7 @@ public class NUPlannerSystemTest {
     Assert.assertThrows(IllegalArgumentException.class, () -> system.checkEventConflict(null));
 
     // conflicting event
-    Event event = new Event();
+    IEvent event = new Event();
     event.setName("OH");
     event.setEventTimes("Tuesday", "1100", "Tuesday", "1300");
     event.setLocation(false, "Churchill Hall 101");
@@ -559,7 +563,7 @@ public class NUPlannerSystemTest {
 
     // throws because scheduling strategy hasn't been set
     Assert.assertThrows(IllegalStateException.class,
-        () -> system.automaticScheduling("Prof. Lucia", "Finals week", false,
+        () -> system.scheduleEvent("Prof. Lucia", "Finals week", false,
                 "Ryder Hall", 10080,
                 new ArrayList<>(List.of("Prof. Lucia", "Chat", "Student Anon"))));
   }
@@ -577,41 +581,41 @@ public class NUPlannerSystemTest {
     system.readUserSchedule(new File("prof.xml"));
     system.readUserSchedule(new File("chat.xml"));
 
-    system.setScheduleStrategy(new AnyTimeSchedule());
+    system.setScheduleStrategy(new AnyTimeScheduleStrategy());
 
-    Schedule chatSchedule = system.getSchedule("Chat");
-    Schedule profSchedule = system.getSchedule("Prof. Lucia");
-    Schedule anonSchedule = system.getSchedule("Student Anon");
+    ISchedule chatSchedule = system.getSchedule("Chat");
+    ISchedule profSchedule = system.getSchedule("Prof. Lucia");
+    ISchedule anonSchedule = system.getSchedule("Student Anon");
 
     // try scheduling with a duration that is more than 6 days 23 hours and 59 minutes.
     Assert.assertThrows(IllegalArgumentException.class,
-        () -> system.automaticScheduling("Prof. Lucia", "Finals week", false,
+        () -> system.scheduleEvent("Prof. Lucia", "Finals week", false,
                 "Ryder Hall", 10080,
                 new ArrayList<>(List.of("Prof. Lucia", "Chat", "Student Anon"))));
 
     // when duration is 0 minutes or less
     Assert.assertThrows(IllegalArgumentException.class,
-        () -> system.automaticScheduling("Prof. Lucia", "Finals week", false,
+        () -> system.scheduleEvent("Prof. Lucia", "Finals week", false,
                 "Ryder Hall", 0,
                 new ArrayList<>(List.of("Prof. Lucia", "Chat", "Student Anon"))));
 
     Assert.assertThrows(IllegalArgumentException.class,
-        () -> system.automaticScheduling("Prof. Lucia", "Finals week", false,
+        () -> system.scheduleEvent("Prof. Lucia", "Finals week", false,
                 "Ryder Hall", -100,
                 new ArrayList<>(List.of("Prof. Lucia", "Chat", "Student Anon"))));
 
     // test scheduling a four-day event, prof. lucia doesn't have space for it.
     Assert.assertThrows(IllegalArgumentException.class,
-        () -> system.automaticScheduling("Prof. Lucia", "Finals week", false,
+        () -> system.scheduleEvent("Prof. Lucia", "Finals week", false,
                 "Ryder Hall", 5760,
                 new ArrayList<>(List.of("Prof. Lucia", "Chat", "Student Anon"))));
 
     // schedule a one-day event, expected to be scheduled from Sunday 00:00 to Monday 00:00
-    system.automaticScheduling("Prof. Lucia", "Finals week", false,
+    system.scheduleEvent("Prof. Lucia", "Finals week", false,
             "Ryder Hall", 1440,
             new ArrayList<>(List.of("Prof. Lucia", "Student Anon", "Chat")));
 
-    Event oneDayEvent = new Event();
+    IEvent oneDayEvent = new Event();
     oneDayEvent.setName("Finals week");
     oneDayEvent.setEventTimes("Sunday", "0000", "Monday", "0000");
     oneDayEvent.setLocation(false, "Ryder Hall");
@@ -623,11 +627,11 @@ public class NUPlannerSystemTest {
     Assert.assertTrue(chatSchedule.hasEvent(oneDayEvent));
 
     // test scheduling a three-day event it should start from the last tuesday cs Morning lecture
-    system.automaticScheduling("Prof. Lucia", "Finals week", false,
+    system.scheduleEvent("Prof. Lucia", "Finals week", false,
             "Ryder Hall", 4320,
             new ArrayList<>(List.of("Prof. Lucia", "Student Anon", "Chat")));
 
-    Event threeEvent = new Event();
+    IEvent threeEvent = new Event();
     threeEvent.setName("Finals week");
     threeEvent.setEventTimes("Tuesday", "1515", "Friday", "1515");
     threeEvent.setLocation(false, "Ryder Hall");
@@ -644,33 +648,34 @@ public class NUPlannerSystemTest {
     Assert.assertEquals(chatSchedule.getEvents().size(), 6);
 
     PlannerSystem newSystem = new NUPlannerSystem();
+    newSystem.setFirstDayOfWeek("Sunday");
     newSystem.readUserSchedule(new File("chat.xml"));
-    newSystem.setScheduleStrategy(new AnyTimeSchedule());
-    Schedule chatSchedule2 = newSystem.getSchedule("Chat");
-    Schedule profSchedule2 = newSystem.getSchedule("Prof. Lucia");
+    newSystem.setScheduleStrategy(new AnyTimeScheduleStrategy());
+    ISchedule chatSchedule2 = newSystem.getSchedule("Chat");
+    ISchedule profSchedule2 = newSystem.getSchedule("Prof. Lucia");
 
     // schedule an event in this new empty system from Monday 15:15 to saturday 23:59
-    newSystem.automaticScheduling("Prof. Lucia", "Finals week", false,
+    newSystem.scheduleEvent("Prof. Lucia", "Finals week", false,
             "Ryder Hall", 7724,
             new ArrayList<>(List.of("Prof. Lucia", "Student Anon", "Chat")));
-    Event weekEvent = new Event();
+    IEvent weekEvent = new Event();
     weekEvent.setName("Finals week");
     weekEvent.setEventTimes("Monday", "1515", "Saturday", "2359");
     weekEvent.setLocation(false, "Ryder Hall");
     weekEvent.setHost("Prof. Lucia");
     weekEvent.setInvitees(new ArrayList<>(Arrays.asList("Prof. Lucia", "Student Anon", "Chat")));
 
-    Schedule anonSchedule2 = newSystem.getSchedule("Student Anon");
+    ISchedule anonSchedule2 = newSystem.getSchedule("Student Anon");
     Assert.assertTrue(chatSchedule2.hasEvent(weekEvent));
     Assert.assertTrue(profSchedule2.hasEvent(weekEvent));
     Assert.assertTrue(anonSchedule2.hasEvent(weekEvent));
 
     // schedule an event from saturday 23:59 to saturday 23:58
-    newSystem.automaticScheduling("Prof. Lucia", "Spring Break", false,
+    newSystem.scheduleEvent("Prof. Lucia", "Spring Break", false,
             "Cabo", 10079,
             new ArrayList<>(List.of("Prof. Lucia", "Student Anon", "Chat")));
 
-    Event breakEvent = new Event();
+    IEvent breakEvent = new Event();
     breakEvent.setName("Spring Break");
     breakEvent.setEventTimes("Saturday", "2359", "Saturday",
             "2358");
@@ -698,35 +703,35 @@ public class NUPlannerSystemTest {
   @Test
   public void testWorkHourLenientSchedule() {
     system.readUserSchedule(new File("prof.xml"));
-    system.setScheduleStrategy(new WorkHourSchedule());
+    system.setScheduleStrategy(new WorkHourScheduleStrategy());
 
-    Schedule chatSchedule = system.getSchedule("Chat");
-    Schedule profSchedule = system.getSchedule("Prof. Lucia");
-    Schedule anonSchedule = system.getSchedule("Student Anon");
+    ISchedule chatSchedule = system.getSchedule("Chat");
+    ISchedule profSchedule = system.getSchedule("Prof. Lucia");
+    ISchedule anonSchedule = system.getSchedule("Student Anon");
 
     // try scheduling with a duration that is more than 8 hours.
     Assert.assertThrows(IllegalArgumentException.class,
-        () -> system.automaticScheduling("Prof. Lucia", "Finals week", false,
+        () -> system.scheduleEvent("Prof. Lucia", "Finals week", false,
                 "Ryder Hall", 481,
                 new ArrayList<>(List.of("Prof. Lucia", "Chat", "Student Anon"))));
 
     // when duration is 0 minutes or less
     Assert.assertThrows(IllegalArgumentException.class,
-        () -> system.automaticScheduling("Prof. Lucia", "Finals week", false,
+        () -> system.scheduleEvent("Prof. Lucia", "Finals week", false,
                 "Ryder Hall", 0,
                 new ArrayList<>(List.of("Prof. Lucia", "Chat", "Student Anon"))));
 
     Assert.assertThrows(IllegalArgumentException.class,
-        () -> system.automaticScheduling("Prof. Lucia", "Finals week", false,
+        () -> system.scheduleEvent("Prof. Lucia", "Finals week", false,
                 "Ryder Hall", -100,
                 new ArrayList<>(List.of("Prof. Lucia", "Chat", "Student Anon"))));
 
     // Schedules an event on monday for 8 hours
-    system.automaticScheduling("Prof. Lucia", "Finals week", false,
+    system.scheduleEvent("Prof. Lucia", "Finals week", false,
             "Ryder Hall", 480,
             new ArrayList<>(List.of("Prof. Lucia", "Chat", "Student Anon")));
 
-    Event oneDayEvent = new Event();
+    IEvent oneDayEvent = new Event();
     oneDayEvent.setName("Finals week");
     oneDayEvent.setEventTimes("Monday", "0900", "Monday", "1700");
     oneDayEvent.setLocation(false, "Ryder Hall");
@@ -738,10 +743,10 @@ public class NUPlannerSystemTest {
     Assert.assertTrue(chatSchedule.hasEvent(oneDayEvent));
 
     // Schedules an event on wednesday for 8 hours because there is no 8 hours window on tuesday
-    system.automaticScheduling("Prof. Lucia", "Finals week", false,
+    system.scheduleEvent("Prof. Lucia", "Finals week", false,
             "Ryder Hall", 480,
             new ArrayList<>(List.of("Prof. Lucia", "Chat", "Student Anon")));
-    Event nextEvent = new Event();
+    IEvent nextEvent = new Event();
     nextEvent.setName("Finals week");
     nextEvent.setEventTimes("Wednesday", "0900", "Wednesday",
             "1700");
@@ -754,9 +759,9 @@ public class NUPlannerSystemTest {
     Assert.assertTrue(chatSchedule.hasEvent(nextEvent));
 
     // Schedules an event on Thursday for prof lucia and chat
-    system.automaticScheduling("Prof. Lucia", "Finals week", false,
+    system.scheduleEvent("Prof. Lucia", "Finals week", false,
             "Ryder Hall", 480, new ArrayList<>(List.of("Prof. Lucia", "Chat")));
-    Event thirdEvent = new Event();
+    IEvent thirdEvent = new Event();
     thirdEvent.setName("Finals week");
     thirdEvent.setEventTimes("Thursday", "0900", "Thursday",
             "1700");
@@ -768,10 +773,10 @@ public class NUPlannerSystemTest {
     Assert.assertTrue(chatSchedule.hasEvent(thirdEvent));
 
     // Schedules an event on Friday for prof. lucia
-    system.automaticScheduling("Prof. Lucia", "Finals week", false,
+    system.scheduleEvent("Prof. Lucia", "Finals week", false,
             "Ryder Hall", 480, new ArrayList<>(List.of("Prof. Lucia")));
 
-    Event friEvent = new Event();
+    IEvent friEvent = new Event();
     friEvent.setName("Finals week");
     friEvent.setEventTimes("Friday", "0900", "Friday",
             "1700");
@@ -783,19 +788,19 @@ public class NUPlannerSystemTest {
 
     // tries to schedule an 8-hour event when prof. lucia has no free working days
     Assert.assertThrows(IllegalArgumentException.class,
-        () -> system.automaticScheduling("Student Anon", "Finals week", false,
+        () -> system.scheduleEvent("Student Anon", "Finals week", false,
                 "Ryder Hall", 480,
                 new ArrayList<>(List.of("Prof. Lucia", "Chat", "Student Anon"))));
 
     // test Lenient schedule strategy
-    system.setScheduleStrategy(new LenientSchedule());
+    system.setScheduleStrategy(new LenientScheduleStrategy());
 
     // Schedules an event on Thursday for Student Anon, John and Jake but not Prof Lucia and Chat
-    system.automaticScheduling("Student Anon", "TGIT", false,
+    system.scheduleEvent("Student Anon", "TGIT", false,
             "Ryder Hall", 480,
             new ArrayList<>(List.of("Student Anon", "Chat", "Prof. Lucia", "John", "Jake")));
 
-    Event anonEvent = new Event();
+    IEvent anonEvent = new Event();
     anonEvent.setName("TGIT");
     anonEvent.setEventTimes("Thursday", "0900", "Thursday",
             "1700");
@@ -803,8 +808,8 @@ public class NUPlannerSystemTest {
     anonEvent.setHost("Student Anon");
     anonEvent.setInvitees(new ArrayList<>(List.of("Student Anon", "John", "Jake")));
 
-    Schedule jakeSchedule = system.getSchedule("Jake");
-    Schedule johnSchedule = system.getSchedule("John");
+    ISchedule jakeSchedule = system.getSchedule("Jake");
+    ISchedule johnSchedule = system.getSchedule("John");
 
     Assert.assertFalse(profSchedule.hasEvent(anonEvent));
     Assert.assertTrue(anonSchedule.hasEvent(anonEvent));
@@ -813,11 +818,11 @@ public class NUPlannerSystemTest {
     Assert.assertTrue(johnSchedule.hasEvent(anonEvent));
 
     // Schedules an event on Friday for Student Anon Chat John and Jake but not Prof Lucia
-    system.automaticScheduling("Student Anon", "TGIF", false,
+    system.scheduleEvent("Student Anon", "TGIF", false,
             "Ryder Hall", 480,
             new ArrayList<>(List.of("Student Anon", "Chat", "Prof. Lucia", "John", "Jake")));
 
-    Event tgif = new Event();
+    IEvent tgif = new Event();
     tgif.setName("TGIF");
     tgif.setEventTimes("Friday", "0900", "Friday",
             "1700");
@@ -834,7 +839,7 @@ public class NUPlannerSystemTest {
 
     // can't schedule because only anon the host can attend even though it is lenient
     Assert.assertThrows(IllegalArgumentException.class,
-        () -> system.automaticScheduling("Student Anon", "TGIF", false,
+        () -> system.scheduleEvent("Student Anon", "TGIF", false,
                 "Ryder Hall", 480,
                 new ArrayList<>(List.of("Student Anon", "Chat", "Prof. Lucia"))));
 
@@ -852,26 +857,26 @@ public class NUPlannerSystemTest {
    */
   @Test
   public void testAnyTimeSchedulingValidation() {
-    AutoSchedule autoSchedule = new AnyTimeSchedule();
+    ScheduleStrategy scheduleStrategy = new AnyTimeScheduleStrategy();
 
     Assert.assertThrows(IllegalArgumentException.class,
-        () -> autoSchedule.scheduleEvent(null, 20,
+        () -> scheduleStrategy.scheduleEvent(null, 20,
                 new ArrayList<>(List.of(new Schedule("Tobe")))));
 
     Assert.assertThrows(IllegalArgumentException.class,
-        () -> autoSchedule.scheduleEvent(new Event(), 0,
+        () -> scheduleStrategy.scheduleEvent(new Event(), 0,
                 new ArrayList<>(List.of(new Schedule("Tobe")))));
     Assert.assertThrows(IllegalArgumentException.class,
-        () -> autoSchedule.scheduleEvent(new Event(), -10,
+        () -> scheduleStrategy.scheduleEvent(new Event(), -10,
                 new ArrayList<>(List.of(new Schedule("Tobe")))));
     Assert.assertThrows(IllegalArgumentException.class,
-        () -> autoSchedule.scheduleEvent(new Event(), 100, null));
+        () -> scheduleStrategy.scheduleEvent(new Event(), 100, null));
 
     Assert.assertThrows(IllegalArgumentException.class,
-        () -> autoSchedule.scheduleEvent(new Event(), 100, new ArrayList<>()));
+        () -> scheduleStrategy.scheduleEvent(new Event(), 100, new ArrayList<>()));
 
     Assert.assertThrows(IllegalArgumentException.class,
-        () -> autoSchedule.scheduleEvent(new Event(), 100,
+        () -> scheduleStrategy.scheduleEvent(new Event(), 100,
                 new ArrayList<>(Arrays.asList(null, null))));
   }
 
@@ -885,26 +890,26 @@ public class NUPlannerSystemTest {
   public void testWorkHourScheduleValidation() {
 
     // work hour schedule and lenient schedule strategy use the same method
-    AutoSchedule autoSchedule = new WorkHourSchedule();
+    ScheduleStrategy scheduleStrategy = new WorkHourScheduleStrategy();
 
     Assert.assertThrows(IllegalArgumentException.class,
-        () -> autoSchedule.scheduleEvent(null, 20,
+        () -> scheduleStrategy.scheduleEvent(null, 20,
                 new ArrayList<>(List.of(new Schedule("Tobe")))));
 
     Assert.assertThrows(IllegalArgumentException.class,
-        () -> autoSchedule.scheduleEvent(new Event(), 0,
+        () -> scheduleStrategy.scheduleEvent(new Event(), 0,
                 new ArrayList<>(List.of(new Schedule("Tobe")))));
     Assert.assertThrows(IllegalArgumentException.class,
-        () -> autoSchedule.scheduleEvent(new Event(), -10,
+        () -> scheduleStrategy.scheduleEvent(new Event(), -10,
                 new ArrayList<>(List.of(new Schedule("Tobe")))));
     Assert.assertThrows(IllegalArgumentException.class,
-        () -> autoSchedule.scheduleEvent(new Event(), 100, null));
+        () -> scheduleStrategy.scheduleEvent(new Event(), 100, null));
 
     Assert.assertThrows(IllegalArgumentException.class,
-        () -> autoSchedule.scheduleEvent(new Event(), 100, new ArrayList<>()));
+        () -> scheduleStrategy.scheduleEvent(new Event(), 100, new ArrayList<>()));
 
     Assert.assertThrows(IllegalArgumentException.class,
-        () -> autoSchedule.scheduleEvent(new Event(), 100,
+        () -> scheduleStrategy.scheduleEvent(new Event(), 100,
                 new ArrayList<>(Arrays.asList(null, null))));
   }
 }

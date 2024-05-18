@@ -2,10 +2,11 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import schedule.ILocation;
 import schedule.Location;
 
 /**
- * Tests the functionality of the {@link Location} class, ensuring that
+ * Tests the functionality of the {@link ILocation} class, ensuring that
  * setting and getting location names and online status work as expected.
  */
 public class LocationTest {
@@ -13,7 +14,7 @@ public class LocationTest {
   /**
    * The {@link Location} instance used for testing.
    */
-  private Location location;
+  private ILocation location;
 
   /**
    * Initializes a new {@link Location} instance before each test.
@@ -24,7 +25,7 @@ public class LocationTest {
   }
 
   /**
-   * Tests the setLocation and getLocation methods of the {@link Location} class.
+   * Tests the setLocation and getLocation methods of the {@link ILocation} class.
    * Checks that:
    * <ul>
    *   <li>Setting a location to null throws an {@link IllegalArgumentException}.</li>
@@ -43,7 +44,7 @@ public class LocationTest {
   }
 
   /**
-   * Tests the setOnline and isOnline methods of the {@link Location} class.
+   * Tests the setOnline and isOnline methods of the {@link ILocation} class.
    * Checks that:
    * <ul>
    *   <li>The default online status is false.</li>
@@ -58,16 +59,16 @@ public class LocationTest {
   }
 
   /**
-   * Tests the equality and inequality of {@link Location} objects. This test first verifies that
+   * Tests the equality and inequality of {@link ILocation} objects. This test first verifies that
    * two {@link Location} instances with different online statuses are not considered equal,
-   * even if they share the same physical location. It then updates one {@link Location} instance to
-   * have the same online status as the other, and verifies that the two locations are considered
+   * even if they share the same physical location. It then updates one {@link ILocation} instance
+   * to have the same online status as the other, and verifies that the two locations are considered
    * equal. This ensures the {@link Location#equals(Object)} method correctly evaluates both the
    * online status and the physical location string in determining equality.
    */
   @Test
   public void testEquals() {
-    Location spot = new Location();
+    ILocation spot = new Location();
 
     location.setOnline(true);
     location.setLocation("place");

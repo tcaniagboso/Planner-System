@@ -4,7 +4,10 @@ import java.time.DayOfWeek;
 import java.util.List;
 
 import plannersystem.PlannerSystem;
+import plannersystem.ReadonlyPlannerSystem;
 import schedule.Event;
+import schedule.ISchedule;
+import schedule.ReadOnlyEvent;
 import schedule.Schedule;
 import schedule.TimeUtilities;
 
@@ -33,7 +36,7 @@ import schedule.TimeUtilities;
  */
 public class ScheduleViewModel implements ScheduleView {
 
-  private final PlannerSystem system;
+  private final ReadonlyPlannerSystem system;
 
   /**
    * Constructs a ScheduleViewModel with a specific PlannerSystem.
@@ -55,7 +58,7 @@ public class ScheduleViewModel implements ScheduleView {
       throw new IllegalArgumentException("user is null");
     }
 
-    Schedule schedule = this.system.getSchedule(user);
+    ISchedule schedule = this.system.getSchedule(user);
     StringBuilder view = new StringBuilder();
     schedule.sortSchedule();
 
@@ -66,16 +69,16 @@ public class ScheduleViewModel implements ScheduleView {
       if (day < 6) {
         view.append(System.lineSeparator());
       }
-      for (Event event : schedule.getEvents()) {
-        if (event.getTime().getStartDay() == currentDay) {
+      for (ReadOnlyEvent event : schedule.getEvents()) {
+        if (event.getStartDay() == currentDay) {
           view.append("        name: ").append(event.getName()).append(System.lineSeparator());
           view.append("        time: ").append(TimeUtilities.formatDay(currentDay)).append(": ")
                   .append(event.getTime().getStartTime()).append(" -> ")
-                  .append(TimeUtilities.formatDay(event.getTime().getEndDay())).append(": ")
+                  .append(TimeUtilities.formatDay(event.getEndDay())).append(": ")
                   .append(event.getTime().getEndTime()).append(System.lineSeparator());
-          view.append("        location: ").append(event.getLocation().getLocation())
+          view.append("        location: ").append(event.getLocation())
                   .append(System.lineSeparator());
-          view.append("        online: ").append(event.getLocation().isOnline())
+          view.append("        online: ").append(event.isOnline())
                   .append(System.lineSeparator());
           view.append("        invitees: ");
           List<String> invitees = event.getInvitees();

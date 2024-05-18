@@ -56,6 +56,9 @@ public class SaveCalendars implements Command {
       throw new IllegalStateException("No user selected");
     }
     String filePath = this.view.saveFile();
+    if (filePath == null) {
+      return;
+    }
     try {
       this.model.saveUserSchedule(userId, filePath);
     } catch (Exception e) {

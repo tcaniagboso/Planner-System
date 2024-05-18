@@ -4,6 +4,7 @@ import org.junit.Test;
 
 import java.time.DayOfWeek;
 
+import schedule.ITime;
 import schedule.Time;
 
 /**
@@ -15,10 +16,10 @@ import schedule.Time;
  */
 public class TimeTest {
 
-  private Time time;
+  private ITime time;
 
   /**
-   * Initializes a fresh {@link schedule.Time} object before each test method.
+   * Initializes a fresh {@link schedule.ITime} object before each test method.
    * This setup provides a clean state for each test to run independently.
    */
   @Before
@@ -27,7 +28,7 @@ public class TimeTest {
   }
 
   /**
-   * Tests the setter and getter methods of the {@link schedule.Time} class,
+   * Tests the setter and getter methods of the {@link schedule.ITime} class,
    * including validation of day and time inputs.
    * It verifies the enforcement of valid days of the week and correct time formats,
    * ensuring that the class reacts appropriately to invalid inputs by throwing
@@ -66,14 +67,14 @@ public class TimeTest {
     Assert.assertEquals("12:49", time.getEndTime().toString());
 
     // test setting order. Start day -> start time -> end day -> end time
-    Time newTime = new Time();
+    ITime newTime = new Time();
     Assert.assertThrows(IllegalStateException.class, () -> newTime.setStartTime("1250"));
     newTime.setStartDay("Monday");
     Assert.assertThrows(IllegalStateException.class, () -> newTime.setEndDay("wednesday"));
     newTime.setStartTime("1250");
     Assert.assertThrows(IllegalStateException.class, () -> newTime.setEndTime("1300"));
 
-    Time other = new Time();
+    ITime other = new Time();
     Assert.assertThrows(IllegalStateException.class, other::getStartTime);
     Assert.assertThrows(IllegalStateException.class, other::getStartDay);
     Assert.assertThrows(IllegalStateException.class, other::getEndTime);
@@ -81,7 +82,7 @@ public class TimeTest {
   }
 
   /**
-   * Tests the overlap detection logic within the {@link schedule.Time} class.
+   * Tests the overlap detection logic within the {@link schedule.ITime} class.
    * This test covers various scenarios to ensure accurate detection of time overlaps
    * between different Time objects, including edge cases and multi-day events.
    * It validates the overlap logic against overlapping and non-overlapping events,
@@ -91,45 +92,52 @@ public class TimeTest {
   @Test
   public void testOverlap() {
     time = new Time("monday", "1000", "monday", "1100");
-    Time other = new Time("monday", "1000", "monday", "1010");
+    ITime other = new Time("monday", "1000", "monday", "1010");
 
-    Assert.assertTrue(time.overlap(other));
+    Assert.assertTrue(time.overlap(other, "Sunday"));
     other.setStartTime("1005"); // tests starts in between an event
-    Assert.assertTrue(time.overlap(other));
+    Assert.assertTrue(time.overlap(other, "Sunday"));
     other.setStartTime("0905"); // tests end in between an event
-    Assert.assertTrue(time.overlap(other));
+    Assert.assertTrue(time.overlap(other, "Sunday"));
 
     time = new Time("monday", "1000", "monday", "1100");
     other = new Time("monday", "1100", "monday", "1200");
 
-    Assert.assertFalse(time.overlap(other)); // tests starts right after an event
+    // tests starts right after an event
+    Assert.assertFalse(time.overlap(other, "Sunday"));
 
     time = new Time("monday", "1000", "wednesday", "1100");
     other = new Time("Tuesday", "1100", "monday", "1200");
 
-    Assert.assertTrue(time.overlap(other)); // tests starts in between a multi day event
+    // tests starts in between a multi day event
+    Assert.assertTrue(time.overlap(other, "Sunday"));
     other = new Time("Sunday", "1100", "monday", "1200");
-    Assert.assertTrue(time.overlap(other)); // tests ends in between a multi day event
+    // tests ends in between a multi day event
+    Assert.assertTrue(time.overlap(other, "Sunday"));
 
     other.setEndTime("1000");
     time = new Time("monday", "1000", "monday", "0900");
-    Assert.assertFalse(time.overlap(other)); // starts before a multi week event
-    Assert.assertTrue(time.wrapsAround());
+    // starts before a multi week event
+    Assert.assertFalse(time.overlap(other, "Sunday"));
+    Assert.assertTrue(time.wrapsAround("Sunday"));
 
     other = new Time("Monday", "0900", "monday", "1000");
-    Assert.assertFalse(time.overlap(other)); // starts right before a multi week event
-    Assert.assertFalse(other.wrapsAround());
+    // starts right before a multi week event
+    Assert.assertFalse(time.overlap(other, "Sunday"));
+    Assert.assertFalse(other.wrapsAround("Sunday"));
 
     other = new Time("Tuesday", "0900", "Tuesday", "0800");
-    Assert.assertTrue(time.overlap(other)); // tests if it starts within a multi week event
+    // tests if it starts within a multi week event
+    Assert.assertTrue(time.overlap(other, "Sunday"));
 
     other.setStartDay("Sunday");
-    Assert.assertTrue(time.overlap(other)); // tests if it continues within a multi week event
+    // tests if it continues within a multi week event
+    Assert.assertTrue(time.overlap(other, "Sunday"));
 
   }
 
   /**
-   * Tests the equals method of the {@link schedule.Time} class.
+   * Tests the equals method of the {@link schedule.ITime} class.
    * This test verifies that two Time objects are considered equal if they have the same
    * start and end days and times, and correctly identifies unequal objects when their
    * start or end times differ. It ensures that the equals method adheres to the contract
@@ -138,7 +146,7 @@ public class TimeTest {
   @Test
   public void testEquals() {
     time = new Time("monday", "1000", "monday", "1100");
-    Time other = new Time("monday", "1000", "monday", "1100");
+    ITime other = new Time("monday", "1000", "monday", "1100");
 
     Assert.assertEquals(time, other);
     other.setStartDay("Monday");

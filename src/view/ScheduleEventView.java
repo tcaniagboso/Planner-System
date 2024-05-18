@@ -3,18 +3,17 @@ package view;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Dimension;
-import java.awt.event.ActionListener;
 import java.awt.BorderLayout;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JPanel;
-import javax.swing.JTextField;
 import javax.swing.JButton;
+import javax.swing.JPanel;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.JScrollPane;
 
-import schedule.Event;
+import schedule.ReadOnlyEvent;
 
 /**
  * ScheduleEventView class extends EventViewImpl to provide a user interface
@@ -26,7 +25,6 @@ public class ScheduleEventView extends EventViewImpl {
 
   private static final int WIDTH = 600;
   private static final int HEIGHT = 650;
-  private JButton scheduleEventButton;
 
   /**
    * Constructs a ScheduleEventView for a given event and user ID.
@@ -36,14 +34,9 @@ public class ScheduleEventView extends EventViewImpl {
    * @param event  The event to be scheduled or viewed.
    * @param userId The user ID associated with this event scheduling session.
    */
-  public ScheduleEventView(Event event, String userId) {
+  public ScheduleEventView(ReadOnlyEvent event, String userId) {
     super(event, userId);
     this.setSize(WIDTH, HEIGHT);
-  }
-
-  @Override
-  public void setActionListener(ActionListener listener) {
-    this.scheduleEventButton.addActionListener(listener);
   }
 
   @Override
@@ -86,7 +79,7 @@ public class ScheduleEventView extends EventViewImpl {
     String[] unfiltered = inviteesText.split("\n");
     for (String names : unfiltered) {
       if (!names.trim().isEmpty()) {
-        invitees.add(names);
+        invitees.add(names.strip());
       }
     }
     return invitees;
@@ -117,12 +110,13 @@ public class ScheduleEventView extends EventViewImpl {
     buttonPanel.setBackground(Color.lightGray);
 
     // Initialize the scheduleEventButton if not already initialized
-    scheduleEventButton = new JButton("Schedule Event");
+    JButton scheduleEventButton = new JButton("Schedule Event");
     scheduleEventButton.setFont(new Font("Aptos", Font.BOLD, 15));
     scheduleEventButton.setBackground(Color.white);
 
     // Make the button take up the entire panel
     scheduleEventButton.setPreferredSize(new Dimension(WIDTH - 30, 40));
+    scheduleEventButton.addActionListener(this);
     scheduleEventButton.setActionCommand("Schedule event");
 
     // Add the scheduleEventButton to the buttonPanel

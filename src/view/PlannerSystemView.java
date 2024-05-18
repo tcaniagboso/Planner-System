@@ -1,8 +1,8 @@
 package view;
 
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
 import java.io.File;
+
+import controller.PlannerSystemController;
 
 /**
  * Defines the operations that a planner system view should support. This includes
@@ -12,20 +12,12 @@ import java.io.File;
 public interface PlannerSystemView {
 
   /**
-   * Sets the action listener for the view. This listener will be notified of action events
-   * generated within the view.
+   * Sets a planner system controller as a listener for the view. This listener will be notified of
+   * action events generated within the view.
    *
-   * @param listener The ActionListener to be set.
+   * @param listener The PlannerSystemController to be set.
    */
-  void setActionListener(ActionListener listener);
-
-  /**
-   * Sets the mouse listener for the view. This listener will be notified of mouse events
-   * generated within the view.
-   *
-   * @param listener The MouseAdapter to be set.
-   */
-  void setMouseListener(MouseAdapter listener);
+  void setActionListener(PlannerSystemController listener);
 
   /**
    * Makes the view visible to the user.
@@ -79,10 +71,7 @@ public interface PlannerSystemView {
   void updateUsers();
 
   /**
-   * Retrieves the SchedulePanel component of the view. This component is responsible for
-   * displaying the schedule information.
-   *
-   * @return The SchedulePanel component.
+   * Toggles the color of the schedule panel of the view.
    */
-  SchedulePanel getSchedulePanel();
+  void toggleColor();
 }

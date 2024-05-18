@@ -1,9 +1,7 @@
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
 import java.io.File;
 
+import controller.PlannerSystemController;
 import view.PlannerSystemView;
-import view.SchedulePanel;
 
 /**
  * A mock implementation of the {@link PlannerSystemView} interface for testing purposes.
@@ -33,15 +31,9 @@ public class MockPlannerSystemView implements PlannerSystemView {
   }
 
   @Override
-  public void setActionListener(ActionListener listener) {
-    this.log.append("This method sets the action listener to the given listener.")
-            .append(System.lineSeparator());
-  }
-
-  @Override
-  public void setMouseListener(MouseAdapter listener) {
-    this.log.append("This method sets the mouse listener to the given listener.")
-            .append(System.lineSeparator());
+  public void setActionListener(PlannerSystemController listener) {
+    this.log.append("This method sets the given planner system controller as a listener for the ")
+            .append("view.").append(System.lineSeparator());
   }
 
   @Override
@@ -58,14 +50,14 @@ public class MockPlannerSystemView implements PlannerSystemView {
   @Override
   public File loadFile() {
     this.log.append("This method loads a file into the view.").append(System.lineSeparator());
-    return null;
+    return new File("File");
   }
 
   @Override
   public String saveFile() {
     this.log.append("This method returns a desired file path for saving a file.")
             .append(System.lineSeparator());
-    return null;
+    return "filepath";
   }
 
   @Override
@@ -93,9 +85,8 @@ public class MockPlannerSystemView implements PlannerSystemView {
   }
 
   @Override
-  public SchedulePanel getSchedulePanel() {
-    this.log.append("This method gets the schedule panel of the view.")
+  public void toggleColor() {
+    this.log.append("This tells the schedule panel to toggle its color.")
             .append(System.lineSeparator());
-    return new MockSchedulePanel(log);
   }
 }

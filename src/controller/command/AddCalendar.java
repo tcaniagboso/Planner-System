@@ -46,6 +46,9 @@ public class AddCalendar implements Command {
   @Override
   public void execute() {
     File file = this.view.loadFile();
+    if (file == null) {
+      return;
+    }
     try {
       this.model.readUserSchedule(file);
     } catch (Exception e) {

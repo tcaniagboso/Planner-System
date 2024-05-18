@@ -1,3 +1,5 @@
+import controller.PlannerSystemController;
+import schedule.ISchedule;
 import schedule.Schedule;
 import view.SchedulePanel;
 
@@ -37,7 +39,7 @@ public class MockSchedulePanel extends SchedulePanel {
   }
 
   @Override
-  public Schedule getSchedule() {
+  public ISchedule getSchedule() {
     this.log.append("This method gets the schedule of the panel.").append(System.lineSeparator());
     return new Schedule("Tobe");
   }
@@ -49,8 +51,40 @@ public class MockSchedulePanel extends SchedulePanel {
   }
 
   @Override
-  public void setSchedule(Schedule schedule) {
+  public void setSchedule(ISchedule schedule) {
     this.log.append("This method sets the schedule of the panel.").append(System.lineSeparator());
+  }
+
+  @Override
+  public void setActionListener(PlannerSystemController listener) {
+    this.log.append("This method sets the planner system controller as a listener for the panel.")
+            .append(System.lineSeparator());
+  }
+
+  @Override
+  public PlannerSystemController getController() {
+    this.log.append("This retrieves the controller listener for the schedule panel.")
+            .append(System.lineSeparator());
+    return null;
+  }
+
+  @Override
+  public void setColorEvent() {
+    this.log.append("This method toggles the color event handling of the schedule panel.")
+            .append(System.lineSeparator());
+  }
+
+  @Override
+  public void setFirstDayOfWeek(String firstDayOfWeek) {
+    this.log.append("This method sets the first day of the week for the schedule panel.")
+            .append(System.lineSeparator());
+  }
+
+  @Override
+  public String getFirstDayOfWeek() {
+    this.log.append("This method gets the first day of the week from the schedule panel.")
+            .append(System.lineSeparator());
+    return "SUNDAY";
   }
 
 }

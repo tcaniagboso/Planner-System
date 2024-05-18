@@ -3,7 +3,7 @@ package controller.command;
 import java.util.List;
 
 import plannersystem.PlannerSystem;
-import schedule.Event;
+import schedule.ReadOnlyEvent;
 import view.EventView;
 
 /**
@@ -23,10 +23,10 @@ public class ScheduleEvent extends CreateEvent {
    * @param userId    The ID of the user attempting to schedule the event.
    * @param model     The planner system model where the event will be scheduled.
    * @param eventView The view from which event details are gathered.
-   * @param event     The event to be scheduled.
+   * @param ev     The event to be scheduled.
    */
-  public ScheduleEvent(String userId, PlannerSystem model, EventView eventView, Event event) {
-    super(userId, model, eventView, event);
+  public ScheduleEvent(String userId, PlannerSystem model, EventView eventView, ReadOnlyEvent ev) {
+    super(userId, model, eventView, ev);
   }
 
   /**
@@ -51,7 +51,7 @@ public class ScheduleEvent extends CreateEvent {
       boolean isOnline = this.eventView.getOnline();
       List<String> invitees = this.eventView.getInvitees();
       int duration = this.eventView.getDuration();
-      this.model.automaticScheduling(userId, name, isOnline, location, duration, invitees);
+      this.model.scheduleEvent(userId, name, isOnline, location, duration, invitees);
     } catch (Exception e) {
       throw new IllegalStateException("Cannot Schedule event: " + e.getMessage());
     }

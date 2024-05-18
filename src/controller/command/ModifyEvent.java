@@ -3,7 +3,7 @@ package controller.command;
 import java.util.List;
 
 import plannersystem.PlannerSystem;
-import schedule.Event;
+import schedule.ReadOnlyEvent;
 import view.EventView;
 
 /**
@@ -25,7 +25,7 @@ public class ModifyEvent extends CreateEvent {
    *                                  are null, indicating invalid or incomplete command
    *                                  initialization.
    */
-  public ModifyEvent(String userId, PlannerSystem model, EventView eventView, Event event) {
+  public ModifyEvent(String userId, PlannerSystem model, EventView eventView, ReadOnlyEvent event) {
     super(userId, model, eventView, event);
   }
 

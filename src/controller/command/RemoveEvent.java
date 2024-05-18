@@ -4,6 +4,8 @@ import java.util.List;
 
 import plannersystem.PlannerSystem;
 import schedule.Event;
+import schedule.IEvent;
+import schedule.ReadOnlyEvent;
 import view.EventView;
 
 /**
@@ -26,7 +28,7 @@ public class RemoveEvent extends CreateEvent {
    *                                  are null or if the userId is invalid, indicating that valid
    *                                  and meaningful arguments are required for the operation.
    */
-  public RemoveEvent(String userId, PlannerSystem model, EventView eventView, Event event) {
+  public RemoveEvent(String userId, PlannerSystem model, EventView eventView, ReadOnlyEvent event) {
     super(userId, model, eventView, event);
   }
 
@@ -59,7 +61,7 @@ public class RemoveEvent extends CreateEvent {
       boolean isOnline = this.eventView.getOnline();
       List<String> invitees = this.eventView.getInvitees();
 
-      Event curEvent = new Event();
+      IEvent curEvent = new Event();
       curEvent.setName(name);
       curEvent.setEventTimes(startDay, startTime, endDay, endTime);
       curEvent.setLocation(isOnline, location);

@@ -1,4 +1,4 @@
-package autoscheduling;
+package schedulestrategy;
 
 /**
  * A factory class for creating scheduling strategy instances based on specified strategy types.
@@ -11,7 +11,7 @@ public class ScheduleStrategyCreator {
   /**
    * Enumerates the types of scheduling strategies available for creating events.
    */
-  public enum ScheduleStrategy {
+  public enum ScheduleStrategyType {
     ANYTIME, // Represents a scheduling strategy that finds the first possible time slot.
     WORKHOURS, // Represents a scheduling strategy that finds a time slot within work hours.
     LENIENT // Represents a scheduling strategy that is more flexible with scheduling constraints.
@@ -26,16 +26,16 @@ public class ScheduleStrategyCreator {
    * @return An instance of AutoSchedule that implements the requested scheduling strategy.
    * @throws IllegalArgumentException if an unknown or unsupported strategy type is provided.
    */
-  public static AutoSchedule createScheduleStrategy(ScheduleStrategy strategy) {
+  public static ScheduleStrategy createScheduleStrategy(ScheduleStrategyType strategy) {
     switch (strategy) {
       case ANYTIME:
-        return new AnyTimeSchedule();
+        return new AnyTimeScheduleStrategy();
 
       case WORKHOURS:
-        return new WorkHourSchedule();
+        return new WorkHourScheduleStrategy();
 
       case LENIENT:
-        return new LenientSchedule();
+        return new LenientScheduleStrategy();
 
       default:
         throw new IllegalArgumentException("Unknown Schedule Strategy: " + strategy);

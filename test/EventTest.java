@@ -7,22 +7,24 @@ import java.util.Arrays;
 import java.util.List;
 
 import schedule.Event;
+import schedule.IEvent;
+import schedule.ILocation;
 import schedule.Location;
 import schedule.Time;
 
 /**
- * A test class for the {@link schedule.Event} class.
+ * A test class for the {@link schedule.IEvent} class.
  * This class tests cases that verify the functionality of the Event class, including its getters,
  * setters, and other methods.
  * It ensures that Event objects are created and managed correctly,
  * with valid properties, and that they behave as expected under various scenarios.
  */
 public class EventTest {
-  private Event event;
+  private IEvent event;
 
   /**
    * Sets up the test environment before each test method is executed.
-   * Initializes a new {@link schedule.Event} object for testing.
+   * Initializes a new {@link schedule.IEvent} object for testing.
    */
   @Before
   public void init() {
@@ -30,11 +32,11 @@ public class EventTest {
   }
 
   /**
-   * Tests the getter and setter methods of the {@link schedule.Event} class.
+   * Tests the getter and setter methods of the {@link schedule.IEvent} class.
    * It verifies that the methods throw IllegalArgumentException for invalid inputs,
    * and that they correctly assign and retrieve values for the event's properties.
    * It also checks the proper functionality of setting and getting complex objects
-   * like {@link schedule.Time} and {@link schedule.Location}.
+   * like {@link schedule.ITime} and {@link schedule.ILocation}.
    */
   @Test
   public void testGettersSetters() {
@@ -61,10 +63,10 @@ public class EventTest {
         () -> event.setLocation(true, ""));
     event.setLocation(true, "Ryder");
 
-    Location location = new Location();
+    ILocation location = new Location();
     location.setOnline(true);
     location.setLocation("Ryder");
-    Assert.assertEquals(location, event.getLocation());
+    Assert.assertEquals(location, event.getEventLocation());
 
     Assert.assertThrows(IllegalArgumentException.class,
         () -> event.setHost(null));
@@ -97,7 +99,7 @@ public class EventTest {
 
 
   /**
-   * Tests other methods of the {@link schedule.Event} class,
+   * Tests other methods of the {@link schedule.IEvent} class,
    * including the ability to add and remove invitees, check for event overlap,
    * and clone events. It also tests the new equals method It verifies that the methods
    * behave correctly under various scenarios, including handling of invalid inputs. It also tests
@@ -111,19 +113,19 @@ public class EventTest {
     event.setHost("John");
     event.setInvitees(new ArrayList<>(Arrays.asList("John", "James", "Jack")));
 
-    Assert.assertTrue(event.wrapsAround());
+    Assert.assertTrue(event.wrapsAround("Sunday"));
 
-    Event other = new Event();
+    IEvent other = new Event();
     other.setName("Reading");
     other.setEventTimes("Sunday", "1100", "Monday", "1100");
     other.setLocation(true, "Ryder");
     other.setHost("John");
     other.setInvitees(new ArrayList<>(Arrays.asList("John", "James", "Jack")));
-    Assert.assertFalse(other.wrapsAround());
+    Assert.assertFalse(other.wrapsAround("Sunday"));
 
-    Assert.assertFalse(event.overlap(other));
+    Assert.assertFalse(event.overlap(other, "Sunday"));
     other.setEventTimes("Tuesday", "1100", "Monday", "1100");
-    Assert.assertTrue(event.overlap(other));
+    Assert.assertTrue(event.overlap(other, "Sunday"));
 
     Assert.assertThrows(IllegalArgumentException.class, () -> event.removeInvitee(null));
     Assert.assertThrows(IllegalArgumentException.class, () -> event.removeInvitee(""));

@@ -170,58 +170,49 @@ application, serving as a bridge between the view (PlannerSystemView) and the mo
 It listens for GUI actions, processes mouse clicks on the schedule panel, and updates the model or
 view based on user interactions.
 
-EventViewController Interface and Implementation: Focuses on event-specific user interactions
-within an EventView. It supports initializing and displaying event details for editing or creating
-new events, encapsulating the logic for event-related user commands and interactions.
-
 Command Pattern Utilization
 Command Interface: Part of the Command design pattern, encapsulating a request as an object.
 This allows for dynamic operation execution, including creating, modifying, and scheduling events,
 as well as saving calendars and selecting users.
 
 Concrete Commands: Including AddCalendar, CreateEvent, ModifyEvent, RemoveEvent, ScheduleEvent,
-OpenEventFrame, OpenScheduleEvent, SaveCalendars, and SelectUser. These commands encapsulate
-specific actions related to event and schedule management within the planner system, offering
-flexibility in operation execution.
+SaveCalendars, and SelectUser. These commands encapsulate specific actions related to event and
+schedule management within the planner system, offering flexibility in operation execution.
 
-AutoSchedule Interface
-The AutoSchedule interface defines a contract for auto-scheduling events. Implementations of this
-interface are responsible for scheduling an event at an appropriate time slot, considering the
+ScheduleStrategy Interface
+The ScheduleStrategy interface defines a contract for auto-scheduling events. Implementations of
+this interface are responsible for scheduling an event at an appropriate time slot, considering the
 duration and avoiding conflicts with existing schedules.
 
 Method:
-
 scheduleEvent(Event event, int duration, List<Schedule> scheduleList): Schedules an event based on
 its duration and a list of existing schedules, returning the event with updated scheduling details
 if successful.
 
-AnyTimeSchedule Class
-Implements the AutoSchedule interface to provide a scheduling strategy that attempts to find the
+AnyTimeScheduleStrategy Class
+Implements the ScheduleStrategy interface to provide a scheduling strategy that attempts to find the
 earliest possible time for an event within a week, ensuring there is no overlap with existing
 events.
 
 Key Features:
-
 Schedules events at the earliest possible time within the week.
 Ensures the scheduled event does not conflict with existing scheduled events.
 
-WorkHourSchedule Class
-Extends AnyTimeSchedule to specifically target standard work hours
+WorkHourScheduleStrategy Class
+Extends AnyTimeScheduleStrategy to specifically target standard work hours
 (09:00 to 17:00, Monday to Friday) for scheduling events. This class represents a more restrictive
 scheduling strategy, focusing on business hours.
 
 Key Features:
-
 Schedules events within standard work hours and workdays.
 Adheres to a more structured scheduling framework suitable for professional settings.
 
-LenientSchedule Class
-Extends WorkHourSchedule to introduce a lenient approach to scheduling. This strategy aims
+LenientScheduleStrategy Class
+Extends WorkHourScheduleStrategy to introduce a lenient approach to scheduling. This strategy aims
 to schedule events even if not all invitees are available, requiring only the host and at least one
 other invitee to be present.
 
 Key Features:
-
 Adopts a flexible scheduling strategy, prioritizing the host and at least one other invitee's
 availability.Useful in scenarios where full attendance is not critical, allowing for greater
 flexibility in scheduling.
@@ -253,7 +244,7 @@ Components of the system can now "listen" to changes without being directly link
 these changes, enhancing the system's maintainability and scalability.
 
 Scheduling Strategy Flexibility
-Field Added: private AutoSchedule scheduleStrategy;
+Field Added: private ScheduleStrategy scheduleStrategy;
 Purpose: This field allows the system to utilize different strategies for scheduling events
 dynamically. It represents a shift towards a strategy pattern, enabling the selection and
 application of various scheduling algorithms at runtime.
@@ -263,7 +254,7 @@ the system can easily adapt to different scheduling requirements and constraints
 modifying the core logic.
 
 New Methods Overview
-automaticScheduling: Implements automatic scheduling of events based on the current scheduling
+ScheduleEvent: Implements automatic scheduling of events based on the current scheduling
 strategy. It demonstrates the system's ability to dynamically schedule events, considering the
 availability of invitees and the specifics of the scheduling strategy in use.
 addObserver and removeObserver: Facilitate the dynamic management of observers. These methods
@@ -283,6 +274,7 @@ allows for efficient notification mechanisms, while the strategy pattern enables
 scheduling algorithms. Together, these changes make the system more adaptable, maintainable,
 and capable of meeting diverse scheduling needs.
 
+MAIN CLASS:
 The Main class in the Planner System application serves a crucial role as the entry point where the
 application's core functionalities are demonstrated and initiated. This class showcases how the
 Planner System can be utilized, from creating events and schedules to initializing the view and
@@ -356,6 +348,8 @@ flexibility in scheduling.
 TUTORIAL:
 Command Line Arguments: Enter "Anytime" anytime scheduling, "Work-hours" for scheduling work hours,
 and "Lenient" for lenient scheduling. The default scheduling strategy is set to anytime scheduling.
+Enter "Home" as a second command line argument or no additional argument to launch the home planner
+system and enter "Provider" to launch the provider's planner system.
 
 Entering Event Details:
 Event name: Enter the name of the event as a non-empty and non-blank string.

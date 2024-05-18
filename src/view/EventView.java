@@ -1,26 +1,15 @@
 package view;
 
-import java.awt.event.ActionListener;
 import java.util.List;
 
+import controller.PlannerSystemController;
+import schedule.ReadOnlyEvent;
 
 /**
  * The EventView interface defines the operations that an event view should support
  * in the context of displaying and interacting with event details within a user interface.
  */
 public interface EventView {
-
-  /**
-   * Refreshes the view to reflect any changes to the underlying event data.
-   */
-  void refresh();
-
-  /**
-   * Displays an error message to the user using a JOptionPane.
-   *
-   * @param message The message to be displayed to the user.
-   */
-  void displayError(String message);
 
   /**
    * Makes the event view visible to the user.
@@ -35,11 +24,11 @@ public interface EventView {
   String getUserId();
 
   /**
-   * Sets the action listener for user-initiated actions within this view.
+   * Sets a planner system controller as a listener for user-initiated actions within this view.
    *
-   * @param listener The ActionListener to be set.
+   * @param listener The EventViewController to be set.
    */
-  void setActionListener(ActionListener listener);
+  void setActionListener(PlannerSystemController listener);
 
   /**
    * Retrieves the name of the event from the view.
@@ -49,28 +38,32 @@ public interface EventView {
   String getEventName();
 
   /**
-   * Retrieves the start day of the event from the view.
+   * Retrieves the start day of the event from the view. Returns the entered start day for standard
+   * event views and returns null for schedule event views.
    *
    * @return The start day as a String.
    */
   String getStartDay();
 
   /**
-   * Retrieves the start time of the event from the view.
+   * Retrieves the start time of the event from the view. Returns the entered start time for
+   * standard event views and returns null for schedule event views.
    *
    * @return The start time as a String.
    */
   String getStartTime();
 
   /**
-   * Retrieves the end day of the event from the view.
+   * Retrieves the end day of the event from the view. Returns the entered end day for standard
+   * event views and returns null for schedule event views.
    *
    * @return The end day as a String.
    */
   String getEndDay();
 
   /**
-   * Retrieves the end time of the event from the view.
+   * Retrieves the end time of the event from the view. Returns the entered end time for standard
+   * event views and returns null for schedule event views.
    *
    * @return The end time as a String.
    */
@@ -101,7 +94,8 @@ public interface EventView {
    * Retrieves the duration entered by the user in the designated text field.
    * The method attempts to parse the input string into an integer representing
    * the duration. If the parsing fails or the input is not a valid number,
-   * it throws an IllegalArgumentException.
+   * it throws an IllegalArgumentException. Returns 0 for standard event views and returns the
+   * entered duration for schedule event views.
    *
    * @return The duration as an integer, extracted from the text field.
    * @throws IllegalArgumentException If the text entered is not a valid integer
@@ -117,5 +111,17 @@ public interface EventView {
    */
   void checkFieldsNotEmpty();
 
+  /**
+   * Retrieves the event associated with the event view.
+   *
+   * @return The event associated with the event view.
+   */
+  ReadOnlyEvent getEvent();
 
+  /**
+   * Checks if the event view is currently visible on the screen.
+   *
+   * @return true if the event view is visible, false otherwise.
+   */
+  boolean isViewVisible();
 }

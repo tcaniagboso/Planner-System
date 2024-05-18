@@ -2,10 +2,11 @@ import java.io.File;
 import java.util.List;
 import java.util.Set;
 
-import autoscheduling.AutoSchedule;
+import schedule.ISchedule;
+import schedule.ReadOnlyEvent;
+import schedulestrategy.ScheduleStrategy;
 import controller.Observer;
 import plannersystem.PlannerSystem;
-import schedule.Event;
 import schedule.Schedule;
 
 /**
@@ -61,7 +62,7 @@ public class MockPlannerSystem implements PlannerSystem {
   }
 
   @Override
-  public void modifyEvent(String userId, Event event, String name, String startDay,
+  public void modifyEvent(String userId, ReadOnlyEvent event, String name, String startDay,
                           String startTime, String endDay, String endTime, boolean isOnline,
                           String location, List<String> invitees) {
     this.log.append("This method modifies an event in the system, if possible, otherwise throws ")
@@ -70,15 +71,15 @@ public class MockPlannerSystem implements PlannerSystem {
   }
 
   @Override
-  public void removeEvent(String userId, Event event) {
+  public void removeEvent(String userId, ReadOnlyEvent event) {
     this.log.append("This method removes the event from all the invitees' schedules, if userId is ")
             .append("the host of the event, otherwise it removes the event from only the user's ")
             .append("schedule.").append(System.lineSeparator());
   }
 
   @Override
-  public void automaticScheduling(String userId, String name, boolean isOnline, String location,
-                                  int duration, List<String> invitees) {
+  public void scheduleEvent(String userId, String name, boolean isOnline, String location,
+                            int duration, List<String> invitees) {
     this.log.append("This method attempts to schedule an event with the given duration and ")
             .append("details in the system, using the chosen scheduling strategy.")
             .append(System.lineSeparator());
@@ -98,8 +99,33 @@ public class MockPlannerSystem implements PlannerSystem {
   }
 
   @Override
-  public void setScheduleStrategy(AutoSchedule scheduleStrategy) {
+  public void setScheduleStrategy(ScheduleStrategy scheduleStrategy) {
     this.log.append("This method sets the scheduling strategy of the system.")
+            .append(System.lineSeparator());
+  }
+
+  @Override
+  public void addSchedule(ISchedule schedule) {
+    this.log.append("This method adds a schedule to the planner system, if the schedule owner ")
+            .append("doesn't exist in the system.").append(System.lineSeparator());
+  }
+
+  @Override
+  public void addUser(String userId) {
+    this.log.append("This method adds a user to the system, if the user does not exists.")
+            .append(System.lineSeparator());
+  }
+
+  @Override
+  public boolean removeUser(String userId) {
+    this.log.append("This method returns true if a user was successfully removed from the system, ")
+            .append("otherwise false.").append(System.lineSeparator());
+    return false;
+  }
+
+  @Override
+  public void setFirstDayOfWeek(String firstDayOfWeek) {
+    this.log.append("This method sets the first day of the week for the planner.")
             .append(System.lineSeparator());
   }
 
@@ -132,9 +158,16 @@ public class MockPlannerSystem implements PlannerSystem {
   }
 
   @Override
-  public boolean checkEventConflict(Event event) {
+  public boolean checkEventConflict(ReadOnlyEvent event) {
     this.log.append("This method checks if the given event conflicts with the schedule of ")
             .append("any of its invitees").append(System.lineSeparator());
     return false;
+  }
+
+  @Override
+  public String getFirstDayOfWeek() {
+    this.log.append("This method gets the first day of the week of the planner.")
+            .append(System.lineSeparator());
+    return "SUNDAY";
   }
 }

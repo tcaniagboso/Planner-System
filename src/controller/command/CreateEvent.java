@@ -3,7 +3,7 @@ package controller.command;
 import java.util.List;
 
 import plannersystem.PlannerSystem;
-import schedule.Event;
+import schedule.ReadOnlyEvent;
 import view.EventView;
 
 /**
@@ -16,7 +16,7 @@ public class CreateEvent implements Command {
   protected final String userId;
   protected final PlannerSystem model;
   protected final EventView eventView;
-  protected final Event event;
+  protected final ReadOnlyEvent event;
 
 
   /**
@@ -31,7 +31,7 @@ public class CreateEvent implements Command {
    *                                  (userId, model, eventView, event) are null or userId is blank,
    *                                  indicating invalid or incomplete command initialization.
    */
-  public CreateEvent(String userId, PlannerSystem model, EventView eventView, Event event) {
+  public CreateEvent(String userId, PlannerSystem model, EventView eventView, ReadOnlyEvent event) {
     if (model == null || eventView == null || event == null) {
       throw new IllegalArgumentException("Invalid Argument(s)");
     }

@@ -1,16 +1,21 @@
-package autoscheduling;
+package schedulestrategy;
 
+import java.time.DayOfWeek;
+import java.util.ArrayList;
 import java.util.List;
 
-import schedule.Event;
-import schedule.Schedule;
+import schedule.IEvent;
+import schedule.ISchedule;
+import schedule.ReadOnlyEvent;
 import validationutilities.ValidationUtilities;
 
 /**
  * Extends AnyTimeSchedule to specifically schedule events within standard work hours
  * (09:00 to 17:00) from Monday to Friday.
  */
-public class WorkHourSchedule extends AnyTimeSchedule {
+public class WorkHourScheduleStrategy extends AnyTimeScheduleStrategy {
+
+  private static final List<String> weekends = new ArrayList<>(List.of("Saturday", "Sunday"));
 
   /**
    * Schedules an event within standard work hours (09:00 to 17:00) from Monday to Friday,
@@ -27,7 +32,7 @@ public class WorkHourSchedule extends AnyTimeSchedule {
    *                                  is not possible within specified work hours.
    */
   @Override
-  public Event scheduleEvent(Event event, int duration, List<Schedule> scheduleList) {
+  public ReadOnlyEvent scheduleEvent(IEvent event, int duration, List<ISchedule> scheduleList) {
     ValidationUtilities.validateNull(event);
     this.validateDuration(duration);
     this.validateSchedules(scheduleList);
@@ -39,10 +44,15 @@ public class WorkHourSchedule extends AnyTimeSchedule {
     if (duration > maxDuration) {
       throw new IllegalArgumentException("The duration cannot be more than 8 working hours");
     }
-    int day = 1;
-    int startMinute = (day * minutesInDay) + workStart;
-    while (day <= 5 && !foundTime) {
-      String curDay = daysOfWeek[day];
+    int day = 0;
+    int startMinute = workStart;
+    while (day < 7 && !foundTime) {
+      String curDay = daysOfWeek[(day + firstDayOfWeekIndex()) % 7];
+      if (weekends.contains(curDay)) {
+        day++;
+        startMinute = (day * minutesInDay) + workStart;
+        continue;
+      }
       String startTime = durationToHours(startMinute) + durationToMinutes(startMinute);
       int endMinuteOfDuration = startMinute + duration;
       String endTime = durationToHours(endMinuteOfDuration)
@@ -63,5 +73,9 @@ public class WorkHourSchedule extends AnyTimeSchedule {
     } else {
       return null;
     }
+  }
+
+  private int firstDayOfWeekIndex() {
+    return DayOfWeek.valueOf(firstDayOfWeek).getValue() % 7;
   }
 }

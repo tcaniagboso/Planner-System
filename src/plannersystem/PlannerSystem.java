@@ -3,9 +3,10 @@ package plannersystem;
 import java.io.File;
 import java.util.List;
 
-import autoscheduling.AutoSchedule;
+import schedule.ISchedule;
+import schedule.ReadOnlyEvent;
+import schedulestrategy.ScheduleStrategy;
 import controller.Observer;
-import schedule.Event;
 
 /**
  * The PlannerSystem interface defines the contract for a system managing schedules and events for
@@ -26,16 +27,6 @@ public interface PlannerSystem extends ReadonlyPlannerSystem {
    *                                  expected structure.
    */
   void readUserSchedule(File xmlFile);
-
-  /**
-   * Saves the current schedule of a user to an XML file.
-   *
-   * @param userId   The ID of the user whose schedule is being saved.
-   * @param filePath The path of the file to save the schedule to.
-   * @throws IllegalStateException if any error occurs during the saving process, encapsulating
-   *                               the original exception message.
-   */
-  void saveUserSchedule(String userId, String filePath);
 
   /**
    * Creates an event and adds it to the schedule of the specified user and all invitees.
@@ -72,9 +63,9 @@ public interface PlannerSystem extends ReadonlyPlannerSystem {
    * @param location  The new location of the event (if not online).
    * @param invitees  A new list of user IDs of the event invitees.
    */
-  void modifyEvent(String userId, Event event, String name, String startDay, String startTime,
-                   String endDay, String endTime, boolean isOnline, String location,
-                   List<String> invitees);
+  void modifyEvent(String userId, ReadOnlyEvent event, String name, String startDay,
+                   String startTime, String endDay, String endTime, boolean isOnline,
+                   String location, List<String> invitees);
 
   /**
    * Removes an event from the user's schedule. If the user is the host of the event,
@@ -86,14 +77,13 @@ public interface PlannerSystem extends ReadonlyPlannerSystem {
    * @throws IllegalArgumentException If the event does not exist in the user's schedule or
    *                                  if the user does not exist.
    */
-  void removeEvent(String userId, Event event);
+  void removeEvent(String userId, ReadOnlyEvent event);
 
   /**
-   * Attempts to automatically schedule a new event using the current scheduling strategy. This
-   * method constructs a new event based on the provided parameters and uses the assigned scheduling
-   * strategy to find an appropriate time slot. If a suitable time slot is found, the event is added
-   * to the schedules of all its invitees. If no suitable time slot can be found, an exception is
-   * thrown.
+   * Attempts to schedule a new event using the current scheduling strategy. This method constructs
+   * a new event based on the provided parameters and uses the assigned scheduling strategy to find
+   * an appropriate time slot. If a suitable time slot is found, the event is added to the schedules
+   * of all its invitees. If no suitable time slot can be found, an exception is thrown.
    *
    * @param userId   The user ID of the event's host.
    * @param name     The name of the event to be scheduled.
@@ -106,8 +96,8 @@ public interface PlannerSystem extends ReadonlyPlannerSystem {
    *                                  indicating it is not possible to schedule the event as per the
    *                                  current scheduling constraints and availability.
    */
-  void automaticScheduling(String userId, String name, boolean isOnline, String location,
-                           int duration, List<String> invitees);
+  void scheduleEvent(String userId, String name, boolean isOnline, String location, int duration,
+                     List<String> invitees);
 
   /**
    * Registers an observer to be notified of changes to the planner system. Observers are typically
@@ -146,5 +136,49 @@ public interface PlannerSystem extends ReadonlyPlannerSystem {
    * @throws IllegalArgumentException if the provided scheduleStrategy is null, ensuring that the
    *                                  planner system always has a valid scheduling strategy.
    */
-  void setScheduleStrategy(AutoSchedule scheduleStrategy);
+  void setScheduleStrategy(ScheduleStrategy scheduleStrategy);
+
+  /**
+   * Adds a schedule to the system for a specific user after validating that the schedule is not
+   * null and that no schedule exists for that user. It checks for time conflicts between the events
+   * in the schedule and existing events for the invitees. If a conflict is found or if the user
+   * already has a schedule, it throws an IllegalArgumentException.
+   *
+   * @param schedule The schedule to be added. Must not be null and must not conflict with existing
+   *                 schedules.
+   * @throws IllegalArgumentException if the schedule is null, if a schedule for this user already
+   *                                  exists, or if an event time conflicts with an existing event
+   *                                  for its invitees.
+   */
+  void addSchedule(ISchedule schedule);
+
+  /**
+   * Adds a new user with a unique ID to the system. It first validates that the user ID is not null
+   * and checks if the user already exists in the system. If the user exists, it throws an
+   * IllegalArgumentException.
+   *
+   * @param userId The unique identifier for the new user to be added. Must not be null.
+   * @throws IllegalArgumentException if the user ID is null or if a user with the same ID already
+   *                                  exists.
+   */
+  void addUser(String userId);
+
+  /**
+   * Removes a user and their associated schedule from the system by user ID. It checks if the user
+   * exists and, if so, first removes all associated events from the user's schedule before removing
+   * the user. If the user does not exist, the method returns false.
+   *
+   * @param userId The unique identifier of the user to be removed. Must not be null.
+   * @return true if the user was successfully removed; false if no such user exists.
+   * @throws IllegalArgumentException if the user ID is null.
+   */
+  boolean removeUser(String userId);
+
+  /**
+   * Sets the first day of the week for the planner.
+   *
+   * @param firstDayOfWeek The first day of the week.
+   * @throws IllegalArgumentException if the given day is null or invalid.
+   */
+  void setFirstDayOfWeek(String firstDayOfWeek);
 }

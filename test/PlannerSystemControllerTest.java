@@ -2,16 +2,18 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
-import javax.swing.JButton;
 
 import controller.PlannerSystemController;
 import controller.ScheduleViewController;
 import plannersystem.PlannerSystem;
+import schedule.Event;
+import schedule.IEvent;
+import view.EventView;
+import view.EventViewImpl;
 import view.PlannerSystemView;
 
 /**
@@ -61,13 +63,11 @@ public class PlannerSystemControllerTest {
 
     scheduleController.launch(model);
 
-    Assert.assertEquals("This method gets the schedule panel of the view."
-            + System.lineSeparator() + "This method sets the action listener to the "
-            + "given listener." + System.lineSeparator() + "This method sets the mouse "
-            + "listener to the given listener." + System.lineSeparator()
+    Assert.assertEquals("This method sets the given planner system controller as a "
+            + "listener for the view." + System.lineSeparator()
             + "This method adds an observer to the system, to monitor system modifications."
-            + System.lineSeparator() + "This method makes the view visible."
-            + System.lineSeparator(), log.toString());
+            + System.lineSeparator()
+            + "This method makes the view visible." + System.lineSeparator(), log.toString());
   }
 
   /**
@@ -77,16 +77,11 @@ public class PlannerSystemControllerTest {
    * and view through the logged sequence of operations.
    */
   @Test
-  public void testActionEvent() {
+  public void testProcessButtonPress() {
     scheduleController.launch(model);
-    Object dummySource = new Object();
-    MockActionEvent addCalendar = new MockActionEvent(dummySource, 1, "Add calendar");
-    MockActionEvent saveCalendar = new MockActionEvent(dummySource, 2,
-            "Save calendars");
-    MockActionEvent selectUser = new MockActionEvent(dummySource, 3, "Select user");
 
-    ((ActionListener) scheduleController).actionPerformed(addCalendar);
-    String result = result(5);
+    scheduleController.processButtonPress("Add calendar");
+    String result = result(3);
 
     Assert.assertEquals("This method gets the current selected user of the view."
             + System.lineSeparator() + "This method loads a file into the view."
@@ -94,39 +89,50 @@ public class PlannerSystemControllerTest {
             + "the xml file argument if the file or schedule is valid, otherwise throws an "
             + "Exception." + System.lineSeparator() + "This method refreshes the view.", result);
 
-    ((ActionListener) scheduleController).actionPerformed(saveCalendar);
-
+    scheduleController.processButtonPress("Save calendars");
     Assert.assertEquals("This method gets the current selected user of the view."
             + System.lineSeparator() + "This method returns a desired file path for saving a file."
             + System.lineSeparator() + "This method saves the given user's schedule to an xml file "
             + "with the given file path, if no Exception is thrown." + System.lineSeparator()
-            + "This method refreshes the view.", result(9));
+            + "This method refreshes the view.", result(7));
 
-    ((ActionListener) scheduleController).actionPerformed(selectUser);
-
+    scheduleController.processButtonPress("Select user");
     Assert.assertEquals("This method gets the current selected user of the view."
             + System.lineSeparator()
             + "This method updates the schedule panel to that of the current user."
-            + System.lineSeparator() + "This method refreshes the view.", result(13));
-  }
+            + System.lineSeparator() + "This method refreshes the view.", result(11));
 
-  /**
-   * Simulates a mouse click event within the UI and verifies the controller's response.
-   * This test checks the controller's process for handling mouse clicks, ensuring it
-   * appropriately queries and manipulates the view and model based on the click location.
-   */
-  @Test
-  public void testMouseClicked() {
-    scheduleController.launch(model);
+    IEvent event = new Event();
+    event.setName("Something");
+    event.setEventTimes("Tuesday", "1000", "Tuesday", "1300");
+    event.setLocation(true, "Somewhere");
+    event.setHost("Tobe");
+    event.setInvitees(new ArrayList<>(List.of("Tobe", "Karina", "John")));
 
-    MouseEvent event = new MockMouseEvent(new JButton(), MouseEvent.MOUSE_CLICKED,
-            System.currentTimeMillis(), 0, 50, 50, 1, false);
+    EventView eventView = new EventViewImpl(event, "Tobe");
 
-    ((MouseAdapter) scheduleController).mouseClicked(event);
+    scheduleController.setEventView(eventView);
 
-    Assert.assertEquals("This method gets the width of the panel." + System.lineSeparator()
-            + "This method gets the height of the panel." + System.lineSeparator()
-            + "This method gets the schedule of the panel.", result(5));
+    scheduleController.processButtonPress("Create event");
+    Assert.assertEquals("This method gets the current selected user of the view."
+            + System.lineSeparator()
+            + "This method creates an event in the system, if possible, otherwise throws an "
+            + "Exception." + System.lineSeparator() + "This method refreshes the view.",
+            result(14));
+
+    scheduleController.processButtonPress("Remove event");
+    Assert.assertEquals("This method gets the current selected user of the view."
+            + System.lineSeparator() + "This method removes the event from all the invitees' "
+            + "schedules, if userId is the host of the event, otherwise it removes the event from "
+            + "only the user's schedule." + System.lineSeparator()
+            + "This method refreshes the view.", result(17));
+
+    // can check more than that because
+    scheduleController.processButtonPress("Schedule Event");
+    Assert.assertEquals("This method gets the current selected user of the view."
+            + System.lineSeparator()
+            + "This method refreshes the view.", result(20));
+
   }
 
   /**

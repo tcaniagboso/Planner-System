@@ -1,5 +1,7 @@
 package schedule;
 
+import java.time.DayOfWeek;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -13,10 +15,10 @@ import validationutilities.ValidationUtilities;
  * event name, timing, location, host, and invitees. This class provides functionality to manage
  * these details efficiently, including the ability to check for time overlaps with other events.
  */
-public class Event {
+public class Event implements IEvent {
   private String name;
-  private final Time time;
-  private final Location location;
+  private final ITime time;
+  private final ILocation location;
   private String host;
   private final Set<String> invitees;
 
@@ -30,23 +32,13 @@ public class Event {
     this.invitees = new LinkedHashSet<>();
   }
 
-  /**
-   * Retrieves the name of the event.
-   *
-   * @return The name of the event.
-   * @throws IllegalStateException If the event name has not been set.
-   */
+  @Override
   public String getName() {
     ValidationUtilities.validateGetNull(this.name);
     return name;
   }
 
-  /**
-   * Sets the name of the event. The name must not be null or empty.
-   *
-   * @param name The name to assign to this event.
-   * @throws IllegalArgumentException If the name is null or empty.
-   */
+  @Override
   public void setName(String name) {
     if (name == null || name.isBlank()) {
       throw new IllegalArgumentException("Event name cannot be null or empty");
@@ -54,25 +46,13 @@ public class Event {
     this.name = name.trim();
   }
 
-  /**
-   * Retrieves the time details associated with this event.
-   *
-   * @return The {@link Time} object representing the event's timing.
-   */
-  public Time getTime() {
+  @Override
+  public ITime getTime() {
     return time;
   }
 
 
-  /**
-   * Sets the start and end times for the event, including the days. This is a convenience
-   * method to update all time-related fields in one call.
-   *
-   * @param startDay  The start day of the event.
-   * @param startTime The start time of the event.
-   * @param endDay    The end day of the event.
-   * @param endTime   The end time of the event.
-   */
+  @Override
   public void setEventTimes(String startDay, String startTime, String endDay, String endTime) {
     this.time.setStartDay(startDay);
     this.time.setStartTime(startTime);
@@ -80,43 +60,23 @@ public class Event {
     this.time.setEndTime(endTime);
   }
 
-  /**
-   * Configures the location details for this event.
-   *
-   * @param isOnline Indicates whether the event is held online.
-   * @param location The physical location of the event if it's not online.
-   */
+  @Override
   public void setLocation(boolean isOnline, String location) {
     this.location.setOnline(isOnline);
     this.location.setLocation(location);
   }
 
-  /**
-   * Retrieves the location details for this event.
-   *
-   * @return The {@link Location} object representing the event's location.
-   */
-  public Location getLocation() {
+  @Override
+  public ILocation getEventLocation() {
     return this.location;
   }
 
-  /**
-   * Retrieves a list of invitees to this event.
-   *
-   * @return A list containing the invitees' IDs.
-   */
+  @Override
   public List<String> getInvitees() {
     return new ArrayList<>(invitees);
   }
 
-  /**
-   * Updates the list of invitees for this event. The provided list must not be null and must
-   * include the host.
-   *
-   * @param invitees The new list of invitees' IDs.
-   * @throws IllegalArgumentException If the list is null, contains null elements,
-   *                                  or does not include the host.
-   */
+  @Override
   public void setInvitees(List<String> invitees) {
     if (invitees == null || invitees.contains(null)) {
       throw new IllegalArgumentException("Invitees list cannot be null and cannot "
@@ -129,91 +89,84 @@ public class Event {
       throw new IllegalArgumentException("The list of invitees must contain the host of the event");
     }
     this.clearInvitees();
+    this.invitees.add(this.host);
     this.invitees.addAll(invitees);
   }
 
-  /**
-   * Retrieves the host's ID for this event.
-   *
-   * @return The host's ID.
-   * @throws IllegalStateException If the host has not been set.
-   */
+  @Override
   public String getHost() {
     ValidationUtilities.validateGetNull(this.host);
     return host;
   }
 
-  /**
-   * Sets the host of this event. The host cannot be null.
-   *
-   * @param host The User object representing the host of the event.
-   * @throws IllegalArgumentException if the host parameter is null.
-   */
+  @Override
   public void setHost(String host) {
     this.validateUser(host);
 
     this.host = host.trim();
   }
 
-  /**
-   * Adds a User as an invitee to the event. Validates that the User is not null before adding.
-   *
-   * @param invitee The user to be added as an invitee to the event.
-   * @throws IllegalArgumentException if the invitee is null.
-   */
+  @Override
   public void addInvitee(String invitee) {
     this.validateUser(invitee);
     this.invitees.add(invitee);
 
   }
 
-  /**
-   * Removes a User from the event's list of invitees.
-   * Validates that the User is not null before attempting removal.
-   *
-   * @param invitee The user to be removed from the event's invitees.
-   * @throws IllegalArgumentException if the invitee is null.
-   */
+  @Override
   public void removeInvitee(String invitee) {
     this.validateUser(invitee);
     this.invitees.remove(invitee);
   }
 
+  @Override
   public void clearInvitees() {
     this.invitees.clear();
   }
 
-  /**
-   * Determines if this event overlaps with another event in terms of time.
-   * Overlapping is determined based on the start and end times of both events.
-   *
-   * @param event The event to check for an overlap with.
-   * @return true if the events overlap in time, false otherwise.
-   */
-  public boolean overlap(Event event) {
-    return this.time.overlap(event.time);
+  @Override
+  public boolean overlap(ReadOnlyEvent event, String firstDayOfWeek) {
+    return this.time.overlap(event.getTime(), firstDayOfWeek);
   }
 
-  /**
-   * Checks if this event occurs on a specific day and time.
-   * This method is used to find if an event matches a given day and time,
-   * useful for querying events in a schedule.
-   *
-   * @param day  The day to check the event against.
-   * @param time The time to check the event against.
-   * @return true if the event occurs on the specified day and time, false otherwise.
-   */
-  public boolean occurs(String day, String time) {
-    return this.time.occurs(day, time);
+  @Override
+  public boolean occurs(String day, String time, String firstDayOfWeek) {
+    return this.time.occurs(day, time, firstDayOfWeek);
   }
 
-  /**
-   * Checks if an event continues into a new week.
-   *
-   * @return true if an event continues into a new week otherwise return false.
-   */
-  public boolean wrapsAround() {
-    return this.time.wrapsAround();
+  @Override
+  public boolean wrapsAround(String firstDayOfWeek) {
+    return this.time.wrapsAround(firstDayOfWeek);
+  }
+
+  @Override
+  public DayOfWeek getStartDay() {
+    return this.time.getStartDay();
+  }
+
+  @Override
+  public int getStartTime() {
+    return timeToInteger(this.time.getStartTime());
+  }
+
+  @Override
+  public DayOfWeek getEndDay() {
+    return this.time.getEndDay();
+  }
+
+  @Override
+  public int getEndTime() {
+    return timeToInteger(this.time.getEndTime());
+  }
+
+  @Override
+  public String getLocation() {
+    return this.location.getLocation();
+  }
+
+  @Override
+  public boolean isOnline() {
+    return this.location.isOnline();
   }
 
   /**
@@ -230,15 +183,16 @@ public class Event {
     if (this == object) {
       return true;
     }
-    if (!(object instanceof Event)) {
+    if (!(object instanceof ReadOnlyEvent)) {
       return false;
     }
-    Event other = (Event) object;
-    return Objects.equals(this.name, other.name)
-            && Objects.equals(this.time, other.time)
-            && Objects.equals(this.location, other.location)
-            && Objects.equals(this.invitees, other.invitees)
-            && Objects.equals(this.host, other.host);
+
+    ReadOnlyEvent other = (ReadOnlyEvent) object;
+    return Objects.equals(this.name, other.getName())
+            && Objects.equals(this.time, other.getTime())
+            && Objects.equals(this.location, other.getEventLocation())
+            && Objects.equals(this.invitees, new LinkedHashSet<>(other.getInvitees()))
+            && Objects.equals(this.host, other.getHost());
   }
 
   /**
@@ -263,5 +217,17 @@ public class Event {
     if (user == null || user.isBlank()) {
       throw new IllegalArgumentException("User cannot be null or empty.");
     }
+  }
+
+  /**
+   * Converts a LocalTime object to an integer representation by formatting it to a string without a
+   * colon, then converting that string to an integer.
+   *
+   * @param time The LocalTime object to convert.
+   * @return The integer representation of the given LocalTime. For example, 10:15 becomes 1015.
+   */
+  private int timeToInteger(LocalTime time) {
+    String timeString = TimeUtilities.formatTime(time);
+    return Integer.parseInt(timeString);
   }
 }

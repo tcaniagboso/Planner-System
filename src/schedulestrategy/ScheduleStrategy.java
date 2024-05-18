@@ -1,16 +1,17 @@
-package autoscheduling;
+package schedulestrategy;
 
 import java.util.List;
 
-import schedule.Event;
-import schedule.Schedule;
+import schedule.IEvent;
+import schedule.ISchedule;
+import schedule.ReadOnlyEvent;
 
 /**
  * Defines the contract for auto-scheduling events. Implementations of this interface
  * are responsible for automatically scheduling an event at an appropriate time slot,
  * taking into account the event's duration and avoiding conflicts with existing schedules.
  */
-public interface AutoSchedule {
+public interface ScheduleStrategy {
 
   /**
    * Schedules an event based on its duration and a list of existing schedules,
@@ -22,5 +23,12 @@ public interface AutoSchedule {
    * @return The scheduled event with updated start and end times, or null if
    *         scheduling was unsuccessful.
    */
-  Event scheduleEvent(Event event, int duration, List<Schedule> scheduleList);
+  ReadOnlyEvent scheduleEvent(IEvent event, int duration, List<ISchedule> scheduleList);
+
+  /**
+   * Sets the first day of the week for the schedule strategy.
+   *
+   * @param firstDayOfWeek the day to be set.
+   */
+  void setFirstDayOfWeek(String firstDayOfWeek);
 }

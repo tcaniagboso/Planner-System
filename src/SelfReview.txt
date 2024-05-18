@@ -1,0 +1,64 @@
+What We Learned
+
+Adopting Interfaces for Flexibility: Before collaborating with our provider, we had reservations
+about representing our Schedule and Event classes through interfaces, assuming these classes
+represented final implementations that would not require extensions or variations. However, after
+integrating our provider's code, we recognized the benefits of abstraction. Consequently, we
+introduced an ISchedule interface for handling different scheduling behaviors, a ReadOnlyEvent
+interface, and an IEvent interface for the Event class. The introduction of the ReadOnlyEvent
+interface, in particular, facilitated the safe passing of event data to our EventView class solely
+for display purposes, enhancing security and data integrity.
+
+Reducing Coupling for Enhanced Modularity: Our engagement with customers highlighted the importance
+of reducing coupling within our system, particularly in our view implementations. While we have not
+achieved minimal coupling, our efforts have significantly improved the modularity of our views.
+By limiting the dependency of our views on methods from other classes—which may not be shareable
+with our customers—we have streamlined integration and maintenance processes. This approach not
+only simplifies our customers' tasks but also enhances the adaptability of our software to various
+user environments.
+
+Consolidating Controllers for Simplicity: Initially, our system featured separate controllers for
+managing the planner system view and the event view. Although this design was functional and seemed
+optimal, feedback suggested that it introduced excessive coupling, which could confuse or overwhelm
+our customers. In response, we consolidated these into a single controller, utilizing the command
+callback design pattern to maintain functionality while reducing complexity. This change has not
+only simplified the user interface but also improved the overall user experience by providing a
+more cohesive and intuitive interaction model.
+
+Key Takeaways: These lessons have underscored the importance of designing with adaptability,
+customer needs, and system simplicity in mind. Moving forward, we aim to continue these practices,
+ensuring our software remains both powerful and user-friendly.
+
+Experience with Providers
+
+Accessibility and Support: Our experience with our software providers has been exceptionally
+positive. They were consistently accessible and responsive, which greatly facilitated smooth
+collaboration. Their readiness to engage and communicate was a key factor in the seamless
+integration of their systems with ours.
+
+Adaptability of Provided Solutions: The code we received from our providers was well-documented and
+straightforward, making it easy to understand and adapt without the need for significant
+modifications. This high level of code clarity and organization minimized our learning curve and
+integration efforts.
+
+Effective Communication and Compromise: Whenever challenges arose, our providers were quick to enter
+into discussions, always open to feedback and willing to help find solutions. Their cooperative
+approach helped us overcome hurdles efficiently, ensuring continuous progress and mutual
+satisfaction.
+
+Feedback and Improvement: The providers were always ready to receive and act upon feedback, which
+fostered an environment of continuous improvement and trust. This proactive stance on feedback not
+only enhanced the product but also reinforced a positive, productive partnership.
+
+Conclusion: The helpfulness and approachability of our providers have not only made this
+collaboration successful but also enjoyable. Their support has been instrumental in achieving our
+project goals, and we look forward to maintaining this excellent relationship in future phases of
+our development.
+
+Conclusion
+In conclusion, this project provided us with extensive learning opportunities across a wide array of
+design patterns, including the Observer, Command, Factory, Strategy, and Command Callback patterns,
+among others. Moreover, it enhanced our foresight in programming—teaching us to anticipate future
+improvements and to develop code with our customers' needs in mind. These experiences have not only
+broadened our technical expertise but also deepened our understanding of user-centric software
+development.

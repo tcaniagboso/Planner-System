@@ -8,48 +8,28 @@ import validationutilities.ValidationUtilities;
  * Represents the location details of an event, including whether it is an online event
  * and its physical location if applicable.
  */
-public class Location {
+public class Location implements ILocation {
 
   private boolean isOnline;
   private String location;
 
-  /**
-   * Checks if the event is an online event.
-   *
-   * @return true if the event is online, false otherwise.
-   */
+  @Override
   public boolean isOnline() {
     return isOnline;
   }
 
-  /**
-   * Sets the event's mode to online or offline.
-   *
-   * @param online A boolean value indicating whether the event is online (true) or not (false).
-   */
+  @Override
   public void setOnline(boolean online) {
     isOnline = online;
   }
 
-  /**
-   * Retrieves the physical location of the event. The value is meaningful only if the event is
-   * not online.
-   *
-   * @return A string representing the physical location of the event, or null if the event is
-   *         online.
-   */
+  @Override
   public String getLocation() {
     ValidationUtilities.validateGetNull(this.location);
     return location;
   }
 
-  /**
-   * Sets the physical location of the event. This value should be set only if the event is not
-   * online.
-   *
-   * @param location A string representing the physical location of the event.
-   * @throws IllegalArgumentException if location is null or is an empty string.
-   */
+  @Override
   public void setLocation(String location) {
     if (location == null || location.isBlank()) {
       throw new IllegalArgumentException("Invalid location");

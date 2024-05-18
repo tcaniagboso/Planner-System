@@ -1,17 +1,17 @@
-package autoscheduling;
+package schedulestrategy;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import schedule.Event;
-import schedule.Schedule;
+import schedule.IEvent;
+import schedule.ISchedule;
 
 /**
  * Extends WorkHourSchedule to implement a lenient scheduling strategy.
  * This strategy attempts to schedule events even if not all invitees are available,
  * requiring only the host and at least one other invitee to be available.
  */
-public class LenientSchedule extends WorkHourSchedule {
+public class LenientScheduleStrategy extends WorkHourScheduleStrategy {
 
   /**
    * Validates event timing with a lenient approach. Checks if the event does not overlap
@@ -23,12 +23,12 @@ public class LenientSchedule extends WorkHourSchedule {
    *         false otherwise.
    */
   @Override
-  protected boolean validateTime(Event event, List<Schedule> scheduleList) {
+  protected boolean validateTime(IEvent event, List<ISchedule> scheduleList) {
     List<String> availableUsers = new ArrayList<>();
-    for (Schedule schedule : scheduleList) {
+    for (ISchedule schedule : scheduleList) {
       // Check if the event does not overlap with this schedule
-      if (!schedule.overlap(event)) {
-        availableUsers.add(schedule.getUserId());
+      if (!schedule.overlap(event, firstDayOfWeek)) {
+        availableUsers.add(schedule.getUserName());
       }
     }
     // Ensure both the host is available and at least one other user
