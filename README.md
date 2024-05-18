@@ -441,10 +441,6 @@ For the default system (not the provider), a PlannerSystemViewImpl is created, a
 ScheduleViewController is instantiated with this view. The controller then launches the system,
 displaying the GUI and allowing user interaction.
 
-Provider System Launch (Optional):
-If the provider system is chosen, the adapted model (NUPlannerSystemAdapter) is used to launch the
-provider's system, showing how external systems can integrate with this planner system.
-
 Use of Design Patterns
 Command Pattern: Used in handling system operations like creating, modifying, and deleting events.
 Observer Pattern: Implemented in the system to update the view when the underlying model changes.
